@@ -4,27 +4,61 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpenText, Building2, File, History, LayoutGrid, MessageCircleQuestion, Users, Waypoints } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
+        href: '/admin/dashboard',
         icon: LayoutGrid,
+    },
+];
+
+const secondNavItems: NavItem[] = [
+    {
+        title: 'Magang',
+        href: '/admin/internships',
+        icon: Building2,
+    },
+    {
+        title: 'Logbook',
+        href: '/admin/logbooks',
+        icon: History,
+    },
+    {
+        title: 'Reports',
+        href: '/admin/reports',
+        icon: File,
+    },
+];
+
+const thirdNavItems: NavItem[] = [
+    {
+        title: 'Kelas Bimbingan',
+        href: '/admin/guidance-classes',
+        icon: BookOpenText,
+    },
+];
+
+const forthNavItems: NavItem[] = [
+    {
+        title: 'Tutorials',
+        href: '/admin/tutorials',
+        icon: Waypoints,
+    },
+    {
+        title: 'FAQs',
+        href: '/admin/faqs',
+        icon: MessageCircleQuestion,
     },
 ];
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits',
-        icon: BookOpen,
+        title: 'Users',
+        href: '/admin/users',
+        icon: Users,
     },
 ];
 
@@ -44,11 +78,14 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={mainNavItems} title="" />
+                <NavMain items={secondNavItems} title="Manajemen Magang" />
+                <NavMain items={thirdNavItems} title="Buku Panduan Mahasiswa" />
+                <NavMain items={forthNavItems} title="Buku Panduan Mahasiswa" />
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
+                <NavFooter items={footerNavItems} className="mt-auto" title="Manajemen User" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

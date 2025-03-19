@@ -8,7 +8,7 @@ class HomeController extends Controller
     {
         return inertia('home');
     }
-    
+
     public function index()
     {
         return inertia('home');
