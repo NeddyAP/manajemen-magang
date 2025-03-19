@@ -84,7 +84,7 @@ export const columns: ColumnDef<User>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(users.id)}>Copy payment ID</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(users.id)}>Copy user ID</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>Edit</DropdownMenuItem>
                         <DropdownMenuItem className="text-red-500">Delete</DropdownMenuItem>
