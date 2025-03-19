@@ -13,14 +13,17 @@ import {
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
 import { DataTableColumnHeader } from '../../../../components/data-table/column-header';
+import { format, parseISO } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 // This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-export type User = {
+export interface User {
     id: string;
     email: string;
-    name: number;
-};
+    name: string;
+    created_at?: string;
+    [key: string]: unknown; // For any other properties that might be in the user data
+}
 
 export const columns: ColumnDef<User>[] = [
     {
@@ -53,6 +56,18 @@ export const columns: ColumnDef<User>[] = [
     {
         accessorKey: 'created_at',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
+        cell: ({ row }) => {
+            const createdAt = row.getValue('created_at');
+            if (!createdAt || typeof createdAt !== 'string') return '-';
+
+            try {
+                // Format date to Indonesian locale
+                return format(parseISO(createdAt), 'PPpp', { locale: id });
+            } catch (error) {
+                console.error('Error formatting date:', error);
+                return createdAt;
+            }
+        },
     },
     {
         id: 'actions',
