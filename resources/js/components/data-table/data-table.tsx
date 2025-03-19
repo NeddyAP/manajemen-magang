@@ -23,6 +23,7 @@ interface DataTableProps<TData, TValue> {
     meta?: TableMeta;
     className?: string;
     baseUrl?: string;
+    filter?: React.ReactNode;
     [key: string]: unknown;
 }
 
@@ -32,6 +33,7 @@ export function DataTable<TData, TValue>({
     meta,
     baseUrl = window.location.pathname,
     className,
+    filter,
     ...props
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -41,7 +43,6 @@ export function DataTable<TData, TValue>({
     const [searchTerm, setSearchTerm] = React.useState<string>('');
     const [currentPage, setCurrentPage] = React.useState<number>(meta?.current_page || 1);
     const [pageSize, setPageSize] = React.useState<number>(meta?.per_page || 10);
-    const [isNavigating, setIsNavigating] = React.useState(false);
 
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -69,39 +70,26 @@ export function DataTable<TData, TValue>({
         },
     });
 
-    // Navigate to new URL when filters/pagination/sorting change
     useEffect(() => {
-        // Prevent initial navigation on component mount
-        if (isNavigating === false) {
-            setIsNavigating(true);
-            return;
-        }
-
         const queryParams = new URLSearchParams();
 
-        // Add search term if exists
         if (debouncedSearchTerm) {
             queryParams.append('search', debouncedSearchTerm);
         }
 
-        // Add sorting if exists
         if (sorting.length > 0) {
             queryParams.append('sort_field', sorting[0].id);
             queryParams.append('sort_direction', sorting[0].desc ? 'desc' : 'asc');
         }
 
-        // Add pagination params
         queryParams.append('page', currentPage.toString());
         queryParams.append('per_page', pageSize.toString());
 
-        // Append filters
         columnFilters.forEach((filter) => {
             queryParams.append(`filter[${filter.id}]`, filter.value as string);
         });
 
-        // Navigate
         const url = `${baseUrl}?${queryParams.toString()}`;
-        // Use a timeout to avoid rapid consecutive requests
         const timeoutId = setTimeout(() => {
             router.visit(url, {
                 preserveState: true,
@@ -113,20 +101,22 @@ export function DataTable<TData, TValue>({
         return () => clearTimeout(timeoutId);
     }, [debouncedSearchTerm, sorting, currentPage, pageSize, columnFilters, baseUrl]);
 
-    // Custom pagination handlers
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
 
     const handlePageSizeChange = (size: number) => {
         setPageSize(size);
-        setCurrentPage(1); // Reset to first page when changing page size
+        setCurrentPage(1);
     };
 
     return (
         <div>
-            <div className="flex items-center py-4">
-                <Input placeholder="Search..." value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} className="max-w-sm" />
+            <div className="flex items-center gap-2 py-4">
+                <div className="flex flex-1 items-center gap-2">
+                    <Input placeholder="Search..." value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} className="max-w-sm" />
+                    {filter}
+                </div>
                 <DataTableViewOptions table={table} />
             </div>
             <div className={`rounded-md border ${className}`} {...props}>

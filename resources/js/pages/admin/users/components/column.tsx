@@ -1,5 +1,6 @@
 'use client';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -11,17 +12,24 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal } from 'lucide-react';
-import { DataTableColumnHeader } from '../../../../components/data-table/column-header';
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { MoreHorizontal } from 'lucide-react';
+import { DataTableColumnHeader } from '../../../../components/data-table/column-header';
 
 // This type is used to define the shape of our data.
+export interface Role {
+    id: number;
+    name: string;
+    guard_name: string;
+}
+
 export interface User {
     id: string;
     email: string;
     name: string;
     created_at?: string;
+    roles: Role[];
     [key: string]: unknown; // For any other properties that might be in the user data
 }
 
@@ -52,6 +60,25 @@ export const columns: ColumnDef<User>[] = [
     {
         accessorKey: 'name',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Nama" />,
+    },
+    {
+        accessorKey: 'roles',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Role" />,
+        cell: ({ row }) => {
+            const roles = row.original.roles;
+            if (!roles || !roles.length) return '-';
+
+            return (
+                <div className="flex flex-wrap gap-1">
+                    {roles.map((role, index) => (
+                        <Badge key={index} variant="outline">
+                            {role.name}
+                        </Badge>
+                    ))}
+                </div>
+            );
+        },
+        enableSorting: false,
     },
     {
         accessorKey: 'created_at',
