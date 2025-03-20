@@ -11,6 +11,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -113,8 +114,27 @@ export const columns: ColumnDef<User>[] = [
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => navigator.clipboard.writeText(users.id)}>Copy user ID</DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-500">Delete</DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <a href={route('admin.users.edit', users.id)}>Edit</a>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() => {
+                                if (confirm('Are you sure you want to delete this user?')) {
+                                    console.log('Deleting user:', users.id);
+                                    router.delete(route('admin.users.destroy', users.id), {
+                                        onSuccess: () => {
+                                            console.log('Delete successful');
+                                        },
+                                        onError: (errors) => {
+                                            console.error('Delete failed:', errors);
+                                        },
+                                    });
+                                }
+                            }}
+                            className="text-red-500"
+                        >
+                            Delete
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             );

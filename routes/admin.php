@@ -26,6 +26,7 @@ Route::middleware(['auth', 'role:superadmin|admin'])->prefix('admin')->name('adm
     Route::resource('faqs', FaqController::class);
 
     Route::resource('users', UserController::class);
+    Route::delete('users/bulk-destroy', [UserController::class, 'bulkDestroy'])->name('users.destroy.bulk');
 });
 
 require __DIR__.'/auth.php';

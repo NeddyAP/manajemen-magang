@@ -2,6 +2,7 @@
 
 import { ColumnDef, ColumnFiltersState, flexRender, getCoreRowModel, SortingState, useReactTable, VisibilityState } from '@tanstack/react-table';
 
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useDebounce } from '@/hooks/use-debounce';
@@ -24,6 +25,7 @@ interface DataTableProps<TData, TValue> {
     className?: string;
     baseUrl?: string;
     filter?: React.ReactNode;
+    deleteRoute?: string;
     [key: string]: unknown;
 }
 
@@ -34,6 +36,7 @@ export function DataTable<TData, TValue>({
     baseUrl = window.location.pathname,
     className,
     filter,
+    deleteRoute,
     ...props
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -119,6 +122,37 @@ export function DataTable<TData, TValue>({
                 </div>
                 <DataTableViewOptions table={table} />
             </div>
+
+            {/* Selected rows counter and bulk delete button */}
+            <div className="flex items-center justify-between py-2">
+                <div className="text-muted-foreground flex-1 text-sm">
+                    {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected.
+                </div>
+                {deleteRoute && table.getFilteredSelectedRowModel().rows.length > 0 && (
+                    <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => {
+                            if (confirm(`Are you sure you want to delete ${table.getFilteredSelectedRowModel().rows.length} selected items?`)) {
+                                const selectedIds = table.getFilteredSelectedRowModel().rows.map((row) => {
+                                    const original = row.original as any;
+                                    return original.id;
+                                });
+
+                                router.delete(deleteRoute, {
+                                    data: { ids: selectedIds },
+                                    onSuccess: () => {
+                                        setRowSelection({});
+                                    },
+                                });
+                            }
+                        }}
+                    >
+                        Delete Selected
+                    </Button>
+                )}
+            </div>
+
             <div className={`rounded-md border ${className}`} {...props}>
                 <Table>
                     <TableHeader>
