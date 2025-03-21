@@ -46,13 +46,13 @@ class StoreRequest extends FormRequest
                 'last_education' => ['required', 'string', 'max:255'],
                 'academic_position' => ['required', 'string', 'max:255'],
                 'employment_status' => ['required', 'string', Rule::in(['PNS', 'Non-PNS'])],
-                'teaching_start_year' => ['required', 'integer', 'min:1900', 'max:' . date('Y')],
+                'teaching_start_year' => ['required', 'integer', 'min:1900', 'max:'.date('Y')],
             ]);
         } elseif ($selectedRole === 'mahasiswa') {
             $rules = array_merge($rules, [
                 'student_number' => ['required', 'string', 'max:255', 'unique:mahasiswa_profiles'],
                 'study_program' => ['required', 'string', 'max:255'],
-                'class_year' => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 4)],
+                'class_year' => ['required', 'integer', 'min:1900', 'max:'.(date('Y') + 4)],
                 'academic_status' => ['required', 'string', Rule::in(['Aktif', 'Cuti', 'Lulus'])],
                 'semester' => ['required', 'integer', 'min:1', 'max:14'],
                 'advisor_id' => ['nullable', 'exists:users,id'],
@@ -62,4 +62,4 @@ class StoreRequest extends FormRequest
 
         return $rules;
     }
-} 
+}

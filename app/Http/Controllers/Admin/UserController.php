@@ -4,12 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\User\StoreRequest;
-use App\Http\Requests\Admin\User\UpdateRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -129,12 +127,12 @@ class UserController extends Controller
             return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('User creation failed: ' . $e->getMessage());
-            \Log::error('Request data: ' . json_encode($request->all()));
+            \Log::error('User creation failed: '.$e->getMessage());
+            \Log::error('Request data: '.json_encode($request->all()));
 
             return back()
                 ->withInput()
-                ->withErrors(['error' => 'Failed to create user. ' . $e->getMessage()]);
+                ->withErrors(['error' => 'Failed to create user. '.$e->getMessage()]);
         }
     }
 
@@ -159,7 +157,7 @@ class UserController extends Controller
                 'email' => $request->email,
             ];
 
-            if (!empty($request->password)) {
+            if (! empty($request->password)) {
                 $updateData['password'] = Hash::make($request->password);
             }
 
@@ -177,9 +175,9 @@ class UserController extends Controller
                 // Delete old profile
                 if ($currentRole === 'admin') {
                     $user->adminProfile?->delete();
-                } else if ($currentRole === 'dosen') {
+                } elseif ($currentRole === 'dosen') {
                     $user->dosenProfile?->delete();
-                } else if ($currentRole === 'mahasiswa') {
+                } elseif ($currentRole === 'mahasiswa') {
                     $user->mahasiswaProfile?->delete();
                 }
 
@@ -302,13 +300,13 @@ class UserController extends Controller
             return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('User update failed: ' . $e->getMessage());
-            \Log::error('Request data: ' . json_encode($request->all()));
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            \Log::error('User update failed: '.$e->getMessage());
+            \Log::error('Request data: '.json_encode($request->all()));
+            \Log::error('Stack trace: '.$e->getTraceAsString());
 
             return back()
                 ->withInput()
-                ->withErrors(['error' => 'Failed to update user. ' . $e->getMessage()]);
+                ->withErrors(['error' => 'Failed to update user. '.$e->getMessage()]);
         }
     }
 
@@ -334,12 +332,13 @@ class UserController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->withErrors(['error' => 'Failed to delete user. ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'Failed to delete user. '.$e->getMessage()]);
         }
     }
 
     public function bulkDestroy(Request $request)
     {
+        dd($request->all());
         try {
             DB::beginTransaction();
 
@@ -364,12 +363,12 @@ class UserController extends Controller
 
             DB::commit();
 
-            return back()->with('success', count($userIds) . ' users deleted successfully.');
+            return back()->with('success', count($userIds).' users deleted successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Bulk user deletion failed: ' . $e->getMessage());
+            \Log::error('Bulk user deletion failed: '.$e->getMessage());
 
-            return back()->withErrors(['error' => 'Failed to delete users. ' . $e->getMessage()]);
+            return back()->withErrors(['error' => 'Failed to delete users. '.$e->getMessage()]);
         }
     }
 }

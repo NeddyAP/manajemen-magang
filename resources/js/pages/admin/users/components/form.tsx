@@ -3,32 +3,17 @@ import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { cn } from '@/lib/utils';
+import { Role, User } from '@/types/user';
 import { router, useForm } from '@inertiajs/react';
+import { format } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
 import * as React from 'react';
 import { FormEventHandler } from 'react';
-
-interface Role {
-    id: number;
-    name: string;
-}
-
-interface User {
-    id?: number;
-    name: string;
-    email: string;
-    roles?: { name: string }[];
-    profile?: any;
-    admin_profile?: any;
-    dosen_profile?: any;
-    mahasiswa_profile?: any;
-}
 
 interface Props {
     roles: Role[];
@@ -49,7 +34,7 @@ export default function UserForm({ roles, user, mode }: Props) {
         employee_id: user?.admin_profile?.employee_id || '',
         department: user?.admin_profile?.department || '',
         position: user?.admin_profile?.position || '',
-        employment_status: user?.admin_profile?.employment_status || '',
+        employment_status: user?.admin_profile?.employment_status || user?.dosen_profile?.employment_status || '',
         join_date: user?.admin_profile?.join_date || '',
         phone_number: user?.admin_profile?.phone_number || '',
         address: user?.admin_profile?.address || '',
@@ -66,7 +51,7 @@ export default function UserForm({ roles, user, mode }: Props) {
         study_program: user?.mahasiswa_profile?.study_program || '',
         class_year: user?.mahasiswa_profile?.class_year || '',
         academic_status: user?.mahasiswa_profile?.academic_status || 'Aktif',
-        semester: user?.mahasiswa_profile?.semester || 1,
+        semester: user?.mahasiswa_profile?.semester || '',
         advisor_id: user?.mahasiswa_profile?.advisor_id || '',
         gpa: user?.mahasiswa_profile?.gpa || '',
     });
@@ -241,14 +226,14 @@ export default function UserForm({ roles, user, mode }: Props) {
                                         <Popover>
                                             <PopoverTrigger asChild>
                                                 <Button
-                                                    variant={"outline"}
+                                                    variant={'outline'}
                                                     className={cn(
-                                                        "w-full justify-start text-left font-normal",
-                                                        !data.join_date && "text-muted-foreground"
+                                                        'w-full justify-start text-left font-normal',
+                                                        !data.join_date && 'text-muted-foreground',
                                                     )}
                                                 >
                                                     <CalendarIcon className="mr-2 h-4 w-4" />
-                                                    {data.join_date ? format(new Date(data.join_date), "PPP") : <span>Pick a date</span>}
+                                                    {data.join_date ? format(new Date(data.join_date), 'PPP') : <span>Pick a date</span>}
                                                 </Button>
                                             </PopoverTrigger>
                                             <PopoverContent className="w-auto p-0" align="start">
@@ -340,10 +325,10 @@ export default function UserForm({ roles, user, mode }: Props) {
                                         <Popover>
                                             <PopoverTrigger asChild>
                                                 <Button
-                                                    variant={"outline"}
+                                                    variant={'outline'}
                                                     className={cn(
-                                                        "w-full justify-start text-left font-normal",
-                                                        !data.teaching_start_year && "text-muted-foreground"
+                                                        'w-full justify-start text-left font-normal',
+                                                        !data.teaching_start_year && 'text-muted-foreground',
                                                     )}
                                                 >
                                                     <CalendarIcon className="mr-2 h-4 w-4" />
@@ -354,7 +339,7 @@ export default function UserForm({ roles, user, mode }: Props) {
                                                 <Calendar
                                                     mode="single"
                                                     captionLayout="dropdown-buttons"
-                                                    selected={data.teaching_start_year ? new Date(data.teaching_start_year, 0) : undefined}
+                                                    selected={data.teaching_start_year ? new Date(Number(data.teaching_start_year), 0) : undefined}
                                                     onSelect={(date) => setData('teaching_start_year', date ? date.getFullYear() : '')}
                                                     fromYear={1950}
                                                     toYear={new Date().getFullYear()}
@@ -390,10 +375,10 @@ export default function UserForm({ roles, user, mode }: Props) {
                                         <Popover>
                                             <PopoverTrigger asChild>
                                                 <Button
-                                                    variant={"outline"}
+                                                    variant={'outline'}
                                                     className={cn(
-                                                        "w-full justify-start text-left font-normal",
-                                                        !data.class_year && "text-muted-foreground"
+                                                        'w-full justify-start text-left font-normal',
+                                                        !data.class_year && 'text-muted-foreground',
                                                     )}
                                                 >
                                                     <CalendarIcon className="mr-2 h-4 w-4" />
@@ -404,7 +389,7 @@ export default function UserForm({ roles, user, mode }: Props) {
                                                 <Calendar
                                                     mode="single"
                                                     captionLayout="dropdown-buttons"
-                                                    selected={data.class_year ? new Date(data.class_year, 0) : undefined}
+                                                    selected={data.class_year ? new Date(Number(data.class_year), 0) : undefined}
                                                     onSelect={(date) => setData('class_year', date ? date.getFullYear() : '')}
                                                     fromYear={2000}
                                                     toYear={new Date().getFullYear()}

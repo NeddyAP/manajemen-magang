@@ -125,9 +125,6 @@ export function DataTable<TData, TValue>({
 
             {/* Selected rows counter and bulk delete button */}
             <div className="flex items-center justify-between py-2">
-                <div className="text-muted-foreground flex-1 text-sm">
-                    {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected.
-                </div>
                 {deleteRoute && table.getFilteredSelectedRowModel().rows.length > 0 && (
                     <Button
                         variant="destructive"
@@ -135,14 +132,22 @@ export function DataTable<TData, TValue>({
                         onClick={() => {
                             if (confirm(`Are you sure you want to delete ${table.getFilteredSelectedRowModel().rows.length} selected items?`)) {
                                 const selectedIds = table.getFilteredSelectedRowModel().rows.map((row) => {
-                                    const original = row.original as any;
+                                    const original = row.original as { id: number | string };
                                     return original.id;
                                 });
+
+                                console.log('Deleting items with IDs:', selectedIds);
+                                console.log('Delete route:', deleteRoute);
 
                                 router.delete(deleteRoute, {
                                     data: { ids: selectedIds },
                                     onSuccess: () => {
+                                        console.log('Bulk delete successful');
                                         setRowSelection({});
+                                    },
+                                    onError: (errors) => {
+                                        console.error('Bulk delete failed:', errors);
+                                        alert('Failed to delete selected items. Please try again.');
                                     },
                                 });
                             }
