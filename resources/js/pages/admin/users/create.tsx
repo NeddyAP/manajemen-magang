@@ -11,7 +11,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
     {
         title: 'Tambah User',
-        href: '/admin/create',
+        href: '/admin/users/create',
     },
 ];
 interface Props {
