@@ -6,7 +6,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { DataTable } from '../../../components/data-table/data-table';
-import { columns, Role, User } from './components/column';
+import { columns, initialColumnVisibility, Role, User } from './components/column';
 import { RoleFilter } from './components/filters';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -81,6 +81,7 @@ export default function Users({ users, meta }: UsersProps) {
                         meta={meta}
                         filter={<RoleFilter roles={meta.roles} value={selectedRole} onChange={handleRoleChange} />}
                         deleteRoute={route('admin.users.destroy.bulk')}
+                        initialColumnVisibility={initialColumnVisibility}
                     />
                 </div>
             </div>

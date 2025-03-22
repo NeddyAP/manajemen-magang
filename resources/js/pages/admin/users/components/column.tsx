@@ -98,6 +98,22 @@ export const columns: ColumnDef<User>[] = [
         },
     },
     {
+        accessorKey: 'updated_at',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Updated At" />,
+        cell: ({ row }) => {
+            const updatedAt = row.getValue('updated_at');
+            if (!updatedAt || typeof updatedAt !== 'string') return '-';
+
+            try {
+                // Format date to Indonesian locale
+                return format(parseISO(updatedAt), 'PPpp', { locale: id });
+            } catch (error) {
+                console.error('Error formatting date:', error);
+                return updatedAt;
+            }
+        }
+    },
+    {
         id: 'actions',
         cell: ({ row }) => {
             const users = row.original;
@@ -141,3 +157,8 @@ export const columns: ColumnDef<User>[] = [
         },
     },
 ];
+
+export const initialColumnVisibility = {
+    created_at: false,
+    updated_at: false,
+};
