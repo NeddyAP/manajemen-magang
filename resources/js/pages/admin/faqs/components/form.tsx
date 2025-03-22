@@ -1,22 +1,11 @@
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Progress } from '@/components/ui/progress';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { cn } from '@/lib/utils';
-import { Role, User } from '@/types/user';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { router, useForm } from '@inertiajs/react';
-import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
-import * as React from 'react';
 import { FormEventHandler } from 'react';
 import { Faq } from '..';
-import { id } from 'date-fns/locale';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 interface Props {
     faq?: Faq;
@@ -24,7 +13,6 @@ interface Props {
 }
 
 export default function FaqForm({ faq, mode }: Props) {
-
     const { data, setData, post, put, errors, processing } = useForm({
         id: faq?.id || '',
         question: faq?.question || '',
@@ -52,42 +40,27 @@ export default function FaqForm({ faq, mode }: Props) {
         <form onSubmit={onSubmit}>
             {/* Progress bar */}
             <Card>
-                <CardContent className='space-y-4 pt-6'>
+                <CardContent className="space-y-4 pt-6">
                     <div className="space-y-4">
                         <Label htmlFor="question">Pertanyaan*</Label>
-                        <Input
-                            id="question"
-                            value={data.question}
-                            onChange={e => setData('question', e.target.value)}
-                            required
-                        />
+                        <Input id="question" value={data.question} onChange={(e) => setData('question', e.target.value)} required />
                         {errors.question && <p className="text-red-500">{errors.question}</p>}
                     </div>
                     <div className="space-y-4">
                         <Label htmlFor="answer">Jawaban</Label>
-                        <Input
-                            id="answer"
-                            value={data.answer}
-                            onChange={e => setData('answer', e.target.value)}
-                            required
-                        />
+                        <Input id="answer" value={data.answer} onChange={(e) => setData('answer', e.target.value)} required />
                         {errors.answer && <p className="text-red-500">{errors.answer}</p>}
                         <Label htmlFor="category">Kategori</Label>
-                        <Input
-                            id="category"
-                            value={data.category}
-                            onChange={e => setData('category', e.target.value)}
-                            required
-                        />
+                        <Input id="category" value={data.category} onChange={(e) => setData('category', e.target.value)} required />
                         {errors.category && <p className="text-red-500">{errors.category}</p>}
                     </div>
                     <div className="space-y-4">
                         <Label htmlFor="status">Status</Label>
                         <RadioGroup
                             value={data.is_active ? 'active' : 'inactive'}
-                            onValueChange={value => setData('is_active', value === 'active')}
+                            onValueChange={(value) => setData('is_active', value === 'active')}
                             className="flex items-center space-x-4"
-                            id='is_active'
+                            id="is_active"
                         >
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="active" id="active" />
@@ -100,20 +73,13 @@ export default function FaqForm({ faq, mode }: Props) {
                         </RadioGroup>
                         {errors.is_active && <p className="text-red-500">{errors.is_active}</p>}
                     </div>
-                    <div className='space-y-4'>
-                        <Label htmlFor='order'>Urutan</Label>
-                        <Input
-                            id='order'
-                            type='number'
-                            value={data.order}
-                            onChange={e => setData('order', e.target.value)}
-                            required
-                        />
+                    <div className="space-y-4">
+                        <Label htmlFor="order">Urutan</Label>
+                        <Input id="order" type="number" value={data.order} onChange={(e) => setData('order', e.target.value)} required />
                         {errors.order && <p className="text-red-500">{errors.order}</p>}
                     </div>
                 </CardContent>
             </Card>
-
 
             <div className="mt-6 flex justify-end gap-4">
                 <Button type="button" variant="outline" onClick={() => router.get(route('admin.faqs.index'))}>

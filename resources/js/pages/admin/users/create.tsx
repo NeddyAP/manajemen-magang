@@ -1,8 +1,8 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Role } from '@/types/user';
-import UserForm from './components/form';
 import { Head } from '@inertiajs/react';
+import UserForm from './components/form';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

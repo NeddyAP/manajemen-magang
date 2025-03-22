@@ -31,4 +31,4 @@ Route::middleware(['auth', 'role:superadmin|admin'])->prefix('admin')->name('adm
     Route::delete('users/bulk-destroy', [UserController::class, 'bulkDestroy'])->name('users.destroy.bulk');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

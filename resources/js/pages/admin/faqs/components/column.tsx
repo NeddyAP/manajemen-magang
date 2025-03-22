@@ -1,6 +1,5 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -11,16 +10,15 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { MoreHorizontal } from 'lucide-react';
-import { DataTableColumnHeader } from '../../../../components/data-table/column-header';
 import { Faq } from '..';
-import { RadioGroup } from '@radix-ui/react-dropdown-menu';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
+import { DataTableColumnHeader } from '../../../../components/data-table/column-header';
 
 export const columns: ColumnDef<Faq>[] = [
     {
@@ -75,11 +73,14 @@ export const columns: ColumnDef<Faq>[] = [
             const status = typeof statusValue === 'boolean' ? statusValue : false;
             return (
                 <div className="flex items-center space-x-3">
-                    <Switch id="airplane-mode" checked={status} onCheckedChange={(value) => {
-                        const updatedStatus = value;
-                        router.post(route('admin.faqs.toggle', row.original.id), { status: updatedStatus },
-                            { preserveScroll: true });
-                    }} />
+                    <Switch
+                        id="airplane-mode"
+                        checked={status}
+                        onCheckedChange={(value) => {
+                            const updatedStatus = value;
+                            router.post(route('admin.faqs.toggle', row.original.id), { status: updatedStatus }, { preserveScroll: true });
+                        }}
+                    />
                     <Label htmlFor="airplane-mode">{status ? 'Aktif' : 'Tidak Aktif'}</Label>
                 </div>
             );

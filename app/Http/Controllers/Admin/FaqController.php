@@ -71,9 +71,10 @@ class FaqController extends Controller
     {
         try {
             Faq::create($request->validated());
+
             return redirect()->route('admin.faqs.index')->with('success', 'FAQ created successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to create FAQ: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to create FAQ: '.$e->getMessage());
         }
     }
 
@@ -92,9 +93,10 @@ class FaqController extends Controller
     {
         try {
             $faq->update($request->validated());
+
             return redirect()->route('admin.faqs.index')->with('success', 'FAQ updated successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to update FAQ: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to update FAQ: '.$e->getMessage());
         }
     }
 
@@ -104,10 +106,11 @@ class FaqController extends Controller
     public function toggle(Faq $faq)
     {
         try {
-            $faq->update(['is_active' => !$faq->is_active]);
+            $faq->update(['is_active' => ! $faq->is_active]);
+
             return redirect()->route('admin.faqs.index')->with('success', 'FAQ status updated successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to update FAQ status: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to update FAQ status: '.$e->getMessage());
         }
     }
 
@@ -118,9 +121,10 @@ class FaqController extends Controller
     {
         try {
             $faq->delete();
+
             return redirect()->route('admin.faqs.index')->with('success', 'FAQ deleted successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to delete FAQ: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to delete FAQ: '.$e->getMessage());
         }
     }
 
@@ -132,9 +136,10 @@ class FaqController extends Controller
         $ids = request()->input('ids');
         try {
             Faq::destroy($ids);
+
             return redirect()->route('admin.faqs.index')->with('success', 'FAQs deleted successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to delete FAQs: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to delete FAQs: '.$e->getMessage());
         }
     }
 }

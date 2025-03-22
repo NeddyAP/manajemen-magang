@@ -1,9 +1,8 @@
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
-import { Role, User } from '@/types/user';
-import FaqForm from './components/form';
 import { Head } from '@inertiajs/react';
 import { Faq } from '.';
+import FaqForm from './components/form';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

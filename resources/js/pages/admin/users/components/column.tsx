@@ -111,7 +111,7 @@ export const columns: ColumnDef<User>[] = [
                 console.error('Error formatting date:', error);
                 return updatedAt;
             }
-        }
+        },
     },
     {
         id: 'actions',
