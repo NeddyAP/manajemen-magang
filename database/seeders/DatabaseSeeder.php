@@ -34,5 +34,6 @@ class DatabaseSeeder extends Seeder
 
         $this->call(FaqSeeder::class);
         $this->call(TutorialSeeder::class);
+        $this->call(GlobalVariableSeeder::class);
     }
 }

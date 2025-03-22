@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\LogbookController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TutorialController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\GlobalVariableController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/dashboard', '/admin/dashboard');
@@ -26,13 +27,19 @@ Route::middleware(['auth', 'role:superadmin|admin'])->prefix('admin')->name('adm
     Route::post('tutorials/{tutorial}/toggle', [TutorialController::class, 'toggle'])->name('tutorials.toggle');
     Route::post('tutorials/bulk-destroy', [TutorialController::class, 'bulkDestroy'])->name('tutorials.destroy.bulk');
 
+    // Users
+    Route::resource('users', UserController::class);
+    Route::delete('users/bulk-destroy', [UserController::class, 'bulkDestroy'])->name('users.destroy.bulk');
+
     // FAQS
     Route::resource('faqs', FaqController::class)->except(['show']);
     Route::post('faqs/{faq}/toggle', [FaqController::class, 'toggle'])->name('faqs.toggle');
     Route::post('faqs/bulk-destroy', [FaqController::class, 'bulkDestroy'])->name('faqs.destroy.bulk');
 
-    Route::resource('users', UserController::class);
-    Route::delete('users/bulk-destroy', [UserController::class, 'bulkDestroy'])->name('users.destroy.bulk');
+    // Global Variables
+    Route::resource('global-variables', GlobalVariableController::class)->except(['show']);
+    Route::post('global-variables/{globalVariable}/toggle', [GlobalVariableController::class, 'toggle'])->name('global-variables.toggle');
+    Route::post('global-variables/bulk-destroy', [GlobalVariableController::class, 'bulkDestroy'])->name('global-variables.destroy.bulk');
 });
 
 require __DIR__ . '/auth.php';

@@ -146,11 +146,7 @@ export const columns: ColumnDef<Faq>[] = [
                             onClick={() => {
                                 if (confirm('Are you sure you want to delete this user?')) {
                                     router.delete(route('admin.faqs.destroy', faqs.id), {
-                                        onSuccess: () => {
-                                        },
-                                        onError: (errors) => {
-                                            console.error('Delete failed:', errors);
-                                        },
+                                        preserveScroll: true,
                                     });
                                 }
                             }}

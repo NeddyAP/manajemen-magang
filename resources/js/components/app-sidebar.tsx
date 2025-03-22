@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpenText, Building2, File, History, LayoutGrid, MessageCircleQuestion, Users, Waypoints } from 'lucide-react';
+import { BookOpenText, Building2, Cog, File, History, LayoutGrid, MessageCircleQuestion, Users, Waypoints } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -43,6 +43,14 @@ const thirdNavItems: NavItem[] = [
 
 const forthNavItems: NavItem[] = [
     {
+        title: 'Users',
+        href: '/admin/users',
+        icon: Users,
+    },
+];
+
+const fifthNavItems: NavItem[] = [
+    {
         title: 'Tutorials',
         href: '/admin/tutorials',
         icon: Waypoints,
@@ -56,9 +64,9 @@ const forthNavItems: NavItem[] = [
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Users',
-        href: '/admin/users',
-        icon: Users,
+        title: 'Global Variables',
+        href: '/admin/global-variables',
+        icon: Cog,
     },
 ];
 
@@ -80,12 +88,13 @@ export function AppSidebar() {
             <SidebarContent>
                 <NavMain items={mainNavItems} title="" />
                 <NavMain items={secondNavItems} title="Manajemen Magang" />
-                <NavMain items={thirdNavItems} title="Buku Panduan Mahasiswa" />
-                <NavMain items={forthNavItems} title="Buku Panduan Mahasiswa" />
+                <NavMain items={thirdNavItems} title="Bimbingan Mahasiswa" />
+                <NavMain items={forthNavItems} title="Manajemen Pengguna" />
+                <NavMain items={fifthNavItems} title="Buku Panduan Mahasiswa" />
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" title="Manajemen User" />
+                <NavFooter items={footerNavItems} className="mt-auto" title="Pengaturan Website" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

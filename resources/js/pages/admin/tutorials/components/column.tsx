@@ -185,7 +185,9 @@ export const columns: ColumnDef<Tutorial>[] = [
                         <DropdownMenuItem
                             onClick={() => {
                                 if (confirm('Are you sure you want to delete this tutorial?')) {
-                                    router.delete(route('admin.tutorials.destroy', tutorials.id));
+                                    router.delete(route('admin.tutorials.destroy', tutorials.id), {
+                                        preserveScroll: true,
+                                    });
                                 }
                             }}
                             className="text-red-500"

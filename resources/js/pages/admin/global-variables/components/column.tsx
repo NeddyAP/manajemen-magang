@@ -1,6 +1,5 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -11,30 +10,17 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { MoreHorizontal } from 'lucide-react';
 import { DataTableColumnHeader } from '../../../../components/data-table/column-header';
+import { GlobalVariable } from '..';
 
-// This type is used to define the shape of our data.
-export interface Role {
-    id: number;
-    name: string;
-    guard_name: string;
-}
-
-export interface User {
-    id: string;
-    email: string;
-    name: string;
-    created_at?: string;
-    roles: Role[];
-    [key: string]: unknown; // For any other properties that might be in the user data
-}
-
-export const columns: ColumnDef<User>[] = [
+export const columns: ColumnDef<GlobalVariable>[] = [
     {
         id: 'select',
         header: ({ table }) => (
@@ -55,35 +41,69 @@ export const columns: ColumnDef<User>[] = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="Id" />,
     },
     {
-        accessorKey: 'email',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
-    },
-    {
-        accessorKey: 'name',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Nama" />,
-    },
-    {
-        accessorKey: 'roles',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Role" />,
+        accessorKey: 'key',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Key" />,
         cell: ({ row }) => {
-            const roles = row.original.roles;
-            if (!roles || !roles.length) return '-';
+            const key = row.getValue('key');
+            const slug = row.original.slug;
+            if (!key || typeof key !== 'string') return '-';
+            if (!slug || typeof slug !== 'string') return '-';
 
+            return <div className='flex flex-col'>
+                {key.length > 40 ? `${key.slice(0, 40)}...` : key}
+                <p className='text-gray-500 text-wrap'>
+                    {slug.length > 40 ? `${slug.slice(0, 40)}...` : slug}
+                </p>
+            </div>;
+        },
+    },
+    {
+        accessorKey: 'value',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Value" />,
+        cell: ({ row }) => {
+            const answer = row.getValue('value');
+            if (!answer || typeof answer !== 'string') return '-';
+
+            return answer.length > 40 ? `${answer.slice(0, 40)}...` : answer;
+        },
+    },
+    {
+        accessorKey: 'description',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Deskripsi" />,
+        cell: ({ row }) => {
+            const answer = row.getValue('description');
+            if (!answer || typeof answer !== 'string') return '-';
+
+            return answer.length > 40 ? `${answer.slice(0, 40)}...` : answer;
+        },
+    },
+    {
+        accessorKey: 'is_active',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+        // add radio toogle switch to enable/disable in boolean
+        cell: ({ row }) => {
+            const statusValue = row.getValue('is_active');
+            const status = typeof statusValue === 'boolean' ? statusValue : false;
             return (
-                <div className="flex flex-wrap gap-1">
-                    {roles.map((role, index) => (
-                        <Badge key={index} variant="outline">
-                            {role.name}
-                        </Badge>
-                    ))}
+                <div className="flex items-center space-x-3">
+                    <Switch
+                        id="airplane-mode"
+                        checked={status}
+                        onCheckedChange={(value) => {
+                            const updatedStatus = value;
+                            router.post(route('admin.global-variables.toggle', row.original.id), { status: updatedStatus }, { preserveScroll: true });
+                        }}
+                    />
+                    <Label htmlFor="airplane-mode">{status ? 'Aktif' : 'Tidak Aktif'}</Label>
                 </div>
             );
         },
-        enableSorting: false,
     },
     {
         accessorKey: 'created_at',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
+        enableHiding: true,
+
         cell: ({ row }) => {
             const createdAt = row.getValue('created_at');
             if (!createdAt || typeof createdAt !== 'string') return '-';
@@ -100,6 +120,8 @@ export const columns: ColumnDef<User>[] = [
     {
         accessorKey: 'updated_at',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Updated At" />,
+        enableHiding: true,
+
         cell: ({ row }) => {
             const updatedAt = row.getValue('updated_at');
             if (!updatedAt || typeof updatedAt !== 'string') return '-';
@@ -116,7 +138,7 @@ export const columns: ColumnDef<User>[] = [
     {
         id: 'actions',
         cell: ({ row }) => {
-            const users = row.original;
+            const globalVariables = row.original;
 
             return (
                 <DropdownMenu>
@@ -128,15 +150,15 @@ export const columns: ColumnDef<User>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(users.id)}>Copy user ID</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(globalVariables.key)}>Copy Key</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                            <a href={route('admin.users.edit', users.id)}>Edit</a>
+                            <a href={route('admin.global-variables.edit', globalVariables.id)}>Edit</a>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             onClick={() => {
-                                if (confirm('Are you sure you want to delete this user?')) {
-                                    router.delete(route('admin.users.destroy', users.id), {
+                                if (confirm('Are you sure you want to delete this global variable?')) {
+                                    router.delete(route('admin.global-variables.destroy', globalVariables.id), {
                                         preserveScroll: true,
                                     });
                                 }
