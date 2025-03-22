@@ -13,7 +13,15 @@ return new class extends Migration
     {
         Schema::create('faqs', function (Blueprint $table) {
             $table->id();
+            $table->string('question');
+            $table->text('answer');
+            $table->string('category')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->integer('order')->default(0); // Order of the FAQ in the list
             $table->timestamps();
+
+            // index
+            $table->index(['is_active', 'order']);
         });
     }
 

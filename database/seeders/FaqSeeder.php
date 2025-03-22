@@ -11,6 +11,11 @@ class FaqSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        \App\Models\Faq::factory()
+            ->count(15)
+            ->create([
+                'is_active' => true,
+                'order' => 0,
+            ]);
     }
 }

@@ -23,10 +23,12 @@ Route::middleware(['auth', 'role:superadmin|admin'])->prefix('admin')->name('adm
     Route::resource('guidance-classes', GuidanceClassController::class);
 
     Route::resource('tutorials', TutorialController::class);
-    Route::resource('faqs', FaqController::class);
+    Route::resource('faqs', FaqController::class)->except(['show']);
+    Route::post('faqs/{faq}/toggle', [FaqController::class, 'toggle'])->name('faqs.toggle');
+    Route::post('faqs/bulk-destroy', [FaqController::class, 'bulkDestroy'])->name('faqs.destroy.bulk');
 
     Route::resource('users', UserController::class);
     Route::delete('users/bulk-destroy', [UserController::class, 'bulkDestroy'])->name('users.destroy.bulk');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

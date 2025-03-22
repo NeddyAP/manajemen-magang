@@ -26,6 +26,7 @@ interface DataTableProps<TData, TValue> {
     baseUrl?: string;
     filter?: React.ReactNode;
     deleteRoute?: string;
+    initialColumnVisibility?: VisibilityState;
     [key: string]: unknown;
 }
 
@@ -37,11 +38,12 @@ export function DataTable<TData, TValue>({
     className,
     filter,
     deleteRoute,
+    initialColumnVisibility = {},
     ...props
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(initialColumnVisibility);
     const [rowSelection, setRowSelection] = React.useState({});
     const [searchTerm, setSearchTerm] = React.useState<string>('');
     const [currentPage, setCurrentPage] = React.useState<number>(meta?.current_page || 1);

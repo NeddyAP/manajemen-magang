@@ -30,5 +30,7 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => bcrypt('a'),
         ])->assignRole('admin');
+
+        $this->call(FaqSeeder::class);
     }
 }

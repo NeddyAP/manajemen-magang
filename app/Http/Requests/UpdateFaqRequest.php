@@ -11,7 +11,7 @@ class UpdateFaqRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()->hasAnyRole(['superadmin', 'admin']);
     }
 
     /**
@@ -22,7 +22,11 @@ class UpdateFaqRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'question' => 'required|string|max:255',
+            'answer' => 'required|string',
+            'category' => 'nullable|string|max:255',
+            'is_active' => 'boolean',
+            'order' => 'integer|min:0',
         ];
     }
 }

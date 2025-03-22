@@ -17,7 +17,13 @@ class FaqFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'question' => fake()->sentence(),
+            'answer' => fake()->paragraph(),
+            'category' => fake()->word(),
+            'is_active' => fake()->boolean(),
+            'order' => fake()->numberBetween(0, 100),
+            'created_at' => fake()->dateTime(),
+            'updated_at' => fake()->dateTime(),
         ];
     }
 }
