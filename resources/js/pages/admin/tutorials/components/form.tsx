@@ -2,11 +2,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { router, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 import { Tutorial } from '..';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Props {
     tutorial?: Tutorial;
@@ -58,7 +57,7 @@ export default function TutorialForm({ tutorial, mode }: Props) {
                         <Label htmlFor="file_path">File tutorial{mode === 'create' ? '*' : ''}</Label>
                         <Input
                             id="file_path"
-                            type='file'
+                            type="file"
                             onChange={(e) => e.target.files && setData('file_path', e.target.files[0] as unknown as string)}
                             required={mode === 'create'}
                         />
@@ -74,15 +73,9 @@ export default function TutorialForm({ tutorial, mode }: Props) {
                                 <SelectValue placeholder="Select access level" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">
-                                    All
-                                </SelectItem>
-                                <SelectItem value="dosen">
-                                    Dosen
-                                </SelectItem>
-                                <SelectItem value="mahasiswa">
-                                    Mahasiswa
-                                </SelectItem>
+                                <SelectItem value="all">All</SelectItem>
+                                <SelectItem value="dosen">Dosen</SelectItem>
+                                <SelectItem value="mahasiswa">Mahasiswa</SelectItem>
                             </SelectContent>
                         </Select>
                         {errors.access_level && <p className="text-red-500">{errors.access_level}</p>}

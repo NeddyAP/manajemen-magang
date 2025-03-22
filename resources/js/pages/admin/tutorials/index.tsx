@@ -6,7 +6,6 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { columns, initialColumnVisibility } from './components/column';
-import { User } from '@/types/user';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

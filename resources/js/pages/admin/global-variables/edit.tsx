@@ -1,7 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import FaqForm from './components/form';
 import { GlobalVariable } from '.';
 import GlobalVariableForm from './components/form';
 

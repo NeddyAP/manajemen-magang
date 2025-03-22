@@ -76,7 +76,7 @@ class TutorialController extends Controller
             // Handle file upload
             if ($request->hasFile('file_path')) {
                 $file = $request->file('file_path');
-                $fileName = time() . '_' . $file->getClientOriginalName();
+                $fileName = time().'_'.$file->getClientOriginalName();
 
                 // Store file in public directory to make it accessible
                 $path = $file->storeAs('tutorials', $fileName, 'public');
@@ -86,9 +86,10 @@ class TutorialController extends Controller
             }
 
             $tutorial = Tutorial::create($data);
+
             return redirect()->route('admin.tutorials.index')->with('success', 'Tutorial created successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to create tutorial: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to create tutorial: '.$e->getMessage());
         }
     }
 
@@ -102,7 +103,7 @@ class TutorialController extends Controller
                 'tutorial' => $tutorial,
             ]);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to load tutorial: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to load tutorial: '.$e->getMessage());
         }
     }
 
@@ -122,7 +123,7 @@ class TutorialController extends Controller
                 }
 
                 $file = $request->file('file_path');
-                $fileName = time() . '_' . $file->getClientOriginalName();
+                $fileName = time().'_'.$file->getClientOriginalName();
 
                 // Store file in public directory
                 $path = $file->storeAs('tutorials', $fileName, 'public');
@@ -135,9 +136,10 @@ class TutorialController extends Controller
             }
 
             $tutorial->update($data);
+
             return redirect()->route('admin.tutorials.index')->with('success', 'Tutorial updated successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to update tutorial: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to update tutorial: '.$e->getMessage());
         }
     }
 
@@ -147,10 +149,11 @@ class TutorialController extends Controller
     public function toggle(Tutorial $tutorial)
     {
         try {
-            $tutorial->update(['is_active' => !$tutorial->is_active]);
+            $tutorial->update(['is_active' => ! $tutorial->is_active]);
+
             return redirect()->back()->with('success', 'Tutorial status updated successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to update tutorial status: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to update tutorial status: '.$e->getMessage());
         }
     }
 
@@ -166,9 +169,10 @@ class TutorialController extends Controller
             }
 
             $tutorial->delete();
+
             return redirect()->route('admin.tutorials.index')->with('success', 'Tutorial berhasil dihapus.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menghapus tutorial: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus tutorial: '.$e->getMessage());
         }
     }
 
@@ -189,9 +193,10 @@ class TutorialController extends Controller
             }
 
             Tutorial::whereIn('id', $ids)->delete();
+
             return redirect()->route('admin.tutorials.index')->with('success', 'Tutorials deleted successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to delete tutorials: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to delete tutorials: '.$e->getMessage());
         }
     }
 }

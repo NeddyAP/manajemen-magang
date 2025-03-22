@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-
-use App\Models\GlobalVariable;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreGlobalVariableRequest;
 use App\Http\Requests\UpdateGlobalVariableRequest;
-use App\Http\Controllers\Controller;
+use App\Models\GlobalVariable;
 use Illuminate\Http\Request;
 
 class GlobalVariableController extends Controller
@@ -75,7 +74,7 @@ class GlobalVariableController extends Controller
 
             return redirect()->route('admin.global-variables.index')->with('success', 'Global Variable created successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to create Global Variable: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to create Global Variable: '.$e->getMessage());
         }
     }
 
@@ -97,7 +96,7 @@ class GlobalVariableController extends Controller
 
             return redirect()->route('admin.global-variables.index')->with('success', 'Global Variable updated successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to update Global Variable: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to update Global Variable: '.$e->getMessage());
         }
     }
 
@@ -111,7 +110,7 @@ class GlobalVariableController extends Controller
 
             return redirect()->route('admin.global-variables.index')->with('success', 'Global Variable status updated successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to update Global Variable status: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to update Global Variable status: '.$e->getMessage());
         }
     }
 
@@ -125,7 +124,7 @@ class GlobalVariableController extends Controller
 
             return redirect()->route('admin.global-variables.index')->with('success', 'Global Variable deleted successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to delete Global Variable: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to delete Global Variable: '.$e->getMessage());
         }
     }
 
@@ -140,7 +139,7 @@ class GlobalVariableController extends Controller
 
             return redirect()->route('admin.global-variables.index')->with('success', 'Global Variables deleted successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to delete Global Variables: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to delete Global Variables: '.$e->getMessage());
         }
     }
 }

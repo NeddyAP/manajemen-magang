@@ -1,9 +1,17 @@
 import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
 import { type BreadcrumbItem } from '@/types';
-import { type ReactNode } from 'react';
 import { usePage } from '@inertiajs/react';
+import { useEffect, type ReactNode } from 'react';
 import { toast } from 'sonner';
-import { useEffect } from 'react';
+
+interface PageProps {
+    flash?: {
+        success?: string;
+        error?: string;
+        warning?: string;
+        info?: string;
+    };
+}
 
 interface AppLayoutProps {
     children: ReactNode;
@@ -11,7 +19,7 @@ interface AppLayoutProps {
 }
 
 export default function AppLayout({ children, breadcrumbs = [], ...props }: AppLayoutProps) {
-    const { flash } = usePage().props as any;
+    const { flash } = usePage().props as PageProps;
 
     // Display flash messages using toast when they arrive from backend
     useEffect(() => {

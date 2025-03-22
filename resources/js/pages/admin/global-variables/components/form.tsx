@@ -36,9 +36,12 @@ export default function GlobalVariableForm({ globalVariable, mode }: Props) {
     };
 
     const generateSlug = (key: string) => {
-        const slug = key.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9-]/g, '_');
+        const slug = key
+            .toLowerCase()
+            .replace(/\s+/g, '_')
+            .replace(/[^a-z0-9-]/g, '_');
         setData('slug', slug);
-    }
+    };
 
     return (
         <form onSubmit={onSubmit}>
@@ -47,22 +50,40 @@ export default function GlobalVariableForm({ globalVariable, mode }: Props) {
                 <CardContent className="space-y-4 pt-6">
                     <div className="space-y-4">
                         <Label htmlFor="key">Key*</Label>
-                        <Input id="key" value={data.key} onChange={(e) => {
-                            setData('key', e.target.value);
-                            generateSlug(e.target.value);
-                        }} required />
+                        <Input
+                            id="key"
+                            value={data.key}
+                            onChange={(e) => {
+                                setData('key', e.target.value);
+                                generateSlug(e.target.value);
+                            }}
+                            required
+                        />
                         {errors.key && <p className="text-red-500">{errors.key}</p>}
-                        <Label htmlFor="slug" className='text-gray-500'>Nama variable: <br></br> {data.slug}</Label>
-                        <Input id="slug" value={data.slug} onChange={(e) => {
-                            setData('slug', e.target.value);
-                        }} required hidden />
+                        <Label htmlFor="slug" className="text-gray-500">
+                            Nama variable: <br></br> {data.slug}
+                        </Label>
+                        <Input
+                            id="slug"
+                            value={data.slug}
+                            onChange={(e) => {
+                                setData('slug', e.target.value);
+                            }}
+                            required
+                            hidden
+                        />
                         {errors.slug && <p className="text-red-500">{errors.slug}</p>}
                     </div>
                     <div className="space-y-4">
                         <Label htmlFor="value">Value*</Label>
-                        <Input id="value" value={data.value} onChange={(e) => {
-                            setData('value', e.target.value);
-                        }} required />
+                        <Input
+                            id="value"
+                            value={data.value}
+                            onChange={(e) => {
+                                setData('value', e.target.value);
+                            }}
+                            required
+                        />
                         {errors.value && <p className="text-red-500">{errors.value}</p>}
                     </div>
                     <div className="space-y-4">
@@ -72,7 +93,10 @@ export default function GlobalVariableForm({ globalVariable, mode }: Props) {
                     </div>
                     <div className="space-y-4">
                         <Label htmlFor="is_active">Status*</Label>
-                        <RadioGroup value={data.is_active ? 'aktif' : 'tidak aktif'} onValueChange={(value) => setData('is_active', value === 'active')}>
+                        <RadioGroup
+                            value={data.is_active ? 'aktif' : 'tidak aktif'}
+                            onValueChange={(value) => setData('is_active', value === 'active')}
+                        >
                             <div className="flex space-x-4">
                                 <RadioGroupItem id="aktif" value="aktif" />
                                 <Label htmlFor="aktif">Aktif</Label>

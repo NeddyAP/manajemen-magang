@@ -1,5 +1,6 @@
 'use client';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -19,8 +20,6 @@ import { id } from 'date-fns/locale';
 import { FileSpreadsheet, MoreHorizontal } from 'lucide-react';
 import { Tutorial } from '..';
 import { DataTableColumnHeader } from '../../../../components/data-table/column-header';
-import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
 
 export const columns: ColumnDef<Tutorial>[] = [
     {
@@ -50,7 +49,7 @@ export const columns: ColumnDef<Tutorial>[] = [
             if (!title || typeof title !== 'string') return '-';
 
             return title.length > 30 ? `${title.slice(0, 30)}...` : title;
-        }
+        },
     },
     {
         accessorKey: 'content',
@@ -71,10 +70,7 @@ export const columns: ColumnDef<Tutorial>[] = [
             if (!accessLevel || typeof accessLevel !== 'string') return '-';
 
             return (
-                <Badge
-                    variant={accessLevel === 'all' ? 'outline' : accessLevel === 'dosen' ? 'secondary' : 'default'}
-                    className="capitalize"
-                >
+                <Badge variant={accessLevel === 'all' ? 'outline' : accessLevel === 'dosen' ? 'secondary' : 'default'} className="capitalize">
                     {accessLevel}
                 </Badge>
             );
@@ -92,13 +88,8 @@ export const columns: ColumnDef<Tutorial>[] = [
             const fileName = row.original.file_name || filePath.split('/').pop() || 'Download';
 
             return (
-                <a
-                    href={fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
-                >
-                    <FileSpreadsheet className="h-4 w-4 mr-2 inline" />
+                <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    <FileSpreadsheet className="mr-2 inline h-4 w-4" />
                     {fileName}
                 </a>
             );
@@ -195,7 +186,7 @@ export const columns: ColumnDef<Tutorial>[] = [
                             Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>
-                </DropdownMenu >
+                </DropdownMenu>
             );
         },
     },

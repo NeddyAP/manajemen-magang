@@ -2,7 +2,8 @@ import { Toaster } from 'sonner';
 
 export function ToastProvider() {
     return (
-        <Toaster position='top-right'
+        <Toaster
+            position="top-right"
             toastOptions={{
                 style: {
                     border: '2px solid',
@@ -19,6 +20,7 @@ export function ToastProvider() {
                     warning: 'border-yellow-500/30 bg-yellow-500/10 text-yellow-700 dark:text-yellow-400',
                     info: 'border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400',
                 },
-            }} />
+            }}
+        />
     );
 }

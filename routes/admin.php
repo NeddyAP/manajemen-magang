@@ -2,13 +2,13 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FaqController;
+use App\Http\Controllers\Admin\GlobalVariableController;
 use App\Http\Controllers\Admin\GuidanceClassController;
 use App\Http\Controllers\Admin\InternshipController;
 use App\Http\Controllers\Admin\LogbookController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TutorialController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\GlobalVariableController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/dashboard', '/admin/dashboard');
@@ -42,4 +42,4 @@ Route::middleware(['auth', 'role:superadmin|admin'])->prefix('admin')->name('adm
     Route::post('global-variables/bulk-destroy', [GlobalVariableController::class, 'bulkDestroy'])->name('global-variables.destroy.bulk');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

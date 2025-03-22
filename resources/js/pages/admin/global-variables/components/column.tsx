@@ -17,8 +17,8 @@ import { ColumnDef } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { MoreHorizontal } from 'lucide-react';
-import { DataTableColumnHeader } from '../../../../components/data-table/column-header';
 import { GlobalVariable } from '..';
+import { DataTableColumnHeader } from '../../../../components/data-table/column-header';
 
 export const columns: ColumnDef<GlobalVariable>[] = [
     {
@@ -49,12 +49,12 @@ export const columns: ColumnDef<GlobalVariable>[] = [
             if (!key || typeof key !== 'string') return '-';
             if (!slug || typeof slug !== 'string') return '-';
 
-            return <div className='flex flex-col'>
-                {key.length > 40 ? `${key.slice(0, 40)}...` : key}
-                <p className='text-gray-500 text-wrap'>
-                    {slug.length > 40 ? `${slug.slice(0, 40)}...` : slug}
-                </p>
-            </div>;
+            return (
+                <div className="flex flex-col">
+                    {key.length > 40 ? `${key.slice(0, 40)}...` : key}
+                    <p className="text-wrap text-gray-500">{slug.length > 40 ? `${slug.slice(0, 40)}...` : slug}</p>
+                </div>
+            );
         },
     },
     {
