@@ -136,15 +136,7 @@ export const columns: ColumnDef<User>[] = [
                         <DropdownMenuItem
                             onClick={() => {
                                 if (confirm('Are you sure you want to delete this user?')) {
-                                    console.log('Deleting user:', users.id);
-                                    router.delete(route('admin.users.destroy', users.id), {
-                                        onSuccess: () => {
-                                            console.log('Delete successful');
-                                        },
-                                        onError: (errors) => {
-                                            console.error('Delete failed:', errors);
-                                        },
-                                    });
+                                    router.delete(route('admin.users.destroy', users.id));
                                 }
                             }}
                             className="text-red-500"

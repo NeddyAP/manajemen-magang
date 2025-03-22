@@ -34,7 +34,6 @@ export default function FaqForm({ faq, mode }: Props) {
             put(route('admin.faqs.update', faq?.id));
         }
     };
-    console.log('data', data);
 
     return (
         <form onSubmit={onSubmit}>

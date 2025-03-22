@@ -11,7 +11,7 @@ class StoreTutorialRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,12 @@ class StoreTutorialRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'file_name' => 'required|string|max:255',
+            'file_path' => 'required|file|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,zip,rar|max:10240',
+            'access_level' => 'required|string|in:all,dosen,mahasiswa',
+            'is_active' => 'boolean',
         ];
     }
 }

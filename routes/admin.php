@@ -22,7 +22,11 @@ Route::middleware(['auth', 'role:superadmin|admin'])->prefix('admin')->name('adm
 
     Route::resource('guidance-classes', GuidanceClassController::class);
 
-    Route::resource('tutorials', TutorialController::class);
+    Route::resource('tutorials', TutorialController::class)->except(['show']);
+    Route::post('tutorials/{tutorial}/toggle', [TutorialController::class, 'toggle'])->name('tutorials.toggle');
+    Route::post('tutorials/bulk-destroy', [TutorialController::class, 'bulkDestroy'])->name('tutorials.destroy.bulk');
+
+    // FAQS
     Route::resource('faqs', FaqController::class)->except(['show']);
     Route::post('faqs/{faq}/toggle', [FaqController::class, 'toggle'])->name('faqs.toggle');
     Route::post('faqs/bulk-destroy', [FaqController::class, 'bulkDestroy'])->name('faqs.destroy.bulk');
@@ -31,4 +35,4 @@ Route::middleware(['auth', 'role:superadmin|admin'])->prefix('admin')->name('adm
     Route::delete('users/bulk-destroy', [UserController::class, 'bulkDestroy'])->name('users.destroy.bulk');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

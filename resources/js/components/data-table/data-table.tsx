@@ -137,14 +137,9 @@ export function DataTable<TData, TValue>({
                                     const original = row.original as { id: number | string };
                                     return original.id;
                                 });
-
-                                console.log('Deleting items with IDs:', selectedIds);
-                                console.log('Delete route:', deleteRoute);
-
                                 router.delete(deleteRoute, {
                                     data: { ids: selectedIds },
                                     onSuccess: () => {
-                                        console.log('Bulk delete successful');
                                         setRowSelection({});
                                     },
                                     onError: (errors) => {

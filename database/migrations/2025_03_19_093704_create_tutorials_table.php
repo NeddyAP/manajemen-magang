@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('tutorials', function (Blueprint $table) {
             $table->id();
+            $table->string('title');
+            $table->text('content');
+            $table->string('file_name');
+            $table->string('file_path');
+            $table->enum('access_level', ['mahasiswa', 'dosen', 'all'])->default('all');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

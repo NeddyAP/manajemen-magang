@@ -17,7 +17,12 @@ class TutorialFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'title' => fake()->sentence(),
+            'content' => fake()->paragraph(),
+            'file_name' => fake()->sentence(),
+            'file_path' => fake()->filePath(),
+            'access_level' => fake()->randomElement(['mahasiswa', 'dosen', 'all']),
+            'is_active' => fake()->boolean(),
         ];
     }
 }

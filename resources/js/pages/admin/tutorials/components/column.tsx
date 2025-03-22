@@ -16,11 +16,13 @@ import { router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { MoreHorizontal } from 'lucide-react';
-import { Faq } from '..';
+import { FileSpreadsheet, MoreHorizontal } from 'lucide-react';
+import { Tutorial } from '..';
 import { DataTableColumnHeader } from '../../../../components/data-table/column-header';
+import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 
-export const columns: ColumnDef<Faq>[] = [
+export const columns: ColumnDef<Tutorial>[] = [
     {
         id: 'select',
         header: ({ table }) => (
@@ -41,28 +43,66 @@ export const columns: ColumnDef<Faq>[] = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="Id" />,
     },
     {
-        accessorKey: 'question',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Pertanyaan" />,
+        accessorKey: 'title',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Judul" />,
         cell: ({ row }) => {
-            const question = row.getValue('question');
-            if (!question || typeof question !== 'string') return '-';
+            const title = row.getValue('title');
+            if (!title || typeof title !== 'string') return '-';
 
-            return question.length > 40 ? `${question.slice(0, 40)}...` : question;
+            return title.length > 30 ? `${title.slice(0, 30)}...` : title;
+        }
+    },
+    {
+        accessorKey: 'content',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Konten" />,
+        cell: ({ row }) => {
+            const content = row.getValue('content');
+            if (!content || typeof content !== 'string') return '-';
+
+            return content.length > 30 ? `${content.slice(0, 30)}...` : content;
         },
     },
     {
-        accessorKey: 'answer',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Jawaban" />,
+        accessorKey: 'access_level',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Akses Level" />,
+        // different access level different badge
         cell: ({ row }) => {
-            const answer = row.getValue('answer');
-            if (!answer || typeof answer !== 'string') return '-';
+            const accessLevel = row.getValue('access_level');
+            if (!accessLevel || typeof accessLevel !== 'string') return '-';
 
-            return answer.length > 40 ? `${answer.slice(0, 40)}...` : answer;
+            return (
+                <Badge
+                    variant={accessLevel === 'all' ? 'outline' : accessLevel === 'dosen' ? 'secondary' : 'default'}
+                    className="capitalize"
+                >
+                    {accessLevel}
+                </Badge>
+            );
         },
     },
     {
-        accessorKey: 'category',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Kategori" />,
+        accessorKey: 'file_path',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="File" />,
+        cell: ({ row }) => {
+            const filePath = row.getValue('file_path');
+            if (!filePath || typeof filePath !== 'string') return '-';
+
+            // Create a URL to the file
+            const fileUrl = `/storage/${filePath}`;
+            const fileName = row.original.file_name || filePath.split('/').pop() || 'Download';
+
+            return (
+                <a
+                    href={fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                >
+                    <FileSpreadsheet className="h-4 w-4 mr-2 inline" />
+                    {fileName}
+                </a>
+            );
+        },
     },
     {
         accessorKey: 'is_active',
@@ -78,7 +118,7 @@ export const columns: ColumnDef<Faq>[] = [
                         checked={status}
                         onCheckedChange={(value) => {
                             const updatedStatus = value;
-                            router.post(route('admin.faqs.toggle', row.original.id), { status: updatedStatus }, { preserveScroll: true });
+                            router.post(route('admin.tutorials.toggle', row.original.id), { status: updatedStatus }, { preserveScroll: true });
                         }}
                     />
                     <Label htmlFor="airplane-mode">{status ? 'Aktif' : 'Tidak Aktif'}</Label>
@@ -125,7 +165,7 @@ export const columns: ColumnDef<Faq>[] = [
     {
         id: 'actions',
         cell: ({ row }) => {
-            const faqs = row.original;
+            const tutorials = row.original;
 
             return (
                 <DropdownMenu>
@@ -137,21 +177,15 @@ export const columns: ColumnDef<Faq>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(faqs.answer)}>Copy Answer ID</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(tutorials.title)}>Copy Answer ID</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                            <a href={route('admin.faqs.edit', faqs.id)}>Edit</a>
+                            <a href={route('admin.tutorials.edit', tutorials.id)}>Edit</a>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             onClick={() => {
-                                if (confirm('Are you sure you want to delete this user?')) {
-                                    router.delete(route('admin.faqs.destroy', faqs.id), {
-                                        onSuccess: () => {
-                                        },
-                                        onError: (errors) => {
-                                            console.error('Delete failed:', errors);
-                                        },
-                                    });
+                                if (confirm('Are you sure you want to delete this tutorial?')) {
+                                    router.delete(route('admin.tutorials.destroy', tutorials.id));
                                 }
                             }}
                             className="text-red-500"
@@ -159,13 +193,14 @@ export const columns: ColumnDef<Faq>[] = [
                             Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>
-                </DropdownMenu>
+                </DropdownMenu >
             );
         },
     },
 ];
 
 export const initialColumnVisibility = {
+    user_name: false,
     created_at: false,
     updated_at: false,
 };

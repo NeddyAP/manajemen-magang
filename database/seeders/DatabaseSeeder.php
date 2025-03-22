@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Tutorial;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -32,5 +33,6 @@ class DatabaseSeeder extends Seeder
         ])->assignRole('admin');
 
         $this->call(FaqSeeder::class);
+        $this->call(TutorialSeeder::class);
     }
 }
