@@ -19,7 +19,7 @@ class FaqFactory extends Factory
         return [
             'question' => fake()->sentence(),
             'answer' => fake()->paragraph(),
-            'category' => fake()->word(),
+            'category' => fake()->randomElement(['general', 'magang', 'laporan']),
             'is_active' => fake()->boolean(),
             'order' => fake()->numberBetween(0, 100),
             'created_at' => fake()->dateTime(),

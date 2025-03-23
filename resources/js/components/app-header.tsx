@@ -21,6 +21,11 @@ const mainNavItems: NavItem[] = [
         href: '/',
         icon: LayoutGrid,
     },
+    {
+        title: 'Panduan',
+        href: '/buku-panduan',
+        icon: BookOpen,
+    },
 ];
 
 const rightNavItems: NavItem[] = [
@@ -171,7 +176,9 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                         ) : (
                             <div className="flex items-center space-x-2">
                                 <Link href="/login">
-                                    <Button variant="ghost" size="sm">Login</Button>
+                                    <Button variant="ghost" size="sm">
+                                        Login
+                                    </Button>
                                 </Link>
                                 <Link href="/register">
                                     <Button size="sm">Register</Button>

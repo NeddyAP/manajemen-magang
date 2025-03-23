@@ -1,3 +1,4 @@
+import AppFooter from '@/components/app-footer';
 import AppLayoutTemplate from '@/layouts/app/app-header-layout';
 import { type BreadcrumbItem } from '@/types';
 import { usePage } from '@inertiajs/react';
@@ -42,9 +43,8 @@ export default function FrontLayout({ children, breadcrumbs, ...props }: AppLayo
 
     return (
         <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
-            <div className="w-full">
-                {children}
-            </div>
+            <div className="w-full">{children}</div>
+            <AppFooter />
         </AppLayoutTemplate>
     );
 }
