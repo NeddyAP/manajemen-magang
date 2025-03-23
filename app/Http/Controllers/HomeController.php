@@ -6,11 +6,11 @@ class HomeController extends Controller
 {
     public function __invoke()
     {
-        return inertia('home');
+        return inertia('front/home/index');
     }
 
     public function index()
     {
-        return inertia('home');
+        return inertia('front/home/index');
     }
 }
