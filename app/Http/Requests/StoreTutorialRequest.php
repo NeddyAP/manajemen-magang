@@ -30,4 +30,31 @@ class StoreTutorialRequest extends FormRequest
             'is_active' => 'boolean',
         ];
     }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'title.required' => 'Judul harus diisi.',
+            'title.string' => 'Judul harus berupa string.',
+            'title.max' => 'Judul maksimal 255 karakter.',
+            'content.required' => 'Konten harus diisi.',
+            'content.string' => 'Konten harus berupa string.',
+            'file_name.required' => 'Nama file harus diisi.',
+            'file_name.string' => 'Nama file harus berupa string.',
+            'file_name.max' => 'Nama file maksimal 255 karakter.',
+            'file_path.required' => 'File harus diunggah.',
+            'file_path.file' => 'File harus berupa file.',
+            'file_path.mimes' => 'File harus berformat: pdf, doc, docx, ppt, pptx, xls, xlsx, zip, rar.',
+            'file_path.max' => 'Ukuran file maksimal 10MB.',
+            'access_level.required' => 'Level akses harus diisi.',
+            'access_level.string' => 'Level akses harus berupa string.',
+            'access_level.in' => 'Level akses harus salah satu dari: all, dosen, mahasiswa.',
+            'is_active.boolean' => 'Status aktif harus berupa boolean.',
+        ];
+    }
 }

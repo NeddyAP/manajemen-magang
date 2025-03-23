@@ -72,9 +72,9 @@ class GlobalVariableController extends Controller
         try {
             GlobalVariable::create($request->validated());
 
-            return redirect()->route('admin.global-variables.index')->with('success', 'Global Variable created successfully.');
+            return redirect()->route('admin.global-variables.index')->with('success', 'Variabel Global berhasil dibuat.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to create Global Variable: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Gagal membuat Variabel Global: '.$e->getMessage());
         }
     }
 
@@ -94,9 +94,9 @@ class GlobalVariableController extends Controller
         try {
             $globalVariable->update($request->validated());
 
-            return redirect()->route('admin.global-variables.index')->with('success', 'Global Variable updated successfully.');
+            return redirect()->route('admin.global-variables.index')->with('success', 'Variabel Global berhasil diperbarui.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to update Global Variable: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memperbarui Variabel Global: '.$e->getMessage());
         }
     }
 
@@ -108,9 +108,9 @@ class GlobalVariableController extends Controller
         try {
             $globalVariable->update(['is_active' => ! $globalVariable->is_active]);
 
-            return redirect()->route('admin.global-variables.index')->with('success', 'Global Variable status updated successfully.');
+            return redirect()->route('admin.global-variables.index')->with('success', 'Status Variabel Global berhasil diperbarui.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to update Global Variable status: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memperbarui status Variabel Global: '.$e->getMessage());
         }
     }
 
@@ -122,9 +122,9 @@ class GlobalVariableController extends Controller
         try {
             $globalVariable->delete();
 
-            return redirect()->route('admin.global-variables.index')->with('success', 'Global Variable deleted successfully.');
+            return redirect()->route('admin.global-variables.index')->with('success', 'Variabel Global berhasil dihapus.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to delete Global Variable: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus Variabel Global: '.$e->getMessage());
         }
     }
 
@@ -137,9 +137,9 @@ class GlobalVariableController extends Controller
         try {
             GlobalVariable::destroy($ids);
 
-            return redirect()->route('admin.global-variables.index')->with('success', 'Global Variables deleted successfully.');
+            return redirect()->route('admin.global-variables.index')->with('success', 'Variabel Global berhasil dihapus.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to delete Global Variables: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus Variabel Global: '.$e->getMessage());
         }
     }
 }

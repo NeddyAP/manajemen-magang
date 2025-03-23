@@ -87,9 +87,9 @@ class TutorialController extends Controller
 
             $tutorial = Tutorial::create($data);
 
-            return redirect()->route('admin.tutorials.index')->with('success', 'Tutorial created successfully.');
+            return redirect()->route('admin.tutorials.index')->with('success', 'Tutorial berhasil dibuat.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to create tutorial: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Gagal membuat tutorial: '.$e->getMessage());
         }
     }
 
@@ -137,9 +137,9 @@ class TutorialController extends Controller
 
             $tutorial->update($data);
 
-            return redirect()->route('admin.tutorials.index')->with('success', 'Tutorial updated successfully.');
+            return redirect()->route('admin.tutorials.index')->with('success', 'Tutorial berhasil diperbarui.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to update tutorial: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memperbarui tutorial: '.$e->getMessage());
         }
     }
 
@@ -151,9 +151,9 @@ class TutorialController extends Controller
         try {
             $tutorial->update(['is_active' => ! $tutorial->is_active]);
 
-            return redirect()->back()->with('success', 'Tutorial status updated successfully.');
+            return redirect()->back()->with('success', 'Status tutorial berhasil diperbarui.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to update tutorial status: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memperbarui status tutorial: '.$e->getMessage());
         }
     }
 
@@ -194,9 +194,9 @@ class TutorialController extends Controller
 
             Tutorial::whereIn('id', $ids)->delete();
 
-            return redirect()->route('admin.tutorials.index')->with('success', 'Tutorials deleted successfully.');
+            return redirect()->route('admin.tutorials.index')->with('success', 'Tutorial berhasil dihapus.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to delete tutorials: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus tutorial: '.$e->getMessage());
         }
     }
 }

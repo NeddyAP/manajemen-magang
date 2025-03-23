@@ -1,3 +1,4 @@
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent } from '@/components/ui/card';
@@ -141,7 +142,7 @@ export default function UserForm({ roles, user, mode }: Props) {
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    {errors.roles && <p className="text-sm text-red-500">{errors.roles}</p>}
+                                    <InputError message={errors.roles} />
                                     {mode === 'create' && !selectedRole && (
                                         <p className="text-muted-foreground text-sm">Please select a role to access profile information.</p>
                                     )}
@@ -152,13 +153,13 @@ export default function UserForm({ roles, user, mode }: Props) {
                             <div className="space-y-2">
                                 <Label htmlFor="name">Name</Label>
                                 <Input id="name" value={data.name} onChange={(e) => setData('name', e.target.value)} />
-                                {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+                                <InputError message={errors.name} />
                             </div>
 
                             <div className="space-y-2">
                                 <Label htmlFor="email">Email</Label>
                                 <Input id="email" type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} />
-                                {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+                                <InputError message={errors.email} />
                             </div>
 
                             {/* Password fields - Required on create, optional on edit */}
@@ -172,7 +173,7 @@ export default function UserForm({ roles, user, mode }: Props) {
                                             value={data.password}
                                             onChange={(e) => setData('password', e.target.value)}
                                         />
-                                        {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
+                                        <InputError message={errors.password} />
                                     </div>
 
                                     <div className="space-y-2">
@@ -199,14 +200,17 @@ export default function UserForm({ roles, user, mode }: Props) {
                                     <div className="space-y-2">
                                         <Label htmlFor="employee_id">Employee ID</Label>
                                         <Input id="employee_id" value={data.employee_id} onChange={(e) => setData('employee_id', e.target.value)} />
+                                        <InputError message={errors.employee_id} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="department">Department</Label>
                                         <Input id="department" value={data.department} onChange={(e) => setData('department', e.target.value)} />
+                                        <InputError message={errors.department} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="position">Position</Label>
                                         <Input id="position" value={data.position} onChange={(e) => setData('position', e.target.value)} />
+                                        <InputError message={errors.position} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="employment_status">Employment Status</Label>
@@ -220,6 +224,7 @@ export default function UserForm({ roles, user, mode }: Props) {
                                                 <SelectItem value="Magang">Magang</SelectItem>
                                             </SelectContent>
                                         </Select>
+                                        <InputError message={errors.employment_status} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="join_date">Join Date</Label>
@@ -245,6 +250,7 @@ export default function UserForm({ roles, user, mode }: Props) {
                                                 />
                                             </PopoverContent>
                                         </Popover>
+                                        <InputError message={errors.join_date} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="phone_number">Phone Number</Label>
@@ -253,10 +259,12 @@ export default function UserForm({ roles, user, mode }: Props) {
                                             value={data.phone_number}
                                             onChange={(e) => setData('phone_number', e.target.value)}
                                         />
+                                        <InputError message={errors.phone_number} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="address">Address</Label>
                                         <Input id="address" value={data.address} onChange={(e) => setData('address', e.target.value)} />
+                                        <InputError message={errors.address} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="supervisor_name">Supervisor Name</Label>
@@ -265,6 +273,7 @@ export default function UserForm({ roles, user, mode }: Props) {
                                             value={data.supervisor_name}
                                             onChange={(e) => setData('supervisor_name', e.target.value)}
                                         />
+                                        <InputError message={errors.supervisor_name} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="work_location">Work Location</Label>
@@ -273,6 +282,7 @@ export default function UserForm({ roles, user, mode }: Props) {
                                             value={data.work_location}
                                             onChange={(e) => setData('work_location', e.target.value)}
                                         />
+                                        <InputError message={errors.work_location} />
                                     </div>
                                 </>
                             )}
@@ -287,10 +297,12 @@ export default function UserForm({ roles, user, mode }: Props) {
                                             value={data.employee_number}
                                             onChange={(e) => setData('employee_number', e.target.value)}
                                         />
+                                        <InputError message={errors.employee_number} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="expertise">Expertise</Label>
                                         <Input id="expertise" value={data.expertise} onChange={(e) => setData('expertise', e.target.value)} />
+                                        <InputError message={errors.expertise} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="last_education">Last Education</Label>
@@ -299,6 +311,7 @@ export default function UserForm({ roles, user, mode }: Props) {
                                             value={data.last_education}
                                             onChange={(e) => setData('last_education', e.target.value)}
                                         />
+                                        <InputError message={errors.last_education} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="academic_position">Academic Position</Label>
@@ -307,6 +320,7 @@ export default function UserForm({ roles, user, mode }: Props) {
                                             value={data.academic_position}
                                             onChange={(e) => setData('academic_position', e.target.value)}
                                         />
+                                        <InputError message={errors.academic_position} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="employment_status">Employment Status</Label>
@@ -319,6 +333,7 @@ export default function UserForm({ roles, user, mode }: Props) {
                                                 <SelectItem value="Non-PNS">Non-PNS</SelectItem>
                                             </SelectContent>
                                         </Select>
+                                        <InputError message={errors.employment_status} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="teaching_start_year">Teaching Start Year</Label>
@@ -347,6 +362,7 @@ export default function UserForm({ roles, user, mode }: Props) {
                                                 />
                                             </PopoverContent>
                                         </Popover>
+                                        <InputError message={errors.teaching_start_year} />
                                     </div>
                                 </>
                             )}
@@ -361,6 +377,7 @@ export default function UserForm({ roles, user, mode }: Props) {
                                             value={data.student_number}
                                             onChange={(e) => setData('student_number', e.target.value)}
                                         />
+                                        <InputError message={errors.student_number} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="study_program">Study Program</Label>
@@ -369,6 +386,7 @@ export default function UserForm({ roles, user, mode }: Props) {
                                             value={data.study_program}
                                             onChange={(e) => setData('study_program', e.target.value)}
                                         />
+                                        <InputError message={errors.study_program} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="class_year">Class Year</Label>
@@ -397,6 +415,7 @@ export default function UserForm({ roles, user, mode }: Props) {
                                                 />
                                             </PopoverContent>
                                         </Popover>
+                                        <InputError message={errors.class_year} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="academic_status">Academic Status</Label>
@@ -410,6 +429,7 @@ export default function UserForm({ roles, user, mode }: Props) {
                                                 <SelectItem value="Lulus">Lulus</SelectItem>
                                             </SelectContent>
                                         </Select>
+                                        <InputError message={errors.academic_status} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="semester">Semester</Label>
@@ -421,6 +441,7 @@ export default function UserForm({ roles, user, mode }: Props) {
                                             value={data.semester}
                                             onChange={(e) => setData('semester', e.target.value)}
                                         />
+                                        <InputError message={errors.semester} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="gpa">GPA (IPK)</Label>
@@ -433,6 +454,12 @@ export default function UserForm({ roles, user, mode }: Props) {
                                             value={data.gpa}
                                             onChange={(e) => setData('gpa', e.target.value)}
                                         />
+                                        <InputError message={errors.gpa} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="advisor_id">Advisor ID</Label>
+                                        <Input id="advisor_id" value={data.advisor_id} onChange={(e) => setData('advisor_id', e.target.value)} />
+                                        <InputError message={errors.advisor_id} />
                                     </div>
                                 </>
                             )}

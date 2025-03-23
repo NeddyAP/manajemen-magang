@@ -124,7 +124,7 @@ class UserController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
+            return redirect()->route('admin.users.index')->with('success', 'Pengguna berhasil dibuat.');
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('User creation failed: '.$e->getMessage());
@@ -132,7 +132,7 @@ class UserController extends Controller
 
             return back()
                 ->withInput()
-                ->withErrors(['error' => 'Failed to create user. '.$e->getMessage()]);
+                ->withErrors(['error' => 'Gagal membuat pengguna. '.$e->getMessage()]);
         }
     }
 
@@ -297,7 +297,7 @@ class UserController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
+            return redirect()->route('admin.users.index')->with('success', 'Pengguna berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('User update failed: '.$e->getMessage());
@@ -306,7 +306,7 @@ class UserController extends Controller
 
             return back()
                 ->withInput()
-                ->withErrors(['error' => 'Failed to update user. '.$e->getMessage()]);
+                ->withErrors(['error' => 'Gagal memperbarui pengguna. '.$e->getMessage()]);
         }
     }
 
@@ -328,11 +328,11 @@ class UserController extends Controller
 
             DB::commit();
 
-            return back()->with('success', 'User deleted successfully.');
+            return back()->with('success', 'Pengguna berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->withErrors(['error' => 'Failed to delete user. '.$e->getMessage()]);
+            return back()->withErrors(['error' => 'Gagal menghapus pengguna. '.$e->getMessage()]);
         }
     }
 
@@ -363,12 +363,12 @@ class UserController extends Controller
 
             DB::commit();
 
-            return back()->with('success', count($userIds).' users deleted successfully.');
+            return back()->with('success', count($userIds).' pengguna berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Bulk user deletion failed: '.$e->getMessage());
 
-            return back()->withErrors(['error' => 'Failed to delete users. '.$e->getMessage()]);
+            return back()->withErrors(['error' => 'Gagal menghapus pengguna. '.$e->getMessage()]);
         }
     }
 }

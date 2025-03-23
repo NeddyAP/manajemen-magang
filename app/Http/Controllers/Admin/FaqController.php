@@ -72,9 +72,9 @@ class FaqController extends Controller
         try {
             Faq::create($request->validated());
 
-            return redirect()->route('admin.faqs.index')->with('success', 'FAQ created successfully.');
+            return redirect()->route('admin.faqs.index')->with('success', 'FAQ berhasil dibuat.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to create FAQ: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Gagal membuat FAQ: '.$e->getMessage());
         }
     }
 
@@ -94,9 +94,9 @@ class FaqController extends Controller
         try {
             $faq->update($request->validated());
 
-            return redirect()->route('admin.faqs.index')->with('success', 'FAQ updated successfully.');
+            return redirect()->route('admin.faqs.index')->with('success', 'FAQ berhasil diperbarui.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to update FAQ: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memperbarui FAQ: '.$e->getMessage());
         }
     }
 
@@ -108,9 +108,9 @@ class FaqController extends Controller
         try {
             $faq->update(['is_active' => ! $faq->is_active]);
 
-            return redirect()->route('admin.faqs.index')->with('success', 'FAQ status updated successfully.');
+            return redirect()->route('admin.faqs.index')->with('success', 'Status FAQ berhasil diperbarui.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to update FAQ status: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memperbarui status FAQ: '.$e->getMessage());
         }
     }
 
@@ -122,9 +122,9 @@ class FaqController extends Controller
         try {
             $faq->delete();
 
-            return redirect()->route('admin.faqs.index')->with('success', 'FAQ deleted successfully.');
+            return redirect()->route('admin.faqs.index')->with('success', 'FAQ berhasil dihapus.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to delete FAQ: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus FAQ: '.$e->getMessage());
         }
     }
 
@@ -137,9 +137,9 @@ class FaqController extends Controller
         try {
             Faq::destroy($ids);
 
-            return redirect()->route('admin.faqs.index')->with('success', 'FAQs deleted successfully.');
+            return redirect()->route('admin.faqs.index')->with('success', 'FAQ berhasil dihapus.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to delete FAQs: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus FAQ: '.$e->getMessage());
         }
     }
 }

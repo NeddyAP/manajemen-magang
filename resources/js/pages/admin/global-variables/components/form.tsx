@@ -1,3 +1,4 @@
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -49,7 +50,7 @@ export default function GlobalVariableForm({ globalVariable, mode }: Props) {
             <Card>
                 <CardContent className="space-y-4 pt-6">
                     <div className="space-y-4">
-                        <Label htmlFor="key">Key*</Label>
+                        <Label htmlFor="key">Key</Label>
                         <Input
                             id="key"
                             value={data.key}
@@ -59,7 +60,7 @@ export default function GlobalVariableForm({ globalVariable, mode }: Props) {
                             }}
                             required
                         />
-                        {errors.key && <p className="text-red-500">{errors.key}</p>}
+                        <InputError message={errors.key} />
                         <Label htmlFor="slug" className="text-gray-500">
                             Nama variable: <br></br> {data.slug}
                         </Label>
@@ -72,10 +73,10 @@ export default function GlobalVariableForm({ globalVariable, mode }: Props) {
                             required
                             hidden
                         />
-                        {errors.slug && <p className="text-red-500">{errors.slug}</p>}
+                        <InputError message={errors.slug} />
                     </div>
                     <div className="space-y-4">
-                        <Label htmlFor="value">Value*</Label>
+                        <Label htmlFor="value">Value</Label>
                         <Input
                             id="value"
                             value={data.value}
@@ -84,15 +85,15 @@ export default function GlobalVariableForm({ globalVariable, mode }: Props) {
                             }}
                             required
                         />
-                        {errors.value && <p className="text-red-500">{errors.value}</p>}
+                        <InputError message={errors.value} />
                     </div>
                     <div className="space-y-4">
-                        <Label htmlFor="description">Description*</Label>
+                        <Label htmlFor="description">Description</Label>
                         <Input id="description" value={data.description} onChange={(e) => setData('description', e.target.value)} required />
-                        {errors.description && <p className="text-red-500">{errors.description}</p>}
+                        <InputError message={errors.description} />
                     </div>
                     <div className="space-y-4">
-                        <Label htmlFor="is_active">Status*</Label>
+                        <Label htmlFor="is_active">Status</Label>
                         <RadioGroup
                             value={data.is_active ? 'aktif' : 'tidak aktif'}
                             onValueChange={(value) => setData('is_active', value === 'active')}
@@ -104,7 +105,7 @@ export default function GlobalVariableForm({ globalVariable, mode }: Props) {
                                 <Label htmlFor="tidak aktif">Tidak Aktif</Label>
                             </div>
                         </RadioGroup>
-                        {errors.is_active && <p className="text-red-500">{errors.is_active}</p>}
+                        <InputError message={errors.is_active} />
                     </div>
                 </CardContent>
             </Card>

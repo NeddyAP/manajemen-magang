@@ -10,17 +10,17 @@ class DashboardController extends Controller
     public function __invoke(Request $request)
     {
         return inertia('admin/dashboard/index', [
-            'title' => 'Dashboard',
-            'description' => 'Welcome to the admin dashboard.',
+            'title' => 'Dasbor',
+            'description' => 'Selamat datang di dasbor admin.',
         ]);
     }
 
     public function index()
     {
         return inertia('admin/dashboard/index', [
-            'title' => 'Admin Dashboard',
-            'description' => 'Welcome to the admin dashboard.',
-            'additional_info' => 'This is some additional information for the dashboard.',
+            'title' => 'Dasbor Admin',
+            'description' => 'Selamat datang di dasbor admin.',
+            'additional_info' => 'Ini adalah informasi tambahan untuk dasbor.',
         ]);
     }
 }

@@ -1,3 +1,4 @@
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -41,17 +42,17 @@ export default function FaqForm({ faq, mode }: Props) {
             <Card>
                 <CardContent className="space-y-4 pt-6">
                     <div className="space-y-4">
-                        <Label htmlFor="question">Pertanyaan*</Label>
-                        <Input id="question" value={data.question} onChange={(e) => setData('question', e.target.value)} required />
-                        {errors.question && <p className="text-red-500">{errors.question}</p>}
+                        <Label htmlFor="question">Pertanyaan</Label>
+                        <Input id="question" value={data.question} onChange={(e) => setData('question', e.target.value)} />
+                        <InputError message={errors.question} />
                     </div>
                     <div className="space-y-4">
                         <Label htmlFor="answer">Jawaban</Label>
-                        <Input id="answer" value={data.answer} onChange={(e) => setData('answer', e.target.value)} required />
-                        {errors.answer && <p className="text-red-500">{errors.answer}</p>}
+                        <Input id="answer" value={data.answer} onChange={(e) => setData('answer', e.target.value)} />
+                        <InputError message={errors.answer} />
                         <Label htmlFor="category">Kategori</Label>
-                        <Input id="category" value={data.category} onChange={(e) => setData('category', e.target.value)} required />
-                        {errors.category && <p className="text-red-500">{errors.category}</p>}
+                        <Input id="category" value={data.category} onChange={(e) => setData('category', e.target.value)} />
+                        <InputError message={errors.category} />
                     </div>
                     <div className="space-y-4">
                         <Label htmlFor="status">Status</Label>
@@ -70,12 +71,12 @@ export default function FaqForm({ faq, mode }: Props) {
                                 <Label htmlFor="inactive">Inactive</Label>
                             </div>
                         </RadioGroup>
-                        {errors.is_active && <p className="text-red-500">{errors.is_active}</p>}
+                        <InputError message={errors.is_active} />
                     </div>
                     <div className="space-y-4">
                         <Label htmlFor="order">Urutan</Label>
-                        <Input id="order" type="number" value={data.order} onChange={(e) => setData('order', e.target.value)} required />
-                        {errors.order && <p className="text-red-500">{errors.order}</p>}
+                        <Input id="order" type="number" value={data.order} onChange={(e) => setData('order', e.target.value)} />
+                        <InputError message={errors.order} />
                     </div>
                 </CardContent>
             </Card>

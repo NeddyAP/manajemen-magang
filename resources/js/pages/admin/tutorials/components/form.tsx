@@ -1,3 +1,4 @@
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -39,19 +40,19 @@ export default function TutorialForm({ tutorial, mode }: Props) {
             <Card>
                 <CardContent className="space-y-4 pt-6">
                     <div className="space-y-4">
-                        <Label htmlFor="title">Judul*</Label>
-                        <Input id="title" value={data.title} onChange={(e) => setData('title', e.target.value)} required />
-                        {errors.title && <p className="text-red-500">{errors.title}</p>}
+                        <Label htmlFor="title">Judul</Label>
+                        <Input id="title" value={data.title} onChange={(e) => setData('title', e.target.value)} />
+                        <InputError message={errors.title} />
                     </div>
                     <div className="space-y-4">
-                        <Label htmlFor="content">Konten*</Label>
-                        <Input id="content" value={data.content} onChange={(e) => setData('content', e.target.value)} required />
-                        {errors.content && <p className="text-red-500">{errors.content}</p>}
+                        <Label htmlFor="content">Konten</Label>
+                        <Input id="content" value={data.content} onChange={(e) => setData('content', e.target.value)} />
+                        <InputError message={errors.content} />
                     </div>
                     <div className="space-y-4">
-                        <Label htmlFor="file_name">Nama File*</Label>
-                        <Input id="file_name" value={data.file_name} onChange={(e) => setData('file_name', e.target.value)} required />
-                        {errors.file_name && <p className="text-red-500">{errors.file_name}</p>}
+                        <Label htmlFor="file_name">Nama File</Label>
+                        <Input id="file_name" value={data.file_name} onChange={(e) => setData('file_name', e.target.value)} />
+                        <InputError message={errors.file_name} />
                     </div>
                     <div className="space-y-4">
                         <Label htmlFor="file_path">File tutorial{mode === 'create' ? '*' : ''}</Label>
@@ -59,15 +60,14 @@ export default function TutorialForm({ tutorial, mode }: Props) {
                             id="file_path"
                             type="file"
                             onChange={(e) => e.target.files && setData('file_path', e.target.files[0] as unknown as string)}
-                            required={mode === 'create'}
                         />
                         {mode === 'edit' && data.file_path && typeof data.file_path === 'string' && (
                             <p className="text-sm text-gray-500">File saat ini: {data.file_path}</p>
                         )}
-                        {errors.file_path && <p className="text-red-500">{errors.file_path}</p>}
+                        <InputError message={errors.file_path} />
                     </div>
                     <div className="space-y-4">
-                        <Label htmlFor="access_level">Level Akses*</Label>
+                        <Label htmlFor="access_level">Level Akses</Label>
                         <Select value={data.access_level} onValueChange={(value) => setData('access_level', value)}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select access level" />
@@ -78,7 +78,7 @@ export default function TutorialForm({ tutorial, mode }: Props) {
                                 <SelectItem value="mahasiswa">Mahasiswa</SelectItem>
                             </SelectContent>
                         </Select>
-                        {errors.access_level && <p className="text-red-500">{errors.access_level}</p>}
+                        <InputError message={errors.access_level} />
                     </div>
                 </CardContent>
             </Card>

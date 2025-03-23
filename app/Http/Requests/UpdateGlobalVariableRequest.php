@@ -29,4 +29,29 @@ class UpdateGlobalVariableRequest extends FormRequest
             'is_active' => 'boolean',
         ];
     }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'key.required' => 'Kunci harus diisi.',
+            'key.string' => 'Kunci harus berupa string.',
+            'key.max' => 'Kunci maksimal 255 karakter.',
+            'key.unique' => 'Kunci sudah ada.',
+            'slug.required' => 'Slug harus diisi.',
+            'slug.string' => 'Slug harus berupa string.',
+            'slug.max' => 'Slug maksimal 255 karakter.',
+            'slug.unique' => 'Slug sudah ada.',
+            'value.required' => 'Nilai harus diisi.',
+            'value.string' => 'Nilai harus berupa string.',
+            'value.max' => 'Nilai maksimal 255 karakter.',
+            'description.string' => 'Deskripsi harus berupa string.',
+            'description.max' => 'Deskripsi maksimal 255 karakter.',
+            'is_active.boolean' => 'Status aktif harus berupa boolean.',
+        ];
+    }
 }
