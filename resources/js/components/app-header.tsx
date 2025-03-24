@@ -11,7 +11,7 @@ import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, LayoutDashboard, LayoutGrid, Menu, Search } from 'lucide-react';
+import { BookOpen, GraduationCap, LayoutDashboard, LayoutGrid, Menu, Search } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 
@@ -25,6 +25,11 @@ const mainNavItems: NavItem[] = [
         title: 'Panduan',
         href: '/buku-panduan',
         icon: BookOpen,
+    },
+    {
+        title: 'Dashboard Magang',
+        href: '/magang',
+        icon: GraduationCap,
     },
 ];
 

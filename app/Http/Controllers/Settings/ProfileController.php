@@ -67,4 +67,17 @@ class ProfileController extends Controller
 
         return redirect('/');
     }
+
+    public function appearance(Request $request)
+    {
+
+        $userRole = $request->user()->roles->pluck('name');
+
+        $route = 'front/settings/appearance';
+        if ($userRole->contains('admin') || $userRole->contains('superadmin')) {
+            $route = 'admin/settings/appearance';
+        }
+
+        return Inertia::render($route);
+    }
 }
