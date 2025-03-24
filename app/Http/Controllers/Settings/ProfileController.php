@@ -18,7 +18,14 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
-        return Inertia::render('admin/settings/profile', [
+        $userRole = $request->user()->roles->pluck('name');
+
+        $route = 'front/settings/profile';
+        if ($userRole->contains('admin') || $userRole->contains('superadmin')) {
+            $route = 'admin/settings/profile';
+        }
+
+        return Inertia::render($route, [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
         ]);

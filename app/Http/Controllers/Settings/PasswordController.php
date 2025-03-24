@@ -18,7 +18,13 @@ class PasswordController extends Controller
      */
     public function edit(Request $request): Response
     {
-        return Inertia::render('admin/settings/password', [
+        $userRole = $request->user()->roles->pluck('name');
+        $route = 'front/settings/password';
+        if ($userRole->contains('admin') || $userRole->contains('superadmin')) {
+            $route = 'admin/settings/password';
+        }
+
+        return Inertia::render($route, [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
         ]);

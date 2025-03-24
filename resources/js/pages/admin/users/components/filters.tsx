@@ -32,9 +32,9 @@ export function FilterPopover({ label, value, options, onChange }: FilterProps) 
             </PopoverTrigger>
             <PopoverContent className="w-[180px] p-0" align="start">
                 <Command>
-                    <CommandInput placeholder={`Search ${label}...`} />
+                    <CommandInput placeholder={`Cari ${label}...`} />
                     <CommandList>
-                        <CommandEmpty>No {label} found.</CommandEmpty>
+                        <CommandEmpty>Tidak ada {label} ditemukan.</CommandEmpty>
                         <CommandGroup>
                             <CommandItem
                                 onSelect={() => {

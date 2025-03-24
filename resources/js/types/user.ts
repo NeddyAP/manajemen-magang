@@ -38,3 +38,9 @@ export interface User {
         gpa: string | number;
     };
 }
+
+export interface Lecturer {
+    id: string;
+    name: string;
+    employee_number: string;
+}

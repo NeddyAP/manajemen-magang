@@ -66,8 +66,16 @@ class UserController extends Controller
 
     public function create()
     {
+        // get all dosen for mahasiswa dropdown
+        $lecturers = User::with(['roles'])->select('id', 'name')
+            ->whereHas('roles', function ($query) {
+                $query->where('name', 'dosen');
+            })
+            ->get();
+
         return inertia('admin/users/create', [
             'roles' => Role::get(),
+            'lecturers' => $lecturers,
         ]);
     }
 
@@ -140,9 +148,17 @@ class UserController extends Controller
     {
         $user->load(['roles', 'adminProfile', 'dosenProfile', 'mahasiswaProfile']);
 
+        // Get all dosen for mahasiswa dropdown
+        $lecturers = User::with(['roles'])->select('id', 'name')
+            ->whereHas('roles', function ($query) {
+                $query->where('name', 'dosen');
+            })
+            ->get();
+
         return inertia('admin/users/edit', [
             'user' => $user,
             'roles' => Role::get(),
+            'lecturers' => $lecturers,
         ]);
     }
 

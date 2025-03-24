@@ -52,7 +52,7 @@ export const columns: ColumnDef<User>[] = [
     },
     {
         accessorKey: 'id',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Id" />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Id Pengguna" />,
     },
     {
         accessorKey: 'email',
@@ -83,7 +83,7 @@ export const columns: ColumnDef<User>[] = [
     },
     {
         accessorKey: 'created_at',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Dibuat Pada" />,
         cell: ({ row }) => {
             const createdAt = row.getValue('created_at');
             if (!createdAt || typeof createdAt !== 'string') return '-';
@@ -99,7 +99,7 @@ export const columns: ColumnDef<User>[] = [
     },
     {
         accessorKey: 'updated_at',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Updated At" />,
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Diperbarui Pada" />,
         cell: ({ row }) => {
             const updatedAt = row.getValue('updated_at');
             if (!updatedAt || typeof updatedAt !== 'string') return '-';
@@ -127,15 +127,15 @@ export const columns: ColumnDef<User>[] = [
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(users.id)}>Copy user ID</DropdownMenuItem>
+                        <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(users.id)}>Salin ID pengguna</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                             <a href={route('admin.users.edit', users.id)}>Edit</a>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                             onClick={() => {
-                                if (confirm('Are you sure you want to delete this user?')) {
+                                if (confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
                                     router.delete(route('admin.users.destroy', users.id), {
                                         preserveScroll: true,
                                     });
