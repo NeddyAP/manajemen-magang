@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpenText, Building2, Cog, File, History, LayoutGrid, MessageCircleQuestion, Users, Waypoints } from 'lucide-react';
+import { BookOpenText, Building2, Cog, File, History, House, LayoutGrid, MessageCircleQuestion, Users, Waypoints } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -67,6 +67,11 @@ const footerNavItems: NavItem[] = [
         title: 'Global Variables',
         href: '/admin/global-variables',
         icon: Cog,
+    },
+    {
+        title: 'Home',
+        href: '/',
+        icon: House,
     },
 ];
 
