@@ -20,6 +20,9 @@ return new class extends Migration
             $table->enum('access_level', ['mahasiswa', 'dosen', 'all'])->default('all');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+
+            // index
+            $table->index(['title', 'file_name']);
         });
     }
 
