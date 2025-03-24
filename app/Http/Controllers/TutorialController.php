@@ -11,10 +11,16 @@ class TutorialController extends Controller
     public function index(Request $request)
     {
         // Determine user role access levels more efficiently
-        $userRoles = Auth::user()->roles->pluck('name');
+        if (Auth::guest()) {
+            $userRoles = 'guest';
+        } else {
+            $userRoles = Auth::user()->roles->pluck('name');
+        }
         $accessLevels = ['all'];
 
-        if ($userRoles->contains('admin') || $userRoles->contains('superadmin')) {
+        if ($userRoles === 'guest') {
+            $accessLevels[] = 'all';
+        } elseif ($userRoles->contains('admin') || $userRoles->contains('superadmin')) {
             $accessLevels = array_merge($accessLevels, ['admin', 'dosen', 'mahasiswa']);
         } elseif ($userRoles->contains('dosen')) {
             $accessLevels[] = 'dosen';
