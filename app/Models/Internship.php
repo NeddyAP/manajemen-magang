@@ -9,11 +9,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Internship extends Model
 {
     /** @use HasFactory<\Database\Factories\InternshipFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
         'user_id',
-        'lecturer_id',
         'type',
         'application_file',
         'company_name',
@@ -31,17 +30,10 @@ class Internship extends Model
     protected $appends = [
         'progress_percentage',
     ];
-    protected $hidden = [
-        'application_file',
-    ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-    public function lecturer()
-    {
-        return $this->belongsTo(User::class, 'lecturer_id');
     }
     public function logbooks()
     {

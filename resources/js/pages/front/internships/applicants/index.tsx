@@ -9,11 +9,12 @@ import { useState, useEffect } from 'react';
 import { columns, initialColumnVisibility } from './components/column';
 import { StatusFilter, TypeFilter } from './components/filters';
 import { User } from '@/types/user';
+import FrontLayout from '@/layouts/front-layout';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Magang',
-        href: '/admin/internships',
+        title: 'Permohonan Magang',
+        href: '/internships/applicants',
     },
 ];
 
@@ -46,7 +47,7 @@ interface InternshipsProps {
     meta: TableMeta;
 }
 
-export default function Internships({ internships, meta }: InternshipsProps) {
+export default function Applicants({ internships, meta }: InternshipsProps) {
     const [selectedStatus, setSelectedStatus] = useState<string>('');
     const [selectedType, setSelectedType] = useState<string>('');
 
@@ -72,7 +73,7 @@ export default function Internships({ internships, meta }: InternshipsProps) {
         if (status) query.status = status;
         if (selectedType) query.type = selectedType;
 
-        router.get(route('admin.internships.index'), query, {
+        router.get(route('front.internships.applicants.index'), query, {
             preserveState: true,
             preserveScroll: true,
             replace: true,
@@ -87,7 +88,7 @@ export default function Internships({ internships, meta }: InternshipsProps) {
         if (selectedStatus) query.status = selectedStatus;
         if (type) query.type = type;
 
-        router.get(route('admin.internships.index'), query, {
+        router.get(route('front.internships.applicants.index'), query, {
             preserveState: true,
             preserveScroll: true,
             replace: true,
@@ -95,13 +96,10 @@ export default function Internships({ internships, meta }: InternshipsProps) {
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Magang" />
+        <FrontLayout breadcrumbs={breadcrumbs}>
+            <Head title="Permohonan Magang" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                    </div>
+                <div className="grid auto-rows-min gap-4 md:grid-cols-2">
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">
                         <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                     </div>
@@ -116,9 +114,9 @@ export default function Internships({ internships, meta }: InternshipsProps) {
                             <TypeFilter value={selectedType} onChange={handleTypeChange} />
                         </div>
                         <Button>
-                            <Link href={route('admin.internships.create')} className="flex items-center gap-2">
+                            <Link href={route('front.internships.applicants.create')} className="flex items-center gap-2">
                                 <Plus className="h-4 w-4" />
-                                Tambah Magang
+                                Ajukan Magang
                             </Link>
                         </Button>
                     </div>
@@ -131,11 +129,11 @@ export default function Internships({ internships, meta }: InternshipsProps) {
                             { id: 'type', value: selectedType },
                         ]}
                         meta={meta}
-                        deleteRoute={route('admin.internships.destroy.bulk')}
+                        deleteRoute={route('front.internships.applicants.destroy.bulk')}
                         initialColumnVisibility={initialColumnVisibility}
                     />
                 </div>
             </div>
-        </AppLayout>
+        </FrontLayout>
     );
 }

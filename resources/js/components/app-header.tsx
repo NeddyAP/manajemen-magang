@@ -28,7 +28,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Dashboard Magang',
-        href: '/magang',
+        href: '/internships',
         icon: GraduationCap,
     },
 ];
@@ -56,6 +56,22 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
     const getInitials = useInitials();
+
+    // Function to check if current URL starts with the item's href
+    const isActive = (href: string) => {
+        // Convert both URLs to lowercase for case-insensitive comparison
+        const currentUrl = page.url.toLowerCase();
+        const itemHref = href.toLowerCase();
+
+        // Check if current URL starts with the item's href
+        // Also make sure it's a complete path match
+        return currentUrl === itemHref ||
+            (currentUrl.startsWith(itemHref) &&
+                (currentUrl.charAt(itemHref.length) === '/' ||
+                    currentUrl.charAt(itemHref.length) === '?' ||
+                    currentUrl.length === itemHref.length));
+    };
+
     return (
         <>
             <div className="border-sidebar-border/80 border-b">
@@ -77,7 +93,14 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                     <div className="flex h-full flex-col justify-between text-sm">
                                         <div className="flex flex-col space-y-4">
                                             {mainNavItems.map((item) => (
-                                                <Link key={item.title} href={item.href} className="flex items-center space-x-2 font-medium">
+                                                <Link
+                                                    key={item.title}
+                                                    href={item.href}
+                                                    className={cn(
+                                                        "flex items-center space-x-2 font-medium",
+                                                        isActive(item.href) && "text-neutral-900 dark:text-neutral-100"
+                                                    )}
+                                                >
                                                     {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
                                                     <span>{item.title}</span>
                                                 </Link>
@@ -90,7 +113,10 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                     key={item.title}
                                                     href={item.href}
                                                     rel="noopener noreferrer"
-                                                    className="flex items-center space-x-2 font-medium"
+                                                    className={cn(
+                                                        "flex items-center space-x-2 font-medium",
+                                                        isActive(item.href) && "text-neutral-900 dark:text-neutral-100"
+                                                    )}
                                                 >
                                                     {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
                                                     <span>{item.title}</span>
@@ -117,14 +143,14 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                             href={item.href}
                                             className={cn(
                                                 navigationMenuTriggerStyle(),
-                                                page.url === item.href && activeItemStyles,
+                                                isActive(item.href) && activeItemStyles,
                                                 'h-9 cursor-pointer px-3',
                                             )}
                                         >
                                             {item.icon && <Icon iconNode={item.icon} className="mr-2 h-4 w-4" />}
                                             {item.title}
                                         </Link>
-                                        {page.url === item.href && (
+                                        {isActive(item.href) && (
                                             <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>
                                         )}
                                     </NavigationMenuItem>
@@ -196,14 +222,16 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                         )}
                     </div>
                 </div>
-            </div>
-            {breadcrumbs.length > 1 && (
-                <div className="border-sidebar-border/70 flex w-full border-b">
-                    <div className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 md:max-w-7xl">
-                        <Breadcrumbs breadcrumbs={breadcrumbs} />
-                    </div>
-                </div>
-            )}
+            </div >
+            {
+                breadcrumbs.length > 1 && (
+                    <div className="border-sidebar-border/70 flex w-full border-b">
+                        <div className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 md:max-w-7xl">
+                            <Breadcrumbs breadcrumbs={breadcrumbs} />
+                        </div>
+                    </div >
+                )
+            }
         </>
     );
 }

@@ -18,6 +18,11 @@ Route::middleware(['auth', 'role:superadmin|admin'])->prefix('admin')->name('adm
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 
     Route::resource('internships', InternshipController::class);
+    Route::put('internships/{internship}/status', [InternshipController::class, 'updateStatus'])->name('internships.update-status');
+    Route::put('internships/{internship}/progress', [InternshipController::class, 'updateProgress'])->name('internships.update-progress');
+    Route::get('internships/{internship}/download', [InternshipController::class, 'downloadApplicationFile'])->name('internships.download');
+    Route::delete('internships/bulk-destroy', [InternshipController::class, 'bulkDestroy'])->name('internships.destroy.bulk');
+
     Route::resource('logbooks', LogbookController::class);
     Route::resource('reports', ReportController::class);
 
@@ -42,4 +47,4 @@ Route::middleware(['auth', 'role:superadmin|admin'])->prefix('admin')->name('adm
     Route::post('global-variables/bulk-destroy', [GlobalVariableController::class, 'bulkDestroy'])->name('global-variables.destroy.bulk');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
