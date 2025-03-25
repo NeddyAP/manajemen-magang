@@ -41,7 +41,7 @@ const rightNavItems: NavItem[] = [
     },
     {
         title: 'Panduan',
-        href: 'buku-panduan',
+        href: '/buku-panduan',
         icon: BookOpen,
     },
 ];
