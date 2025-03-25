@@ -85,13 +85,21 @@ export default function Tutorials({ tutorials }: { tutorials: Tutorial[] }) {
         return order.indexOf(a) - order.indexOf(b);
     });
 
+    // Get access level display info with fallback for unknown levels
+    const getAccessLevelInfo = (level: string) => {
+        if (level in accessLevelConfig) {
+            return accessLevelConfig[level as keyof typeof accessLevelConfig];
+        }
+        // Fallback for unexpected access levels
+        return { name: level.charAt(0).toUpperCase() + level.slice(1), icon: <BookOpen className="h-5 w-5" /> };
+    };
+
     // Render tutorial card
     const renderTutorialCard = (tutorial: Tutorial) => (
         <div
             key={tutorial.id}
-            className={`flex h-full transform flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-700 dark:bg-gray-800 ${
-                animatedCards[tutorial.id] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-            }`}
+            className={`flex h-full transform flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-700 dark:bg-gray-800 ${animatedCards[tutorial.id] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+                }`}
             style={{ transitionDelay: `${tutorials.findIndex((t) => t.id === tutorial.id) * 50}ms` }}
         >
             <div className="flex-grow p-5">
@@ -203,9 +211,9 @@ export default function Tutorials({ tutorials }: { tutorials: Tutorial[] }) {
                                 <div key={accessLevel} className="mb-8">
                                     <div className="mb-6 flex items-center border-b border-gray-200 pb-3 dark:border-gray-700">
                                         <div className="flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 dark:bg-gray-800">
-                                            {accessLevelConfig[accessLevel as keyof typeof accessLevelConfig]?.icon}
+                                            {getAccessLevelInfo(accessLevel).icon}
                                             <h2 className="text-xl font-bold text-gray-800 dark:text-white">
-                                                {accessLevelConfig[accessLevel as keyof typeof accessLevelConfig]?.name || accessLevel}
+                                                {getAccessLevelInfo(accessLevel).name}
                                             </h2>
                                         </div>
                                         <div className="ml-4 rounded-full bg-gray-200 px-3 py-1 text-sm text-gray-700 dark:bg-gray-700 dark:text-gray-300">
