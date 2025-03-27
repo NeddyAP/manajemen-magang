@@ -21,6 +21,7 @@ return new class extends Migration
             $table->date('start_date');
             $table->date('end_date');
             $table->enum('status', ['waiting', 'accepted', 'rejected'])->default('waiting');
+            $table->text('status_message')->nullable();
             $table->char('progress', 2)->default('0');
             $table->timestamps();
         });

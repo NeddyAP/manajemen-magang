@@ -98,8 +98,9 @@ export default function Tutorials({ tutorials }: { tutorials: Tutorial[] }) {
     const renderTutorialCard = (tutorial: Tutorial) => (
         <div
             key={tutorial.id}
-            className={`flex h-full transform flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-700 dark:bg-gray-800 ${animatedCards[tutorial.id] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-                }`}
+            className={`flex h-full transform flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-700 dark:bg-gray-800 ${
+                animatedCards[tutorial.id] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+            }`}
             style={{ transitionDelay: `${tutorials.findIndex((t) => t.id === tutorial.id) * 50}ms` }}
         >
             <div className="flex-grow p-5">

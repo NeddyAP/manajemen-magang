@@ -12,7 +12,8 @@ interface Internship {
     start_date: string;
     end_date: string;
     status: 'waiting' | 'accepted' | 'rejected';
-    progress: string;
+    status_message?: string | null;
+    progress: number;
     created_at: string;
     updated_at: string;
 }
@@ -36,8 +37,7 @@ export default function EditInternshipApplication({ internship }: Props) {
             href: route('front.internships.applicants.edit', internship.id),
         },
     ];
-
-    const isEditable = internship.status === 'waiting';
+    const isEditable = internship.status === 'waiting' || internship.status === 'rejected';
 
     return (
         <FrontLayout breadcrumbs={breadcrumbs}>
@@ -51,12 +51,17 @@ export default function EditInternshipApplication({ internship }: Props) {
                         </p>
                     </div>
 
-                    {!isEditable && (
+                    {internship.status === 'rejected' && internship.status_message && (
+                        <div className="mb-6 rounded-md border border-red-500 bg-red-50 p-4 text-red-700">
+                            <p className="font-medium">Alasan Penolakan:</p>
+                            <p className="text-sm">{internship.status_message}</p>
+                        </div>
+                    )}
+
+                    {internship.status === 'accepted' && (
                         <div className="mb-6 rounded-md border border-yellow-500 bg-yellow-50 p-4 text-yellow-700">
                             <p className="font-medium">Aplikasi ini tidak dapat diedit</p>
-                            <p className="text-sm">
-                                Aplikasi yang telah {internship.status === 'accepted' ? 'accepted' : 'rejected'} tidak dapat diubah.
-                            </p>
+                            <p className="text-sm">Aplikasi yang telah disetujui tidak dapat diubah.</p>
                         </div>
                     )}
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { DataTableColumnHeader } from '@/components/data-table/column-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -17,7 +18,6 @@ import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { FileSpreadsheet, MoreHorizontal } from 'lucide-react';
 import { Internship } from '..';
-import { DataTableColumnHeader } from '@/components/data-table/column-header';
 
 export const columns: ColumnDef<Internship>[] = [
     {
@@ -26,11 +26,11 @@ export const columns: ColumnDef<Internship>[] = [
             <Checkbox
                 checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
                 onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label="Select all"
+                aria-label="Pilih semua"
             />
         ),
         cell: ({ row }) => (
-            <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />
+            <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Pilih baris" />
         ),
         enableSorting: false,
         enableHiding: false,
@@ -55,17 +55,31 @@ export const columns: ColumnDef<Internship>[] = [
         },
     },
     {
+        accessorKey: 'lecturer',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Dosen Pembimbing" />,
+        cell: ({ row }) => {
+            const advisor = row.original?.user?.mahasiswa_profile?.advisor;
+            if (!advisor) return <span className="text-muted-foreground text-sm">Belum ditentukan</span>;
+
+            return (
+                <div className="flex flex-col">
+                    <span className="font-medium">{advisor.name}</span>
+                    <span className="text-muted-foreground text-sm">{advisor.email}</span>
+                    {advisor.dosen_profile?.expertise && (
+                        <span className="text-muted-foreground text-xs italic">{advisor.dosen_profile.expertise}</span>
+                    )}
+                </div>
+            );
+        },
+    },
+    {
         accessorKey: 'type',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Jenis" />,
         cell: ({ row }) => {
             const type = row.getValue('type');
             if (!type || typeof type !== 'string') return '-';
 
-            return (
-                <Badge variant={type === 'kkl' ? 'default' : 'secondary'}>
-                    {type.toUpperCase()}
-                </Badge>
-            );
+            return <Badge variant={type === 'kkl' ? 'default' : 'secondary'}>{type.toUpperCase()}</Badge>;
         },
     },
     {
@@ -78,11 +92,8 @@ export const columns: ColumnDef<Internship>[] = [
 
             return (
                 <div className="flex items-center">
-                    <div className="h-2 w-full bg-gray-200 rounded-full">
-                        <div
-                            className="h-full bg-blue-500 rounded-full"
-                            style={{ width: `${progress}%` }}
-                        />
+                    <div className="h-2 w-full rounded-full bg-gray-200">
+                        <div className="h-full rounded-full bg-blue-500" style={{ width: `${progress}%` }} />
                     </div>
                     <span className="ml-2 text-sm">{progress}%</span>
                 </div>
@@ -104,11 +115,7 @@ export const columns: ColumnDef<Internship>[] = [
 
             const statusInfo = statusMap[status] || { label: status, variant: 'default' };
 
-            return (
-                <Badge variant={statusInfo.variant}>
-                    {statusInfo.label}
-                </Badge>
-            );
+            return <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>;
         },
     },
     {
@@ -124,9 +131,7 @@ export const columns: ColumnDef<Internship>[] = [
                     <span className="font-medium">{companyName.length > 40 ? `${companyName.slice(0, 40)}...` : companyName}</span>
                     {companyAddress && (
                         <span className="text-muted-foreground text-sm">
-                            {typeof companyAddress === 'string' && companyAddress.length > 40
-                                ? `${companyAddress.slice(0, 40)}...`
-                                : companyAddress}
+                            {typeof companyAddress === 'string' && companyAddress.length > 40 ? `${companyAddress.slice(0, 40)}...` : companyAddress}
                         </span>
                     )}
                 </div>
@@ -151,7 +156,9 @@ export const columns: ColumnDef<Internship>[] = [
 
                 return (
                     <div className="flex flex-col">
-                        <span>{formattedStartDate} - {formattedEndDate}</span>
+                        <span>
+                            {formattedStartDate} - {formattedEndDate}
+                        </span>
                     </div>
                 );
             } catch (error) {
@@ -159,7 +166,8 @@ export const columns: ColumnDef<Internship>[] = [
                 return `${startDate} - ${endDate}`;
             }
         },
-    }, {
+    },
+    {
         accessorKey: 'application_file',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Berkas" />,
         cell: ({ row }) => {
@@ -168,7 +176,6 @@ export const columns: ColumnDef<Internship>[] = [
 
             // Create a URL to the file
             const fileUrl = `/storage/${filePath}`;
-            const fileName = row.original.application_file || filePath.split('/').pop() || 'Download';
 
             return (
                 <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
@@ -228,9 +235,7 @@ export const columns: ColumnDef<Internship>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(String(internship.id))}>
-                            Salin ID
-                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(String(internship.id))}>Salin ID</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                             <a href={route('admin.internships.edit', internship.id)}>Ubah</a>
@@ -248,7 +253,7 @@ export const columns: ColumnDef<Internship>[] = [
                             Hapus
                         </DropdownMenuItem>
                     </DropdownMenuContent>
-                </DropdownMenu >
+                </DropdownMenu>
             );
         },
     },
@@ -256,6 +261,7 @@ export const columns: ColumnDef<Internship>[] = [
 
 export const initialColumnVisibility = {
     user_id: false,
+    progress: false,
     created_at: false,
     updated_at: false,
 };

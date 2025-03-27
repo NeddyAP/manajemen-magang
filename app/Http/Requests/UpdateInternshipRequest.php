@@ -12,8 +12,8 @@ class UpdateInternshipRequest extends FormRequest
     public function authorize(): bool
     {
         // Check if user is authorized to update this internship
-        // return auth()->check() && 
-        //        auth()->user()->role === 'mahasiswa' && 
+        // return auth()->check() &&
+        //        auth()->user()->role === 'mahasiswa' &&
         //        $this->internship->user_id === auth()->id() &&
         //        $this->internship->status === 'waiting';
         return true;

@@ -35,6 +35,20 @@ export interface User {
         academic_status: string;
         semester: number;
         advisor_id: string | number;
+        advisor: {
+            name: string;
+            email: string;
+            roles?: { name: string }[];
+            profile?: Record<string, unknown>;
+            dosen_profile?: {
+                employee_number: string;
+                expertise: string;
+                last_education: string;
+                academic_position: string;
+                employment_status: string;
+                teaching_start_year: string | number;
+            };
+        };
         gpa: string | number;
     };
 }

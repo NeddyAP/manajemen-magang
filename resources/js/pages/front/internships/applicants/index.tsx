@@ -1,15 +1,14 @@
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import AppLayout from '@/layouts/app-layout';
+import FrontLayout from '@/layouts/front-layout';
 import { type BreadcrumbItem } from '@/types';
+import { User } from '@/types/user';
 import { Head, Link, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { columns, initialColumnVisibility } from './components/column';
 import { StatusFilter, TypeFilter } from './components/filters';
-import { User } from '@/types/user';
-import FrontLayout from '@/layouts/front-layout';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -33,6 +32,7 @@ export interface Internship {
     progress_percentage?: number;
     created_at?: string;
     updated_at?: string;
+    status_message?: string | null;
 }
 
 interface TableMeta {

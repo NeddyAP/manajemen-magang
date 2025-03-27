@@ -1,14 +1,12 @@
 import { DataTable } from '@/components/data-table/data-table';
-import { Button } from '@/components/ui/button';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { User } from '@/types/user';
+import { Head, router } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 import { columns, initialColumnVisibility } from './components/column';
 import { StatusFilter, TypeFilter } from './components/filters';
-import { User } from '@/types/user';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -28,6 +26,7 @@ export interface Internship {
     start_date?: string;
     end_date?: string;
     status?: string;
+    status_message?: string;
     progress?: number;
     progress_percentage?: number;
     created_at?: string;
@@ -115,12 +114,6 @@ export default function Internships({ internships, meta }: InternshipsProps) {
                             <StatusFilter value={selectedStatus} onChange={handleStatusChange} />
                             <TypeFilter value={selectedType} onChange={handleTypeChange} />
                         </div>
-                        <Button>
-                            <Link href={route('admin.internships.create')} className="flex items-center gap-2">
-                                <Plus className="h-4 w-4" />
-                                Tambah Magang
-                            </Link>
-                        </Button>
                     </div>
                     <DataTable
                         className="inset-0 size-full"

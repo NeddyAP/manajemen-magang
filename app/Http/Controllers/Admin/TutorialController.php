@@ -76,7 +76,7 @@ class TutorialController extends Controller
             // Handle file upload
             if ($request->hasFile('file_path')) {
                 $file = $request->file('file_path');
-                $fileName = time() . '_' . $file->getClientOriginalName();
+                $fileName = time().'_'.$file->getClientOriginalName();
 
                 // Store file in public directory to make it accessible
                 $path = $file->storeAs('tutorials', $fileName, 'public');
@@ -89,7 +89,7 @@ class TutorialController extends Controller
 
             return redirect()->route('admin.tutorials.index')->with('success', 'Tutorial berhasil dibuat.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal membuat tutorial: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal membuat tutorial: '.$e->getMessage());
         }
     }
 
@@ -103,7 +103,7 @@ class TutorialController extends Controller
                 'tutorial' => $tutorial,
             ]);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to load tutorial: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to load tutorial: '.$e->getMessage());
         }
     }
 
@@ -123,7 +123,7 @@ class TutorialController extends Controller
                 }
 
                 $file = $request->file('file_path');
-                $fileName = time() . '_' . $file->getClientOriginalName();
+                $fileName = time().'_'.$file->getClientOriginalName();
 
                 // Store file in public directory
                 $path = $file->storeAs('tutorials', $fileName, 'public');
@@ -139,7 +139,7 @@ class TutorialController extends Controller
 
             return redirect()->route('admin.tutorials.index')->with('success', 'Tutorial berhasil diperbarui.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal memperbarui tutorial: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memperbarui tutorial: '.$e->getMessage());
         }
     }
 
@@ -153,7 +153,7 @@ class TutorialController extends Controller
 
             return redirect()->back()->with('success', 'Status tutorial berhasil diperbarui.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal memperbarui status tutorial: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memperbarui status tutorial: '.$e->getMessage());
         }
     }
 
@@ -172,7 +172,7 @@ class TutorialController extends Controller
 
             return redirect()->route('admin.tutorials.index')->with('success', 'Tutorial berhasil dihapus.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menghapus tutorial: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus tutorial: '.$e->getMessage());
         }
     }
 
@@ -196,7 +196,7 @@ class TutorialController extends Controller
 
             return redirect()->route('admin.tutorials.index')->with('success', 'Tutorial berhasil dihapus.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menghapus tutorial: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus tutorial: '.$e->getMessage());
         }
     }
 }

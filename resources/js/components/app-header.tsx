@@ -65,11 +65,11 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
 
         // Check if current URL starts with the item's href
         // Also make sure it's a complete path match
-        return currentUrl === itemHref ||
+        return (
+            currentUrl === itemHref ||
             (currentUrl.startsWith(itemHref) &&
-                (currentUrl.charAt(itemHref.length) === '/' ||
-                    currentUrl.charAt(itemHref.length) === '?' ||
-                    currentUrl.length === itemHref.length));
+                (currentUrl.charAt(itemHref.length) === '/' || currentUrl.charAt(itemHref.length) === '?' || currentUrl.length === itemHref.length))
+        );
     };
 
     return (
@@ -97,8 +97,8 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                     key={item.title}
                                                     href={item.href}
                                                     className={cn(
-                                                        "flex items-center space-x-2 font-medium",
-                                                        isActive(item.href) && "text-neutral-900 dark:text-neutral-100"
+                                                        'flex items-center space-x-2 font-medium',
+                                                        isActive(item.href) && 'text-neutral-900 dark:text-neutral-100',
                                                     )}
                                                 >
                                                     {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
@@ -114,8 +114,8 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                     href={item.href}
                                                     rel="noopener noreferrer"
                                                     className={cn(
-                                                        "flex items-center space-x-2 font-medium",
-                                                        isActive(item.href) && "text-neutral-900 dark:text-neutral-100"
+                                                        'flex items-center space-x-2 font-medium',
+                                                        isActive(item.href) && 'text-neutral-900 dark:text-neutral-100',
                                                     )}
                                                 >
                                                     {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
@@ -222,16 +222,14 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                         )}
                     </div>
                 </div>
-            </div >
-            {
-                breadcrumbs.length > 1 && (
-                    <div className="border-sidebar-border/70 flex w-full border-b">
-                        <div className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 md:max-w-7xl">
-                            <Breadcrumbs breadcrumbs={breadcrumbs} />
-                        </div>
-                    </div >
-                )
-            }
+            </div>
+            {breadcrumbs.length > 1 && (
+                <div className="border-sidebar-border/70 flex w-full border-b">
+                    <div className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 md:max-w-7xl">
+                        <Breadcrumbs breadcrumbs={breadcrumbs} />
+                    </div>
+                </div>
+            )}
         </>
     );
 }

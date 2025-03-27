@@ -13,11 +13,11 @@ export function NavMain({ items = [], title }: { items: NavItem[]; title: string
 
         // Check if current URL starts with the item's href
         // Also make sure it's a complete path match (e.g., /admin/users should not match /admin/user-settings)
-        return currentUrl === itemHref ||
+        return (
+            currentUrl === itemHref ||
             (currentUrl.startsWith(itemHref) &&
-                (currentUrl.charAt(itemHref.length) === '/' ||
-                    currentUrl.charAt(itemHref.length) === '?' ||
-                    currentUrl.length === itemHref.length));
+                (currentUrl.charAt(itemHref.length) === '/' || currentUrl.charAt(itemHref.length) === '?' || currentUrl.length === itemHref.length))
+        );
     };
 
     return (

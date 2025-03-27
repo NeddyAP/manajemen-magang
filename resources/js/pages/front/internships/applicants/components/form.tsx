@@ -10,22 +10,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { router, useForm } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
-import { FormEventHandler, useState } from 'react';
-
-interface Internship {
-    id?: number;
-    user_id?: number;
-    type: 'kkl' | 'kkn';
-    application_file?: string;
-    company_name: string;
-    company_address: string;
-    start_date: string;
-    end_date: string;
-    status?: 'waiting' | 'accepted' | 'rejected';
-    progress?: string;
-    created_at?: string;
-    updated_at?: string;
-}
+import { FormEventHandler, useEffect, useState } from 'react';
+import { Internship } from '..';
 
 interface Props {
     internship?: Internship;
@@ -33,64 +19,82 @@ interface Props {
     disabled?: boolean;
 }
 
+type InternshipType = 'kkl' | 'kkn';
+
+interface InternshipFormData {
+    type: InternshipType;
+    application_file?: File | null;
+    company_name: string;
+    company_address: string;
+    start_date: string;
+    end_date: string;
+    _method: string;
+    [key: string]: string | File | null | InternshipType | undefined;
+}
+
 export default function InternshipForm({ internship, mode, disabled = false }: Props) {
-    const { data, setData, post, put, errors, processing, setError, clearErrors } = useForm<any>({
-        type: internship?.type || 'kkl',
-        application_file: '',
-        company_name: internship?.company_name || '',
-        company_address: internship?.company_address || '',
-        start_date: internship?.start_date || '',
-        end_date: internship?.end_date || '',
+    const form = useForm<InternshipFormData>({
+        type: (internship?.type as InternshipType) ?? 'kkl',
+        application_file: null,
+        company_name: internship?.company_name ?? '',
+        company_address: internship?.company_address ?? '',
+        start_date: internship?.start_date ?? '',
+        end_date: internship?.end_date ?? '',
+        _method: mode === 'edit' ? 'PUT' : 'POST',
     });
 
-    // Store parsed dates for the calendar UI
-    const [startDate, setStartDate] = useState<Date | undefined>(
-        data.start_date ? new Date(data.start_date) : undefined
-    );
-    const [endDate, setEndDate] = useState<Date | undefined>(
-        data.end_date ? new Date(data.end_date) : undefined
-    );
+    // Store the current file path for display
+    const [currentFile, setCurrentFile] = useState(internship?.application_file || '');
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            // Check file size (max 2MB)
-            if (file.size > 2 * 1024 * 1024) {
-                setError('application_file', 'Ukuran file harus kurang dari 2MB');
-                return;
-            }
-
-            // Check file type (only PDF)
-            if (file.type !== 'application/pdf') {
-                setError('application_file', 'Hanya file PDF yang diizinkan');
-                return;
-            }
-
-            clearErrors('application_file');
-            setData('application_file', file);
+    // When editing and no new file is selected, remove application_file from form data
+    useEffect(() => {
+        if (mode === 'edit' && !form.data.application_file && form.data.application_file !== undefined) {
+            form.setData('application_file', undefined);
         }
-    };
+    }, [mode, form]);
+
+    // Store parsed dates for the calendar UI
+    const [startDate, setStartDate] = useState<Date | undefined>(form.data.start_date ? new Date(form.data.start_date as string) : undefined);
+    const [endDate, setEndDate] = useState<Date | undefined>(form.data.end_date ? new Date(form.data.end_date as string) : undefined);
 
     const onSubmit: FormEventHandler = (e) => {
         e.preventDefault();
 
         // Submit the form
-        if (mode === 'create') {
-            post(route('front.internships.applicants.store'));
+        const url = mode === 'create' ? route('front.internships.applicants.store') : route('front.internships.applicants.update', internship?.id);
+
+        // Remove application_file from form data if no new file is selected in edit mode
+        if (mode === 'edit' && !form.data.application_file) {
+            form.setData('application_file', undefined);
+            form.post(url, {
+                preserveScroll: true,
+                forceFormData: true,
+            });
         } else {
-            put(route('front.internships.applicants.update', internship?.id));
+            form.post(url, {
+                preserveScroll: true,
+                forceFormData: true,
+            });
+        }
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
+        form.setData('application_file', file);
+        if (file) {
+            setCurrentFile(file.name);
         }
     };
 
     return (
-        <form onSubmit={onSubmit}>
+        <form onSubmit={onSubmit} encType="multipart/form-data">
             <Card>
                 <CardContent className="space-y-4 pt-6">
                     <div className="space-y-4">
                         <Label htmlFor="type">Jenis Magang</Label>
                         <RadioGroup
-                            value={data.type}
-                            onValueChange={(value: 'kkl' | 'kkn') => setData('type', value)}
+                            value={form.data.type as string}
+                            onValueChange={(value: InternshipType) => form.setData('type', value)}
                             className="flex items-center space-x-4"
                             id="type"
                             disabled={disabled}
@@ -104,49 +108,50 @@ export default function InternshipForm({ internship, mode, disabled = false }: P
                                 <Label htmlFor="kkn">KKN (Kuliah Kerja Nyata)</Label>
                             </div>
                         </RadioGroup>
-                        <InputError message={errors.type} />
+                        <InputError message={form.errors.type} />
                     </div>
 
                     <div className="space-y-4">
-                        <Label htmlFor="application_file">Berkas Aplikasi (PDF)</Label>
-                        <Input id="application_file" type="file" accept=".pdf" onChange={handleFileChange} disabled={disabled} />
-                        <p className="text-muted-foreground text-xs">Unggah surat lamaran Anda dalam format PDF (maks 2MB)</p>
-                        {mode === 'edit' && internship?.application_file && (
-                            <div className="flex items-center gap-2 text-sm">
-                                <span>File saat ini:</span>
-                                <a
-                                    href={route('front.internships.applicants.download', internship.id)}
-                                    className="text-primary underline"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    Unduh PDF
-                                </a>
-                            </div>
+                        <Label htmlFor="application_file">File tutorial{mode === 'create' ? '*' : ''}</Label>
+                        <Input id="application_file" type="file" accept=".pdf" disabled={disabled} onChange={handleFileChange} />
+                        {currentFile && (
+                            <p className="text-sm text-gray-500">
+                                File saat ini: {currentFile}
+                                {mode === 'edit' && internship?.application_file && (
+                                    <a
+                                        href={route('front.internships.applicants.download', internship.id)}
+                                        className="ml-2 text-blue-500 hover:text-blue-700"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        (Download)
+                                    </a>
+                                )}
+                            </p>
                         )}
-                        <InputError message={errors.application_file} />
+                        <InputError message={form.errors.application_file} />
                     </div>
 
                     <div className="space-y-4">
                         <Label htmlFor="company_name">Nama Perusahaan/Institusi</Label>
                         <Input
                             id="company_name"
-                            value={data.company_name}
-                            onChange={(e) => setData('company_name', e.target.value)}
+                            value={form.data.company_name as string}
+                            onChange={(e) => form.setData('company_name', e.target.value)}
                             disabled={disabled}
                         />
-                        <InputError message={errors.company_name} />
+                        <InputError message={form.errors.company_name} />
                     </div>
 
                     <div className="space-y-4">
                         <Label htmlFor="company_address">Alamat Perusahaan/Institusi</Label>
                         <Textarea
                             id="company_address"
-                            value={data.company_address}
-                            onChange={(e) => setData('company_address', e.target.value)}
+                            value={form.data.company_address as string}
+                            onChange={(e) => form.setData('company_address', e.target.value)}
                             disabled={disabled}
                         />
-                        <InputError message={errors.company_address} />
+                        <InputError message={form.errors.company_address} />
                     </div>
 
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -156,8 +161,7 @@ export default function InternshipForm({ internship, mode, disabled = false }: P
                                 <PopoverTrigger asChild>
                                     <Button
                                         variant="outline"
-                                        className={`w-full justify-start text-left font-normal ${!startDate && 'text-muted-foreground'
-                                            }`}
+                                        className={`w-full justify-start text-left font-normal ${!startDate && 'text-muted-foreground'}`}
                                         disabled={disabled}
                                     >
                                         <CalendarIcon className="mr-2 h-4 w-4" />
@@ -170,13 +174,13 @@ export default function InternshipForm({ internship, mode, disabled = false }: P
                                         selected={startDate}
                                         onSelect={(date) => {
                                             setStartDate(date);
-                                            setData('start_date', date ? format(date, 'yyyy-MM-dd') : '');
+                                            form.setData('start_date', date ? format(date, 'yyyy-MM-dd') : '');
                                         }}
                                         initialFocus
                                     />
                                 </PopoverContent>
                             </Popover>
-                            <InputError message={errors.start_date} />
+                            <InputError message={form.errors.start_date} />
                         </div>
 
                         <div className="space-y-4">
@@ -185,8 +189,7 @@ export default function InternshipForm({ internship, mode, disabled = false }: P
                                 <PopoverTrigger asChild>
                                     <Button
                                         variant="outline"
-                                        className={`w-full justify-start text-left font-normal ${!endDate && 'text-muted-foreground'
-                                            }`}
+                                        className={`w-full justify-start text-left font-normal ${!endDate && 'text-muted-foreground'}`}
                                         disabled={disabled}
                                     >
                                         <CalendarIcon className="mr-2 h-4 w-4" />
@@ -199,13 +202,13 @@ export default function InternshipForm({ internship, mode, disabled = false }: P
                                         selected={endDate}
                                         onSelect={(date) => {
                                             setEndDate(date);
-                                            setData('end_date', date ? format(date, 'yyyy-MM-dd') : '');
+                                            form.setData('end_date', date ? format(date, 'yyyy-MM-dd') : '');
                                         }}
                                         initialFocus
                                     />
                                 </PopoverContent>
                             </Popover>
-                            <InputError message={errors.end_date} />
+                            <InputError message={form.errors.end_date} />
                         </div>
                     </div>
                 </CardContent>
@@ -216,7 +219,7 @@ export default function InternshipForm({ internship, mode, disabled = false }: P
                     Kembali ke Daftar Aplikasi
                 </Button>
                 {!disabled && (
-                    <Button type="submit" disabled={processing}>
+                    <Button type="submit" disabled={form.processing}>
                         {mode === 'create' ? 'Ajukan Aplikasi' : 'Perbarui Aplikasi'}
                     </Button>
                 )}

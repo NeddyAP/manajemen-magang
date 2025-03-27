@@ -3,10 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreInternshipRequest;
-use App\Http\Requests\UpdateInternshipRequest;
 use App\Models\Internship;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -18,7 +15,10 @@ class InternshipController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Internship::with(['user.mahasiswaProfile.advisor']);
+        $query = Internship::with([
+            'user.mahasiswaProfile.advisor',
+            'user.mahasiswaProfile.advisor.dosenProfile',
+        ]);
 
         // Handle search
         if ($request->has('search')) {
@@ -71,65 +71,16 @@ class InternshipController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        $students = User::where('role', 'mahasiswa')->get();
-        $lecturers = User::where('role', 'dosen')->get();
-
-        return Inertia::render('admin/internships/create', [
-            'students' => $students,
-            'lecturers' => $lecturers,
-        ]);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreInternshipRequest $request)
-    {
-        $validated = $request->validated();
-
-        // Handle file upload
-        if ($request->hasFile('application_file')) {
-            $path = $request->file('application_file')->store('internship_applications', 'public');
-            $validated['application_file'] = $path;
-        }
-
-        Internship::create($validated);
-
-        return redirect()->route('admin.internships.index')
-            ->with('success', 'Magang berhasil dibuat!');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Internship $internship)
-    {
-        $internship->load(['user.mahasiswaProfile.advisor', 'logbooks', 'reports']);
-
-        // Assign the advisor as lecturer for frontend compatibility
-        $internship->lecturer = $internship->user->mahasiswaProfile->advisor ?? null;
-
-        return Inertia::render('admin/internships/show', [
-            'internship' => $internship,
-        ]);
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
     public function edit(Internship $internship)
     {
-        $students = User::where('role', 'mahasiswa')->get();
-        $lecturers = User::where('role', 'dosen')->get();
 
         return Inertia::render('admin/internships/edit', [
-            'internship' => $internship,
-            'students' => $students,
-            'lecturers' => $lecturers,
+            'internship' => $internship->load([
+                'user.mahasiswaProfile.advisor',
+                'user.mahasiswaProfile.advisor.dosenProfile',
+            ]),
         ]);
     }
 
@@ -138,30 +89,10 @@ class InternshipController extends Controller
      */
     public function update(Request $request, Internship $internship)
     {
-        // Validate the request
         $validated = $request->validate([
-            'user_id' => 'sometimes|required|exists:users,id',
-            'lecturer_id' => 'sometimes|nullable|exists:users,id',
-            'type' => 'sometimes|required|in:kkl,kkn',
-            'company_name' => 'sometimes|required|string|max:255',
-            'company_address' => 'sometimes|required|string|max:255',
-            'start_date' => 'sometimes|required|date',
-            'end_date' => 'sometimes|required|date|after:start_date',
-            'status' => 'sometimes|required|in:waiting,accepted,rejected',
-            'progress' => 'sometimes|required|numeric|min:0|max:100',
-            'application_file' => 'sometimes|nullable|file|mimes:pdf|max:2048',
+            'status' => 'required|in:waiting,accepted,rejected',
+            'status_message' => 'required_if:status,rejected',
         ]);
-
-        // Handle file upload if provided
-        if ($request->hasFile('application_file')) {
-            // Delete old file if exists
-            if ($internship->application_file) {
-                Storage::disk('public')->delete($internship->application_file);
-            }
-
-            $path = $request->file('application_file')->store('internship_applications', 'public');
-            $validated['application_file'] = $path;
-        }
 
         $internship->update($validated);
 
@@ -182,7 +113,7 @@ class InternshipController extends Controller
         // Update the advisor_id in the MahasiswaProfile instead of lecturer_id in Internship
         if (isset($validated['advisor_id']) && $internship->user->mahasiswaProfile) {
             $internship->user->mahasiswaProfile->update([
-                'advisor_id' => $validated['advisor_id']
+                'advisor_id' => $validated['advisor_id'],
             ]);
             unset($validated['advisor_id']);
         }
@@ -227,7 +158,7 @@ class InternshipController extends Controller
      */
     public function downloadApplicationFile(Internship $internship)
     {
-        if (!$internship->application_file) {
+        if (! $internship->application_file) {
             abort(404, 'Berkas tidak ditemukan.');
         }
 
