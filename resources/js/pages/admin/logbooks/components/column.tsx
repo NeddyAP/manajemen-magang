@@ -25,11 +25,11 @@ export const columns: ColumnDef<Logbook>[] = [
             <Checkbox
                 checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
                 onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label="Select all"
+                aria-label="Pilih semua"
             />
         ),
         cell: ({ row }) => (
-            <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />
+            <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Pilih baris" />
         ),
         enableSorting: false,
         enableHiding: false,
@@ -120,14 +120,14 @@ export const columns: ColumnDef<Logbook>[] = [
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                             onClick={() => {
                                 router.get(`/admin/logbooks/${logbook.id}`);
                             }}
                         >
-                            View
+                            Lihat
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

@@ -40,12 +40,12 @@ class StoreInternshipRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'type' => 'Internship Type',
-            'application_file' => 'Application File',
-            'company_name' => 'Company/Institution Name',
-            'company_address' => 'Company/Institution Address',
-            'start_date' => 'Start Date',
-            'end_date' => 'End Date',
+            'type' => 'Tipe Magang',
+            'application_file' => 'Berkas Lamaran',
+            'company_name' => 'Nama Perusahaan/Instansi',
+            'company_address' => 'Alamat Perusahaan/Instansi',
+            'start_date' => 'Tanggal Mulai',
+            'end_date' => 'Tanggal Selesai',
         ];
     }
 }

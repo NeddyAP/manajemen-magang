@@ -16,10 +16,10 @@ export default function LogbookForm({ logbook }: Props) {
             <Card>
                 <CardContent className="space-y-4 pt-6">
                     <div className="space-y-4">
-                        <Label>Student Information</Label>
+                        <Label>Informasi Mahasiswa</Label>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <p className="text-sm text-gray-500">Name</p>
+                                <p className="text-sm text-gray-500">Nama</p>
                                 <p>{user?.name || '-'}</p>
                             </div>
                             <div>
@@ -27,59 +27,59 @@ export default function LogbookForm({ logbook }: Props) {
                                 <p>{mahasiswaProfile?.nim || '-'}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">Study Program</p>
+                                <p className="text-sm text-gray-500">Program Studi</p>
                                 <p>{mahasiswaProfile?.prodi?.name || '-'}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">Faculty</p>
+                                <p className="text-sm text-gray-500">Fakultas</p>
                                 <p>{mahasiswaProfile?.fakultas?.name || '-'}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">Advisor</p>
+                                <p className="text-sm text-gray-500">Pembimbing</p>
                                 <p>{advisor?.name || '-'}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">Advisor NIP</p>
+                                <p className="text-sm text-gray-500">NIP Pembimbing</p>
                                 <p>{advisor?.dosenProfile?.nip || '-'}</p>
                             </div>
                         </div>
                     </div>
 
                     <div className="space-y-4">
-                        <Label>Internship Information</Label>
+                        <Label>Informasi Magang</Label>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <p className="text-sm text-gray-500">Company</p>
+                                <p className="text-sm text-gray-500">Perusahaan</p>
                                 <p>{logbook.internship?.company_name || '-'}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">Address</p>
+                                <p className="text-sm text-gray-500">Alamat</p>
                                 <p>{logbook.internship?.company_address || '-'}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">Start Date</p>
+                                <p className="text-sm text-gray-500">Tanggal Mulai</p>
                                 <p>{logbook.internship?.start_date ? new Date(logbook.internship.start_date).toLocaleDateString() : '-'}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">End Date</p>
+                                <p className="text-sm text-gray-500">Tanggal Selesai</p>
                                 <p>{logbook.internship?.end_date ? new Date(logbook.internship.end_date).toLocaleDateString() : '-'}</p>
                             </div>
                         </div>
                     </div>
 
                     <div className="space-y-4">
-                        <Label>Logbook Details</Label>
+                        <Label>Detail Logbook</Label>
                         <div className="space-y-4">
                             <div>
-                                <p className="text-sm text-gray-500">Date</p>
+                                <p className="text-sm text-gray-500">Tanggal</p>
                                 <p>{logbook.date ? new Date(logbook.date).toLocaleDateString() : '-'}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">Activities</p>
+                                <p className="text-sm text-gray-500">Aktivitas</p>
                                 <p className="whitespace-pre-wrap">{logbook.activities || '-'}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">Supervisor Notes</p>
+                                <p className="text-sm text-gray-500">Catatan Pembimbing</p>
                                 <p className="whitespace-pre-wrap">{logbook.supervisor_notes || '-'}</p>
                             </div>
                         </div>

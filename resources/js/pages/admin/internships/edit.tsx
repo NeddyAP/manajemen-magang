@@ -6,11 +6,11 @@ import InternshipForm from '../internships/components/form';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Internship',
+        title: 'Magang',
         href: '/admin/internships',
     },
     {
-        title: 'Edit Internship',
+        title: 'Ubah Magang',
         href: '/admin/internships/{id}/edit',
     },
 ];

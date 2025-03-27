@@ -150,7 +150,7 @@ class InternshipController extends Controller
         $internship->delete();
 
         return redirect()->route('admin.internships.index')
-            ->with('success', 'Magang berhasil dihapus!');
+            ->with('success', 'Data magang berhasil dihapus!');
     }
 
     /**
