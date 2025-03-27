@@ -51,4 +51,4 @@ Route::middleware(['auth', 'role:superadmin|admin'])->prefix('admin')->name('adm
     Route::post('logbooks/bulk-destroy', [LogbookController::class, 'bulkDestroy'])->name('logbooks.destroy.bulk');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

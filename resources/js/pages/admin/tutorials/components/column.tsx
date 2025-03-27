@@ -85,7 +85,6 @@ export const columns: ColumnDef<Tutorial>[] = [
 
             // Create a URL to the file
             const fileUrl = `/storage/${filePath}`;
-            const fileName = row.original.file_name || filePath.split('/').pop() || 'Download';
 
             return (
                 <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">

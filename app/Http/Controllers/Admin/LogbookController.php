@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreLogbookRequest;
-use App\Http\Requests\UpdateLogbookRequest;
 use App\Models\Logbook;
 use Illuminate\Http\Request;
 
@@ -86,7 +84,7 @@ class LogbookController extends Controller
 
             return redirect()->route('admin.logbooks.index')->with('success', 'Logbook berhasil dihapus.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menghapus logbook: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus logbook: '.$e->getMessage());
         }
     }
 
@@ -101,7 +99,7 @@ class LogbookController extends Controller
 
             return redirect()->route('admin.logbooks.index')->with('success', 'Logbook berhasil dihapus.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menghapus logbook: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus logbook: '.$e->getMessage());
         }
     }
 }
