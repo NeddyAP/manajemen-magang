@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import FrontLayout from '@/layouts/front-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { UserIcon } from 'lucide-react';
+import { BookOpen, UserIcon } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -69,6 +69,22 @@ export default function InternshipsIndex() {
                                 <p className="mb-4 text-sm">Periksa status aplikasi Anda dan kelola progres magang Anda</p>
                                 <Button asChild variant="outline">
                                     <Link href={route('front.internships.applicants.index')}>Lihat Aplikasi</Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <div className="flex items-center justify-between">
+                                    <CardTitle>Logbook Magang</CardTitle>
+                                    <BookOpen className="text-primary h-6 w-6" />
+                                </div>
+                                <CardDescription>Kelola logbook magang Anda</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="mb-4 text-sm">Catat dan dokumentasikan aktivitas magang Anda setiap hari</p>
+                                <Button asChild variant="outline">
+                                    <Link href={route('front.internships.logbooks.intern-list')}>Pilih Magang</Link>
                                 </Button>
                             </CardContent>
                         </Card>

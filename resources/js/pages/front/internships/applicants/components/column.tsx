@@ -198,6 +198,14 @@ export const columns: ColumnDef<Internship>[] = [
                         <DropdownMenuItem asChild>
                             <a href={route('front.internships.applicants.edit', internship.id)}>Ubah</a>
                         </DropdownMenuItem>
+                        {internship.status === 'accepted' && (
+                            <>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem asChild>
+                                    <a href={route('front.internships.logbooks.index', internship.id)}>Logbook</a>
+                                </DropdownMenuItem>
+                            </>
+                        )}
                         <DropdownMenuItem
                             onClick={() => {
                                 if (confirm('Apakah Anda yakin ingin menghapus permohonan magang ini?')) {

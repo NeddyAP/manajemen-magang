@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Front\InternshipApplicantController;
 use App\Http\Controllers\Front\InternshipController;
+use App\Http\Controllers\Front\LogbookController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TutorialController;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,17 @@ Route::middleware(['auth', 'verified'])->prefix('internships')->name('front.inte
 
         // Add bulk destroy route
         Route::delete('/', [InternshipApplicantController::class, 'bulkDestroy'])->name('destroy.bulk');
+    });
+
+    // Logbook routes
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/logbooks', [LogbookController::class, 'internList'])->name('logbooks.intern-list');
+        Route::get('/logbooks/{internship}', [LogbookController::class, 'index'])->name('logbooks.index');
+        Route::get('/logbooks/{internship}/create', [LogbookController::class, 'create'])->name('logbooks.create');
+        Route::post('/logbooks/{internship}', [LogbookController::class, 'store'])->name('logbooks.store');
+        Route::get('/logbooks/{internship}/{logbook}/edit', [LogbookController::class, 'edit'])->name('logbooks.edit');
+        Route::put('/logbooks/{internship}/{logbook}', [LogbookController::class, 'update'])->name('logbooks.update');
+        Route::delete('/logbooks/{internship}/{logbook}', [LogbookController::class, 'destroy'])->name('logbooks.destroy');
     });
 });
 

@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('logbooks', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('internship_id')
+                ->constrained('internships')
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
+            $table->date('date');
+            $table->text('activities');
+            $table->text('supervisor_notes')->nullable();
             $table->timestamps();
         });
     }
