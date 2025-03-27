@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-export type Appearance = 'light' | 'dark' | 'system';
+export type Appearance = 'light' | 'dark' | 'system' | 'blue';
 
 const prefersDark = () => {
     if (typeof window === 'undefined') {
@@ -22,7 +22,16 @@ const setCookie = (name: string, value: string, days = 365) => {
 const applyTheme = (appearance: Appearance) => {
     const isDark = appearance === 'dark' || (appearance === 'system' && prefersDark());
 
-    document.documentElement.classList.toggle('dark', isDark);
+    // Remove existing theme attributes/classes first
+    document.documentElement.classList.remove('dark');
+    document.documentElement.removeAttribute('data-theme');
+
+    if (appearance === 'blue') {
+        document.documentElement.setAttribute('data-theme', 'blue');
+    } else {
+        // Apply dark class only if not blue theme and conditions met
+        document.documentElement.classList.toggle('dark', isDark);
+    }
 };
 
 const mediaQuery = () => {

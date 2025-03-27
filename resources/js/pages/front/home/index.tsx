@@ -32,7 +32,7 @@ export default function Home({ faqCategories = [], faqsByCategory = {} }: HomePr
                 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
             </Head>
             <div className="-mx-[max(0px,calc((100%-96rem)/2))] relative">
-                <section id="hero" className="from-primary/5 to-background flex min-h-screen w-full items-center bg-gradient-to-b justify-center">
+                <section id="hero" className="justify-center flex items-center min-h-screen transition-colors duration-200 bg-gradient-to-tr from-sky-100 via-sky-200 to-teal-600 dark:from-gray-800 dark:via-gray-900 dark:to-black">
                     <div className="container grid grid-cols-1 items-center gap-8 px-6 lg:grid-cols-2 lg:px-8">
                         <div className="flex flex-col items-start space-y-8 text-left">
                             <p className="text-muted-foreground text-xl">
@@ -65,68 +65,68 @@ export default function Home({ faqCategories = [], faqsByCategory = {} }: HomePr
                         id="tutorial"
                         className="from-background to-secondary/5 flex min-h-screen w-full items-center justify-center bg-gradient-to-b px-6 lg:px-8"
                     >
-                    <div className="w-full max-w-5xl py-24">
-                        <h2 className="mb-8 text-center text-3xl font-semibold">Panduan Penggunaan Website</h2>
-                        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-                            {/* grid looping from globalvariable (video iframe) */}
-                            {globalVariables.map((globalVariable) => {
-                                if (globalVariable.type === 'video_tutorial') {
-                                    return (
-                                        <Card key={globalVariable.id} className="w-full">
-                                            <CardHeader>
-                                                <CardTitle>{globalVariable.key}</CardTitle>
-                                                <CardDescription>{globalVariable.description}</CardDescription>
-                                            </CardHeader>
-                                            <CardContent>
-                                                <iframe
-                                                    src={globalVariable.value}
-                                                    title={globalVariable.key}
-                                                    className="h-[400px] w-full rounded-lg"
-                                                    allowFullScreen
-                                                ></iframe>
-                                            </CardContent>
-                                        </Card>
-                                    );
-                                }
-                            })}
+                        <div className="w-full max-w-5xl py-24">
+                            <h2 className="mb-8 text-center text-3xl font-semibold">Panduan Penggunaan Website</h2>
+                            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+                                {/* grid looping from globalvariable (video iframe) */}
+                                {globalVariables.map((globalVariable) => {
+                                    if (globalVariable.type === 'video_tutorial') {
+                                        return (
+                                            <Card key={globalVariable.id} className="w-full">
+                                                <CardHeader>
+                                                    <CardTitle>{globalVariable.key}</CardTitle>
+                                                    <CardDescription>{globalVariable.description}</CardDescription>
+                                                </CardHeader>
+                                                <CardContent>
+                                                    <iframe
+                                                        src={globalVariable.value}
+                                                        title={globalVariable.key}
+                                                        className="h-[400px] w-full rounded-lg"
+                                                        allowFullScreen
+                                                    ></iframe>
+                                                </CardContent>
+                                            </Card>
+                                        );
+                                    }
+                                })}
+                            </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
 
-                <section
-                    id="faq"
-                    className="from-secondary/5 to-background flex min-h-screen w-full items-center justify-center bg-gradient-to-b px-6 lg:px-8"
-                >
-                    <div className="w-full max-w-4xl py-24">
-                        <h2 className="mb-8 text-center text-3xl font-semibold">Pertanyaan yang Sering Diajukan</h2>
+                    <section
+                        id="faq"
+                        className="from-secondary/5 to-background flex min-h-screen w-full items-center justify-center bg-gradient-to-b px-6 lg:px-8"
+                    >
+                        <div className="w-full max-w-4xl py-24">
+                            <h2 className="mb-8 text-center text-3xl font-semibold">Pertanyaan yang Sering Diajukan</h2>
 
-                        {faqCategories.length > 0 ? (
-                            <Tabs defaultValue={faqCategories[0]} className="w-full">
-                                <TabsList className="mb-6 flex w-full flex-wrap justify-center gap-2">
+                            {faqCategories.length > 0 ? (
+                                <Tabs defaultValue={faqCategories[0]} className="w-full">
+                                    <TabsList className="mb-6 flex w-full flex-wrap justify-center gap-2">
+                                        {faqCategories.map((category) => (
+                                            <TabsTrigger key={category} value={category} className="px-4 py-2">
+                                                {category}
+                                            </TabsTrigger>
+                                        ))}
+                                    </TabsList>
+
                                     {faqCategories.map((category) => (
-                                        <TabsTrigger key={category} value={category} className="px-4 py-2">
-                                            {category}
-                                        </TabsTrigger>
+                                        <TabsContent key={category} value={category} className="w-full backdrop-blur-sm">
+                                            <Accordion type="single" collapsible className="w-full">
+                                                {faqsByCategory[category]?.map((faq, index) => (
+                                                    <AccordionItem key={index} value={`item-${category}-${index}`}>
+                                                        <AccordionTrigger className="text-left">{faq.question}</AccordionTrigger>
+                                                        <AccordionContent>{faq.answer}</AccordionContent>
+                                                    </AccordionItem>
+                                                ))}
+                                            </Accordion>
+                                        </TabsContent>
                                     ))}
-                                </TabsList>
-
-                                {faqCategories.map((category) => (
-                                    <TabsContent key={category} value={category} className="w-full backdrop-blur-sm">
-                                        <Accordion type="single" collapsible className="w-full">
-                                            {faqsByCategory[category]?.map((faq, index) => (
-                                                <AccordionItem key={index} value={`item-${category}-${index}`}>
-                                                    <AccordionTrigger className="text-left">{faq.question}</AccordionTrigger>
-                                                    <AccordionContent>{faq.answer}</AccordionContent>
-                                                </AccordionItem>
-                                            ))}
-                                        </Accordion>
-                                    </TabsContent>
-                                ))}
-                            </Tabs>
-                        ) : (
-                            <p className="text-muted-foreground text-center">Tidak ada FAQ tersedia saat ini.</p>
-                        )}
-                    </div>
+                                </Tabs>
+                            ) : (
+                                <p className="text-muted-foreground text-center">Tidak ada FAQ tersedia saat ini.</p>
+                            )}
+                        </div>
                     </section>
                 </div>
             </div>
