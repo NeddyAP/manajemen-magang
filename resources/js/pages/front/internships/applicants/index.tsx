@@ -113,7 +113,7 @@ export default function Applicants({ internships, meta }: InternshipsProps) {
                         </div>
                     </div>
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 overflow-hidden rounded-xl md:min-h-min">
-                        <div className="mb-4 flex items-center justify-between mt-5">
+                        <div className="mt-5 mb-4 flex items-center justify-between">
                             <div className="flex gap-2">
                                 <StatusFilter value={selectedStatus} onChange={handleStatusChange} />
                                 <TypeFilter value={selectedType} onChange={handleTypeChange} />

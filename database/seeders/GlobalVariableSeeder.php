@@ -92,8 +92,6 @@ class GlobalVariableSeeder extends Seeder
             ],
         ];
 
-
-
         // Video Tutorial
         $videoTutorial = [
             [
@@ -120,7 +118,6 @@ class GlobalVariableSeeder extends Seeder
                 'type' => 'video_tutorial',
                 'is_active' => true,
             ],
-
 
         ];
 

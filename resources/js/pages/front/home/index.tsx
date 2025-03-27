@@ -31,19 +31,27 @@ export default function Home({ faqCategories = [], faqsByCategory = {} }: HomePr
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
             </Head>
-            <div className="-mx-[max(0px,calc((100%-96rem)/2))] relative">
-                <section id="hero" className="justify-center flex items-center min-h-screen transition-colors duration-200 bg-gradient-to-tr from-sky-100 via-sky-200 to-teal-600 dark:from-gray-800 dark:via-gray-900 dark:to-black">
+            <div className="relative -mx-[max(0px,calc((100%-96rem)/2))]">
+                <section
+                    id="hero"
+                    className="flex min-h-screen items-center justify-center bg-gradient-to-tr from-sky-100 via-sky-200 to-teal-600 transition-colors duration-200 dark:from-gray-800 dark:via-gray-900 dark:to-black"
+                >
                     <div className="container grid grid-cols-1 items-center gap-8 px-6 lg:grid-cols-2 lg:px-8">
                         <div className="flex flex-col items-start space-y-8 text-left">
                             <p className="text-muted-foreground text-xl">
                                 {auth.user ? `Selamat datang, ${auth.user.name}!` : 'Selamat datang di platform manajemen magang kami!'}
                             </p>
                             <h1 className="from-foreground to-foreground/70 bg-gradient-to-r bg-clip-text text-3xl font-bold text-transparent sm:text-2xl lg:text-4xl">
-                                {auth.user ? `Semangat melaksanakan kuliah kerja lapangan  & kuliah kerja nyata.` : `
-                                Sederhanakan perjalanan magang Anda dengan platform manajemen komprehensif kami`} <br />
+                                {auth.user
+                                    ? `Semangat melaksanakan kuliah kerja lapangan  & kuliah kerja nyata.`
+                                    : `
+                                Sederhanakan perjalanan magang Anda dengan platform manajemen komprehensif kami`}{' '}
+                                <br />
                             </h1>
                             <p className="text-muted-foreground text-xl">
-                                {auth.user ? `Terus semangat untuk mendapatkan hasil yang luar biasa, Isi sekarang yu.` : `Ajukan tempat magang, Catat logbook, Kumpulkan laporan`}
+                                {auth.user
+                                    ? `Terus semangat untuk mendapatkan hasil yang luar biasa, Isi sekarang yu.`
+                                    : `Ajukan tempat magang, Catat logbook, Kumpulkan laporan`}
                             </p>
                             <Button asChild size="lg" className="font-semibold">
                                 <Link href="/internships">Mulai</Link>

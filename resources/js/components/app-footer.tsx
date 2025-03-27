@@ -24,19 +24,17 @@ export default function AppFooter() {
     // Filter global variables by type
     const socialLinks = globalVariables
         ? Object.entries(globalVariables)
-            .filter(([key, variable]) => variable.type === 'social_media' && variable.is_active)
-            .map(([key, variable]) => ({
-                icon: socialIcons[variable.slug as keyof typeof socialIcons],
-                href: variable.value,
-                label: variable.key,
-            }))
+              .filter(([, variable]) => variable.type === 'social_media' && variable.is_active)
+              .map(([, variable]) => ({
+                  icon: socialIcons[variable.slug as keyof typeof socialIcons],
+                  href: variable.value,
+                  label: variable.key,
+              }))
         : [];
 
     // Get contact information
     const getContactInfo = (slug: string) => {
-        return globalVariables && Object.values(globalVariables).find(
-            (variable) => variable.slug === slug && variable.is_active
-        )?.value;
+        return globalVariables && Object.values(globalVariables).find((variable) => variable.slug === slug && variable.is_active)?.value;
     };
 
     const address = getContactInfo('address');
@@ -46,7 +44,7 @@ export default function AppFooter() {
 
     return (
         <footer className="bg-background border-t">
-            <div className="container px-4 py-10 md:py-16 mx-auto">
+            <div className="container mx-auto px-4 py-10 md:py-16">
                 <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-3 md:gap-12 lg:gap-16">
                     {/* Left Section - Company Info */}
                     <div className="space-y-6">
@@ -95,9 +93,7 @@ export default function AppFooter() {
                 <Separator className="my-8" />
 
                 {/* Bottom Section - Copyright */}
-                <div className="text-muted-foreground text-center text-sm">
-                    {copyright || "Neddy © 2025. All rights reserved."}
-                </div>
+                <div className="text-muted-foreground text-center text-sm">{copyright || 'Neddy © 2025. All rights reserved.'}</div>
             </div>
         </footer>
     );

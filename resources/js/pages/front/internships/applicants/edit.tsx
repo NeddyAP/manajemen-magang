@@ -43,7 +43,6 @@ export default function EditInternshipApplication({ internship }: Props) {
         <FrontLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Aplikasi Magang" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-
                 <div className="container mx-auto max-w-7xl">
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 overflow-hidden rounded-xl md:min-h-min">
                         <div className="mb-6">

@@ -149,26 +149,26 @@
 }
 
 /* Blue Theme Variables */
-:root[data-theme="blue"] {
-    --background: #EFF6FF; /* Tailwind blue-50 */
+:root[data-theme='blue'] {
+    --background: #eff6ff; /* Tailwind blue-50 */
     --foreground: #000000; /* Black text */
-    --card: #FFFFFF; /* White card background */
+    --card: #ffffff; /* White card background */
     --card-foreground: #000000;
-    --popover: #FFFFFF;
+    --popover: #ffffff;
     --popover-foreground: #000000;
-    --primary: #0D9488; /* Tailwind teal-600 */
-    --primary-foreground: #FFFFFF; /* White text on primary */
-    --secondary: #5EEAD4; /* Tailwind teal-300 for lighter shade */
+    --primary: #0d9488; /* Tailwind teal-600 */
+    --primary-foreground: #ffffff; /* White text on primary */
+    --secondary: #5eead4; /* Tailwind teal-300 for lighter shade */
     --secondary-foreground: #000000;
-    --muted: #CCFBF1; /* Tailwind teal-100 for very light shade */
+    --muted: #ccfbf1; /* Tailwind teal-100 for very light shade */
     --muted-foreground: #374151; /* Tailwind gray-700 */
-    --accent: #5EEAD4; /* Tailwind teal-300 for accent */
+    --accent: #5eead4; /* Tailwind teal-300 for accent */
     --accent-foreground: #000000;
     --destructive: oklch(0.577 0.245 27.325); /* Default red */
     --destructive-foreground: oklch(0.985 0 0); /* Default light text */
-    --border: #99F6E4; /* Tailwind teal-200 for light border */
-    --input: #FFFFFF; /* White input background */
-    --ring: #2DD4BF; /* Tailwind teal-400 for focus */
+    --border: #99f6e4; /* Tailwind teal-200 for light border */
+    --input: #ffffff; /* White input background */
+    --ring: #2dd4bf; /* Tailwind teal-400 for focus */
     /* Chart colors can be adjusted if needed, using defaults for now */
     --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
@@ -176,16 +176,15 @@
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
     --radius: 0.625rem; /* Keep radius consistent */
-    --sidebar: #0D9488; /* Tailwind teal-600 for sidebar */
-    --sidebar-foreground: #FFFFFF; /* White text */
-    --sidebar-primary: #FFFFFF; /* White for active/primary items */
-    --sidebar-primary-foreground: #0D9488; /* Tailwind teal-600 text on white */
-    --sidebar-accent: #2DD4BF; /* Tailwind teal-400 for accents */
+    --sidebar: #0d9488; /* Tailwind teal-600 for sidebar */
+    --sidebar-foreground: #ffffff; /* White text */
+    --sidebar-primary: #ffffff; /* White for active/primary items */
+    --sidebar-primary-foreground: #0d9488; /* Tailwind teal-600 text on white */
+    --sidebar-accent: #2dd4bf; /* Tailwind teal-400 for accents */
     --sidebar-accent-foreground: #000000;
-    --sidebar-border: #0F766E; /* Tailwind teal-700 for darker border */
-    --sidebar-ring: #2DD4BF; /* Tailwind teal-400 for focus ring */
+    --sidebar-border: #0f766e; /* Tailwind teal-700 for darker border */
+    --sidebar-ring: #2dd4bf; /* Tailwind teal-400 for focus ring */
 }
-
 
 @layer base {
     * {

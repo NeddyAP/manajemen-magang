@@ -22,8 +22,8 @@ class UpdateGlobalVariableRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'key' => 'required|string|max:255|unique:global_variables,key,' . $this->route('global_variable')->id,
-            'slug' => 'required|string|max:255|unique:global_variables,slug,' . $this->route('global_variable')->id,
+            'key' => 'required|string|max:255|unique:global_variables,key,'.$this->route('global_variable')->id,
+            'slug' => 'required|string|max:255|unique:global_variables,slug,'.$this->route('global_variable')->id,
             'value' => 'required|string|max:255',
             'description' => 'nullable|string|max:255',
             'type' => 'nullable|string|max:255',

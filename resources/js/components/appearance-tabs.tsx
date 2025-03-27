@@ -24,8 +24,8 @@ export default function AppearanceToggleTab({ className = '', ...props }: HTMLAt
                         'flex items-center rounded-md px-3.5 py-1.5 transition-colors',
                         // Adjusted active/inactive styles to potentially accommodate blue theme via CSS
                         appearance === value
-                            ? 'bg-white shadow-xs dark:bg-neutral-700 dark:text-neutral-100 data-[theme=blue]:bg-white data-[theme=blue]:text-neutral-900' // Added specific style hook for active blue
-                            : 'text-neutral-500 hover:bg-neutral-200/60 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-700/60 data-[theme=blue]:text-neutral-700 data-[theme=blue]:hover:bg-blue-100/60', // Added specific style hook for inactive blue
+                            ? 'bg-white shadow-xs data-[theme=blue]:bg-white data-[theme=blue]:text-neutral-900 dark:bg-neutral-700 dark:text-neutral-100' // Added specific style hook for active blue
+                            : 'text-neutral-500 hover:bg-neutral-200/60 hover:text-black data-[theme=blue]:text-neutral-700 data-[theme=blue]:hover:bg-blue-100/60 dark:text-neutral-400 dark:hover:bg-neutral-700/60', // Added specific style hook for inactive blue
                     )}
                 >
                     <Icon className="-ml-1 h-4 w-4" />

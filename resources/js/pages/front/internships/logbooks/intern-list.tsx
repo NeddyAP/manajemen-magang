@@ -42,42 +42,42 @@ export default function InternshipList({ internships }: PageProps) {
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="container mx-auto max-w-7xl">
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl">
-                    <div className="mb-6 flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-bold">Pilih Magang</h1>
+                        <div className="mb-6 flex items-center justify-between">
+                            <div>
+                                <h1 className="text-2xl font-bold">Pilih Magang</h1>
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        {internships.map((internship) => (
-                            <Card key={internship.id}>
-                                <CardHeader>
-                                    <CardTitle className="text-lg">{internship.company_name}</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="space-y-4">
-                                        <div>
-                                            <p className="text-muted-foreground text-sm">Jenis Magang: {internship.type}</p>
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {internships.map((internship) => (
+                                <Card key={internship.id}>
+                                    <CardHeader>
+                                        <CardTitle className="text-lg">{internship.company_name}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="space-y-4">
+                                            <div>
+                                                <p className="text-muted-foreground text-sm">Jenis Magang: {internship.type}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-muted-foreground text-sm">
+                                                    Periode: {format(new Date(internship.start_date), 'dd MMMM yyyy', { locale: id })} -{' '}
+                                                    {format(new Date(internship.end_date), 'dd MMMM yyyy', { locale: id })}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <p className="text-muted-foreground mb-2 text-sm">Progress Logbook</p>
+                                                <Progress value={internship.progress} className="h-2" />
+                                                <p className="text-muted-foreground mt-1 text-xs">{internship.logbooks_count} dari 30 hari</p>
+                                            </div>
+                                            <Button className="w-full" asChild>
+                                                <a href={route('front.internships.logbooks.index', internship.id)}>Lihat Logbook</a>
+                                            </Button>
                                         </div>
-                                        <div>
-                                            <p className="text-muted-foreground text-sm">
-                                                Periode: {format(new Date(internship.start_date), 'dd MMMM yyyy', { locale: id })} -{' '}
-                                                {format(new Date(internship.end_date), 'dd MMMM yyyy', { locale: id })}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <p className="text-muted-foreground mb-2 text-sm">Progress Logbook</p>
-                                            <Progress value={internship.progress} className="h-2" />
-                                            <p className="text-muted-foreground mt-1 text-xs">{internship.logbooks_count} dari 30 hari</p>
-                                        </div>
-                                        <Button className="w-full" asChild>
-                                            <a href={route('front.internships.logbooks.index', internship.id)}>Lihat Logbook</a>
-                                        </Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>

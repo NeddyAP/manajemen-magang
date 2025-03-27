@@ -50,48 +50,48 @@ export default function LogbookEdit({ internship, logbook }: PageProps) {
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="container mx-auto max-w-7xl">
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl">
-                    <div className="mb-6">
-                        <h1 className="text-2xl font-bold">Edit Logbook</h1>
-                        <p className="text-muted-foreground">{internship.title}</p>
-                    </div>
-
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="space-y-2">
-                            <Label htmlFor="date">Tanggal</Label>
-                            <Input
-                                id="date"
-                                type="date"
-                                value={data.date}
-                                onChange={(e) => setData('date', e.target.value)}
-                                className={errors.date ? 'border-destructive' : ''}
-                            />
-                            {errors.date && <p className="text-destructive text-sm">{errors.date}</p>}
+                        <div className="mb-6">
+                            <h1 className="text-2xl font-bold">Edit Logbook</h1>
+                            <p className="text-muted-foreground">{internship.title}</p>
                         </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="activities">Aktivitas</Label>
-                            <Textarea
-                                id="activities"
-                                value={data.activities}
-                                onChange={(e) => setData('activities', e.target.value)}
-                                className={errors.activities ? 'border-destructive' : ''}
-                                rows={5}
-                            />
-                            {errors.activities && <p className="text-destructive text-sm">{errors.activities}</p>}
-                        </div>
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="space-y-2">
+                                <Label htmlFor="date">Tanggal</Label>
+                                <Input
+                                    id="date"
+                                    type="date"
+                                    value={data.date}
+                                    onChange={(e) => setData('date', e.target.value)}
+                                    className={errors.date ? 'border-destructive' : ''}
+                                />
+                                {errors.date && <p className="text-destructive text-sm">{errors.date}</p>}
+                            </div>
 
-                        <div className="flex gap-4">
-                            <Button type="submit" disabled={processing}>
-                                Simpan Perubahan
-                            </Button>
-                            <Button asChild variant="outline" type="button">
-                                <Link href={route('front.internships.logbooks.index', internship.id)}>
-                                    <ArrowLeft className="mr-2 h-4 w-4" />
-                                    Kembali
-                                </Link>
-                            </Button>
-                        </div>
-                    </form>
+                            <div className="space-y-2">
+                                <Label htmlFor="activities">Aktivitas</Label>
+                                <Textarea
+                                    id="activities"
+                                    value={data.activities}
+                                    onChange={(e) => setData('activities', e.target.value)}
+                                    className={errors.activities ? 'border-destructive' : ''}
+                                    rows={5}
+                                />
+                                {errors.activities && <p className="text-destructive text-sm">{errors.activities}</p>}
+                            </div>
+
+                            <div className="flex gap-4">
+                                <Button type="submit" disabled={processing}>
+                                    Simpan Perubahan
+                                </Button>
+                                <Button asChild variant="outline" type="button">
+                                    <Link href={route('front.internships.logbooks.index', internship.id)}>
+                                        <ArrowLeft className="mr-2 h-4 w-4" />
+                                        Kembali
+                                    </Link>
+                                </Button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

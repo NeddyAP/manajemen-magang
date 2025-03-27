@@ -51,26 +51,26 @@ export default function LogbooksIndex({ internship, logbooks }: PageProps) {
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="container mx-auto max-w-7xl">
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl">
-                    <div className="mb-6 flex items-center justify-between">
-                        <div>
-                            <h1 className="text-2xl font-bold">Logbook Magang</h1>
-                            <p className="text-muted-foreground">
-                                {internship.company_name} - {internship.type}
-                            </p>
-                            <p className="text-muted-foreground text-sm">
-                                Periode: {format(new Date(internship.start_date), 'dd MMMM yyyy', { locale: id })} -{' '}
-                                {format(new Date(internship.end_date), 'dd MMMM yyyy', { locale: id })}
-                            </p>
+                        <div className="mb-6 flex items-center justify-between">
+                            <div>
+                                <h1 className="text-2xl font-bold">Logbook Magang</h1>
+                                <p className="text-muted-foreground">
+                                    {internship.company_name} - {internship.type}
+                                </p>
+                                <p className="text-muted-foreground text-sm">
+                                    Periode: {format(new Date(internship.start_date), 'dd MMMM yyyy', { locale: id })} -{' '}
+                                    {format(new Date(internship.end_date), 'dd MMMM yyyy', { locale: id })}
+                                </p>
+                            </div>
+                            <Button asChild>
+                                <Link href={route('front.internships.logbooks.create', internship.id)}>
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    Tambah Logbook
+                                </Link>
+                            </Button>
                         </div>
-                        <Button asChild>
-                            <Link href={route('front.internships.logbooks.create', internship.id)}>
-                                <Plus className="mr-2 h-4 w-4" />
-                                Tambah Logbook
-                            </Link>
-                        </Button>
-                    </div>
 
-                    <DataTable columns={columns} data={logbooks} />
+                        <DataTable columns={columns} data={logbooks} />
                     </div>
                 </div>
             </div>
