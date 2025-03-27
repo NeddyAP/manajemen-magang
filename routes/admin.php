@@ -45,6 +45,10 @@ Route::middleware(['auth', 'role:superadmin|admin'])->prefix('admin')->name('adm
     Route::resource('global-variables', GlobalVariableController::class)->except(['show']);
     Route::post('global-variables/{globalVariable}/toggle', [GlobalVariableController::class, 'toggle'])->name('global-variables.toggle');
     Route::post('global-variables/bulk-destroy', [GlobalVariableController::class, 'bulkDestroy'])->name('global-variables.destroy.bulk');
+
+    // Logbooks
+    Route::resource('logbooks', LogbookController::class)->except(['create', 'store', 'edit', 'update']);
+    Route::post('logbooks/bulk-destroy', [LogbookController::class, 'bulkDestroy'])->name('logbooks.destroy.bulk');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

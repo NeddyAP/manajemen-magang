@@ -6,6 +6,7 @@ import FrontLayout from '@/layouts/front-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
+import { Logbook } from '.';
 
 interface Internship {
     id: number;
