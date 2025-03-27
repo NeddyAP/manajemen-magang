@@ -20,6 +20,7 @@ export default function GlobalVariableForm({ globalVariable, mode }: Props) {
         slug: globalVariable?.slug || '',
         value: globalVariable?.value || '',
         description: globalVariable?.description || '',
+        type: globalVariable?.type || '',
         is_active: globalVariable?.is_active === undefined ? true : Boolean(globalVariable?.is_active),
         created_at: globalVariable?.created_at || '',
         updated_at: globalVariable?.updated_at || '',
@@ -86,6 +87,18 @@ export default function GlobalVariableForm({ globalVariable, mode }: Props) {
                             required
                         />
                         <InputError message={errors.value} />
+                    </div>
+                    <div className="space-y-4">
+                        <Label htmlFor="type">Type</Label>
+                        <Input
+                            id="type"
+                            value={data.type}
+                            onChange={(e) => {
+                                setData('type', e.target.value);
+                            }}
+                            required
+                        />
+                        <InputError message={errors.type} />
                     </div>
                     <div className="space-y-4">
                         <Label htmlFor="description">Description</Label>

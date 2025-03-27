@@ -49,7 +49,8 @@ export default function LogbookCreate({ internship }: PageProps) {
         <FrontLayout breadcrumbs={breadcrumbs}>
             <Head title="Tambah Logbook" />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl">
+                <div className="container mx-auto max-w-7xl">
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl">
                     <div className="mb-6">
                         <h1 className="text-2xl font-bold">Tambah Logbook</h1>
                         <p className="text-muted-foreground">
@@ -111,6 +112,7 @@ export default function LogbookCreate({ internship }: PageProps) {
                             </Button>
                         </div>
                     </form>
+                    </div>
                 </div>
             </div>
         </FrontLayout>

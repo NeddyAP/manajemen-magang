@@ -68,6 +68,16 @@ export const columns: ColumnDef<GlobalVariable>[] = [
         },
     },
     {
+        accessorKey: 'type',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Tipe" />,
+        cell: ({ row }) => {
+            const answer = row.getValue('type');
+            if (!answer || typeof answer !== 'string') return '-';
+
+            return answer.length > 40 ? `${answer.slice(0, 40)}...` : answer;
+        },
+    },
+    {
         accessorKey: 'description',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Deskripsi" />,
         cell: ({ row }) => {

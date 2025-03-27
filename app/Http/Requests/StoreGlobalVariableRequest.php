@@ -26,6 +26,7 @@ class StoreGlobalVariableRequest extends FormRequest
             'slug' => 'required|string|max:255|unique:global_variables,slug',
             'value' => 'required|string|max:255',
             'description' => 'nullable|string|max:255',
+            'type' => 'nullable|string|max:255',
             'is_active' => 'boolean',
         ];
     }

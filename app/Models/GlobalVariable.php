@@ -15,6 +15,7 @@ class GlobalVariable extends Model
         'slug',
         'value',
         'description',
+        'type',
         'is_active',
     ];
 

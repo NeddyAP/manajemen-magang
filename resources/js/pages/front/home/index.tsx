@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import FrontLayout from '@/layouts/front-layout';
-import { Head, Link } from '@inertiajs/react';
+import { SharedData } from '@/types';
+import { Head, Link, usePage } from '@inertiajs/react';
 
 export interface FAQ {
     id?: number;
@@ -20,18 +21,9 @@ interface HomeProps {
 }
 
 export default function Home({ faqCategories = [], faqsByCategory = {} }: HomeProps) {
-    const tutorials = [
-        {
-            title: 'Memulai Magang',
-            description: 'Pelajari cara menavigasi sistem manajemen magang dan memaksimalkan pengalaman Anda.',
-            youtubeLink: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-        },
-        {
-            title: 'Mengelola Buku Catatan Anda',
-            description: 'Panduan lengkap tentang cara memelihara dan mengirimkan aktivitas magang harian Anda di buku catatan.',
-            youtubeLink: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-        },
-    ];
+    const page = usePage<SharedData>();
+    const { auth } = page.props;
+    const { globalVariables } = page.props;
 
     return (
         <FrontLayout>
@@ -39,54 +31,64 @@ export default function Home({ faqCategories = [], faqsByCategory = {} }: HomePr
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
             </Head>
-            <div className="relative">
-                <section id="hero" className="from-primary/5 to-background flex min-h-screen w-full items-center bg-gradient-to-b">
+            <div className="-mx-[max(0px,calc((100%-96rem)/2))] relative">
+                <section id="hero" className="from-primary/5 to-background flex min-h-screen w-full items-center bg-gradient-to-b justify-center">
                     <div className="container grid grid-cols-1 items-center gap-8 px-6 lg:grid-cols-2 lg:px-8">
                         <div className="flex flex-col items-start space-y-8 text-left">
-                            <h1 className="from-foreground to-foreground/70 bg-gradient-to-r bg-clip-text text-4xl font-bold text-transparent sm:text-5xl lg:text-6xl">
-                                Sistem Manajemen Magang
+                            <p className="text-muted-foreground text-xl">
+                                {auth.user ? `Selamat datang, ${auth.user.name}!` : 'Selamat datang di platform manajemen magang kami!'}
+                            </p>
+                            <h1 className="from-foreground to-foreground/70 bg-gradient-to-r bg-clip-text text-3xl font-bold text-transparent sm:text-2xl lg:text-4xl">
+                                {auth.user ? `Semangat melaksanakan kuliah kerja lapangan  & kuliah kerja nyata.` : `
+                                Sederhanakan perjalanan magang Anda dengan platform manajemen komprehensif kami`} <br />
                             </h1>
                             <p className="text-muted-foreground text-xl">
-                                Sederhanakan perjalanan magang Anda dengan platform manajemen komprehensif kami. Lacak kemajuan, kirim laporan, dan
-                                berkolaborasi dengan lancar.
+                                {auth.user ? `Terus semangat untuk mendapatkan hasil yang luar biasa, Isi sekarang yu.` : `Ajukan tempat magang, Catat logbook, Kumpulkan laporan`}
                             </p>
                             <Button asChild size="lg" className="font-semibold">
-                                <Link href={route('register')}>Mulai</Link>
+                                <Link href="/internships">Mulai</Link>
                             </Button>
                         </div>
-                        <div className="relative h-[500px] w-full overflow-hidden rounded-lg">
+                        {/* Container for the image */}
+                        <div className="relative flex h-full items-center justify-center overflow-hidden rounded-lg">
                             <img
-                                src="/assets/logo.svg"
-                                alt="Internship Management Illustration"
-                                className="absolute inset-0 h-full w-full object-cover"
+                                src="/assets/hero-image.webp"
+                                alt="Ilustrasi Manajemen Magang"
+                                className="h-auto max-h-full w-auto max-w-full object-contain"
                             />
-                            <div className="from-background/80 absolute inset-0 bg-gradient-to-t to-transparent backdrop-blur-[2px]" />
                         </div>
                     </div>
                 </section>
 
-                <section
-                    id="tutorial"
-                    className="from-background to-secondary/5 flex min-h-screen w-full items-center justify-center bg-gradient-to-b px-6 lg:px-8"
-                >
+                <div className="mx-auto max-w-7xl">
+                    <section
+                        id="tutorial"
+                        className="from-background to-secondary/5 flex min-h-screen w-full items-center justify-center bg-gradient-to-b px-6 lg:px-8"
+                    >
                     <div className="w-full max-w-5xl py-24">
-                        <h2 className="mb-8 text-center text-3xl font-semibold">Sumber Belajar</h2>
+                        <h2 className="mb-8 text-center text-3xl font-semibold">Panduan Penggunaan Website</h2>
                         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-                            {tutorials.map((tutorial, index) => (
-                                <Card key={index} className="bg-card/50 backdrop-blur-sm">
-                                    <CardHeader>
-                                        <CardTitle>{tutorial.title}</CardTitle>
-                                        <CardDescription>{tutorial.description}</CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <Button variant="outline" asChild>
-                                            <a href={tutorial.youtubeLink} target="_blank" rel="noopener noreferrer">
-                                                Tonton di YouTube
-                                            </a>
-                                        </Button>
-                                    </CardContent>
-                                </Card>
-                            ))}
+                            {/* grid looping from globalvariable (video iframe) */}
+                            {globalVariables.map((globalVariable) => {
+                                if (globalVariable.type === 'video_tutorial') {
+                                    return (
+                                        <Card key={globalVariable.id} className="w-full">
+                                            <CardHeader>
+                                                <CardTitle>{globalVariable.key}</CardTitle>
+                                                <CardDescription>{globalVariable.description}</CardDescription>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <iframe
+                                                    src={globalVariable.value}
+                                                    title={globalVariable.key}
+                                                    className="h-[400px] w-full rounded-lg"
+                                                    allowFullScreen
+                                                ></iframe>
+                                            </CardContent>
+                                        </Card>
+                                    );
+                                }
+                            })}
                         </div>
                     </div>
                 </section>
@@ -125,7 +127,8 @@ export default function Home({ faqCategories = [], faqsByCategory = {} }: HomePr
                             <p className="text-muted-foreground text-center">Tidak ada FAQ tersedia saat ini.</p>
                         )}
                     </div>
-                </section>
+                    </section>
+                </div>
             </div>
         </FrontLayout>
     );

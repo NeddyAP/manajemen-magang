@@ -9,6 +9,10 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: route('front.internships.index'),
     },
     {
+        title: 'Aplikasi Saya',
+        href: route('front.internships.applicants.index'),
+    },
+    {
         title: 'Ajukan Magang',
         href: route('front.internships.applicants.create'),
     },
@@ -19,13 +23,15 @@ export default function CreateInternshipApplication() {
         <FrontLayout breadcrumbs={breadcrumbs}>
             <Head title="Ajukan Magang" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 overflow-hidden rounded-xl md:min-h-min">
-                    <div className="mb-6">
-                        <h1 className="text-2xl font-bold">Ajukan Magang</h1>
-                        <p className="text-muted-foreground">Kirim aplikasi magang Anda dengan detail yang diperlukan</p>
-                    </div>
+                <div className="container mx-auto max-w-7xl">
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 overflow-hidden rounded-xl md:min-h-min">
+                        <div className="mb-6">
+                            <h1 className="text-2xl font-bold">Ajukan Magang</h1>
+                            <p className="text-muted-foreground">Kirim aplikasi magang Anda dengan detail yang diperlukan</p>
+                        </div>
 
-                    <InternshipForm mode="create" />
+                        <InternshipForm mode="create" />
+                    </div>
                 </div>
             </div>
         </FrontLayout>

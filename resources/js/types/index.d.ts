@@ -1,3 +1,4 @@
+import { GlobalVariable } from '@/pages/admin/global-variables';
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
 
@@ -27,6 +28,7 @@ export interface SharedData {
     quote: { message: string; author: string };
     auth: Auth;
     ziggy: Config & { location: string };
+    globalVariables: GlobalVariable[];
     [key: string]: unknown;
 }
 

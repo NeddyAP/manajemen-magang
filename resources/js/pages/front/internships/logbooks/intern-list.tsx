@@ -40,7 +40,8 @@ export default function InternshipList({ internships }: PageProps) {
         <FrontLayout breadcrumbs={breadcrumbs}>
             <Head title="Logbook Magang" />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl">
+                <div className="container mx-auto max-w-7xl">
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl">
                     <div className="mb-6 flex items-center justify-between">
                         <div>
                             <h1 className="text-2xl font-bold">Pilih Magang</h1>
@@ -76,6 +77,7 @@ export default function InternshipList({ internships }: PageProps) {
                                 </CardContent>
                             </Card>
                         ))}
+                    </div>
                     </div>
                 </div>
             </div>

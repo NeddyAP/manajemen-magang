@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Faq;
+use App\Models\GlobalVariable;
 
 class HomeController extends Controller
 {
