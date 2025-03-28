@@ -131,7 +131,7 @@ export const columns: ColumnDef<Internship>[] = [
                     <span className="font-medium">{companyName.length > 40 ? `${companyName.slice(0, 40)}...` : companyName}</span>
                     {companyAddress && (
                         <span className="text-muted-foreground text-sm">
-                            {typeof companyAddress === 'string' && companyAddress.length > 40 ? `${companyAddress.slice(0, 40)}...` : companyAddress}
+                            {typeof companyAddress === 'string' && companyAddress.length > 30 ? `${companyAddress.slice(0, 30)}...` : companyAddress}
                         </span>
                     )}
                 </div>

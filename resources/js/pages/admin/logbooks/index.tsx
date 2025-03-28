@@ -30,14 +30,7 @@ export interface Logbook {
             mahasiswaProfile: {
                 id: number;
                 nim: string;
-                prodi: {
-                    id: number;
-                    name: string;
-                };
-                fakultas: {
-                    id: number;
-                    name: string;
-                };
+                study_program: string;
                 advisor: {
                     id: number;
                     name: string;

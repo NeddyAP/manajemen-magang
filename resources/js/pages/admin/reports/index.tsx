@@ -1,19 +1,79 @@
+import { DataTable } from '@/components/data-table/data-table';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { User } from '@/types/user';
+import { Head, router } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
+import { columns, initialColumnVisibility } from './components/column';
+import { StatusFilter } from './components/filters';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Report',
+        title: 'Laporan',
         href: '/admin/reports',
     },
 ];
 
-export default function Reports() {
+export interface Report {
+    id?: number;
+    user_id?: number;
+    user?: User;
+    internship_id?: number;
+    internship?: {
+        company_name?: string;
+    };
+    title?: string;
+    report_file?: string;
+    version?: number;
+    status?: 'pending' | 'approved' | 'rejected';
+    reviewer_notes?: string;
+    created_at?: string;
+    updated_at?: string;
+}
+
+interface TableMeta {
+    total: number;
+    per_page: number;
+    current_page: number;
+    last_page: number;
+}
+
+interface ReportsProps {
+    reports: Report[];
+    meta: TableMeta;
+}
+
+export default function Reports({ reports, meta }: ReportsProps) {
+    const [selectedStatus, setSelectedStatus] = useState<string>('');
+
+    // Initialize filters from URL on mount
+    useEffect(() => {
+        const url = new URL(window.location.href);
+        const status = url.searchParams.get('status');
+
+        if (status) {
+            setSelectedStatus(status);
+        }
+    }, []);
+
+    const handleStatusChange = (status: string) => {
+        setSelectedStatus(status);
+
+        // Build query object
+        const query: Record<string, string> = {};
+        if (status) query.status = status;
+
+        router.get(route('admin.reports.index'), query, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Manajemen Report" />
+            <Head title="Laporan" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">
@@ -26,8 +86,19 @@ export default function Reports() {
                         <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                     </div>
                 </div>
-                <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border md:min-h-min">
-                    <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 overflow-hidden rounded-xl md:min-h-min">
+                    <div>
+                        <StatusFilter value={selectedStatus} onChange={handleStatusChange} />
+                    </div>
+                    <DataTable
+                        className="inset-0 size-full"
+                        columns={columns}
+                        data={reports}
+                        filters={[{ id: 'status', value: selectedStatus }]}
+                        meta={meta}
+                        deleteRoute={route('admin.reports.destroy.bulk')}
+                        initialColumnVisibility={initialColumnVisibility}
+                    />
                 </div>
             </div>
         </AppLayout>

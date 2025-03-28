@@ -15,8 +15,7 @@ class LogbookController extends Controller
     {
         $query = Logbook::with([
             'internship.user.mahasiswaProfile.advisor.dosenProfile',
-            'internship.user.mahasiswaProfile.prodi',
-            'internship.user.mahasiswaProfile.fakultas',
+            'internship.user.mahasiswaProfile',
         ]);
 
         // Handle search

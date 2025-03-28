@@ -23,8 +23,13 @@ Route::middleware(['auth', 'role:superadmin|admin'])->prefix('admin')->name('adm
     Route::get('internships/{internship}/download', [InternshipController::class, 'downloadApplicationFile'])->name('internships.download');
     Route::delete('internships/bulk-destroy', [InternshipController::class, 'bulkDestroy'])->name('internships.destroy.bulk');
 
-    Route::resource('logbooks', LogbookController::class);
-    Route::resource('reports', ReportController::class);
+    // Logbooks
+    Route::resource('logbooks', LogbookController::class)->except(['create', 'store', 'edit', 'update']);
+    Route::post('logbooks/bulk-destroy', [LogbookController::class, 'bulkDestroy'])->name('logbooks.destroy.bulk');
+
+    // Reports
+    Route::resource('reports', ReportController::class)->except(['create', 'store']);
+    Route::post('reports/bulk-destroy', [ReportController::class, 'bulkDestroy'])->name('reports.destroy.bulk');
 
     Route::resource('guidance-classes', GuidanceClassController::class);
 
@@ -45,10 +50,6 @@ Route::middleware(['auth', 'role:superadmin|admin'])->prefix('admin')->name('adm
     Route::resource('global-variables', GlobalVariableController::class)->except(['show']);
     Route::post('global-variables/{globalVariable}/toggle', [GlobalVariableController::class, 'toggle'])->name('global-variables.toggle');
     Route::post('global-variables/bulk-destroy', [GlobalVariableController::class, 'bulkDestroy'])->name('global-variables.destroy.bulk');
-
-    // Logbooks
-    Route::resource('logbooks', LogbookController::class)->except(['create', 'store', 'edit', 'update']);
-    Route::post('logbooks/bulk-destroy', [LogbookController::class, 'bulkDestroy'])->name('logbooks.destroy.bulk');
 });
 
 require __DIR__.'/auth.php';

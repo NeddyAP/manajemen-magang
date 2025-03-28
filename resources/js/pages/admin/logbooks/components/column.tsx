@@ -71,7 +71,7 @@ export const columns: ColumnDef<Logbook>[] = [
             const activities = row.getValue('activities');
             if (!activities || typeof activities !== 'string') return '-';
 
-            return activities.length > 100 ? `${activities.slice(0, 100)}...` : activities;
+            return activities.length > 40 ? `${activities.slice(0, 40)}...` : activities;
         },
     },
     {
@@ -81,7 +81,7 @@ export const columns: ColumnDef<Logbook>[] = [
             const notes = row.getValue('supervisor_notes');
             if (!notes || typeof notes !== 'string') return '-';
 
-            return notes.length > 100 ? `${notes.slice(0, 100)}...` : notes;
+            return notes.length > 40 ? `${notes.slice(0, 40)}...` : notes;
         },
     },
     {

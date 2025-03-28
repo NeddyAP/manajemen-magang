@@ -28,11 +28,7 @@ export default function LogbookForm({ logbook }: Props) {
                             </div>
                             <div>
                                 <p className="text-sm text-gray-500">Program Studi</p>
-                                <p>{mahasiswaProfile?.prodi?.name || '-'}</p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-500">Fakultas</p>
-                                <p>{mahasiswaProfile?.fakultas?.name || '-'}</p>
+                                <p>{mahasiswaProfile?.study_program || '-'}</p>
                             </div>
                             <div>
                                 <p className="text-sm text-gray-500">Pembimbing</p>
