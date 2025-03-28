@@ -66,8 +66,7 @@ export default function LogbooksIndex({ internship, logbooks, meta }: PageProps)
                             </Button>
                         </div>
 
-                        <DataTable meta={meta} columns={columns} data={logbooks}
-                            initialColumnVisibility={initialColumnVisibility} />
+                        <DataTable meta={meta} columns={columns} data={logbooks} initialColumnVisibility={initialColumnVisibility} />
                     </div>
                 </div>
             </div>

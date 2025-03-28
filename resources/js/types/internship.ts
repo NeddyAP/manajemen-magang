@@ -16,6 +16,8 @@ export interface Internship {
     created_at?: string;
     updated_at?: string;
     status_message?: string | null;
+    logbooks_count?: number; // Optional count
+    reports_count?: number; // Optional count
 }
 
 export interface Logbook {
@@ -27,3 +29,18 @@ export interface Logbook {
     created_at?: string;
     updated_at?: string;
 }
+
+export interface Report {
+    id: number;
+    user_id: number;
+    internship_id: number;
+    title: string;
+    report_file: string; // Path to the file
+    version: number;
+    status: 'pending' | 'approved' | 'rejected';
+    reviewer_notes?: string | null;
+    created_at: string; // Assuming timestamps are returned
+    updated_at: string;
+}
+
+// You might have other related types here

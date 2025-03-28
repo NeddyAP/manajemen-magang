@@ -46,7 +46,7 @@ export default function LogbookForm({ logbook, mode, internshipId }: Props) {
             <Card>
                 <CardContent className="space-y-4 pt-6">
                     <div className="space-y-4">
-                        <Label htmlFor="question">Tanggak</Label>
+                        <Label htmlFor="question">Tanggal</Label>
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button

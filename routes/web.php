@@ -3,6 +3,7 @@
 use App\Http\Controllers\Front\InternshipApplicantController;
 use App\Http\Controllers\Front\InternshipController;
 use App\Http\Controllers\Front\LogbookController;
+use App\Http\Controllers\Front\ReportController; // Import ReportController
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TutorialController;
 use Illuminate\Support\Facades\Route;
@@ -40,6 +41,29 @@ Route::middleware(['auth', 'verified'])->prefix('internships')->name('front.inte
         Route::put('/logbooks/{internship}/{logbook}', [LogbookController::class, 'update'])->name('logbooks.update');
         Route::delete('/logbooks/{internship}/{logbook}', [LogbookController::class, 'destroy'])->name('logbooks.destroy');
     });
+
+    // Logbook routes (Keep existing)
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/logbooks', [LogbookController::class, 'internList'])->name('logbooks.intern-list');
+        Route::get('/logbooks/{internship}', [LogbookController::class, 'index'])->name('logbooks.index');
+        Route::get('/logbooks/{internship}/create', [LogbookController::class, 'create'])->name('logbooks.create');
+        Route::post('/logbooks/{internship}', [LogbookController::class, 'store'])->name('logbooks.store');
+        Route::get('/logbooks/{internship}/{logbook}/edit', [LogbookController::class, 'edit'])->name('logbooks.edit');
+        Route::put('/logbooks/{internship}/{logbook}', [LogbookController::class, 'update'])->name('logbooks.update');
+        Route::delete('/logbooks/{internship}/{logbook}', [LogbookController::class, 'destroy'])->name('logbooks.destroy');
+    });
+
+    // Report routes
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/reports', [ReportController::class, 'internList'])->name('reports.intern-list');
+        Route::get('/reports/{internship}', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/{internship}/create', [ReportController::class, 'create'])->name('reports.create');
+        Route::post('/reports/{internship}', [ReportController::class, 'store'])->name('reports.store');
+        Route::get('/reports/{internship}/{report}/edit', [ReportController::class, 'edit'])->name('reports.edit');
+        Route::put('/reports/{internship}/{report}', [ReportController::class, 'update'])->name('reports.update'); // Use PUT for updates
+        Route::delete('/reports/{internship}/{report}', [ReportController::class, 'destroy'])->name('reports.destroy');
+    });
+
 });
 
 require __DIR__.'/admin.php';

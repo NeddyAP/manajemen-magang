@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import FrontLayout from '@/layouts/front-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { BookOpen, UserIcon } from 'lucide-react';
+import { BookOpen, FileText, UserIcon } from 'lucide-react'; // Import FileText icon
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -85,6 +85,24 @@ export default function InternshipsIndex() {
                                 <p className="mb-4 text-sm">Catat dan dokumentasikan aktivitas magang Anda setiap hari</p>
                                 <Button asChild variant="outline">
                                     <Link href={route('front.internships.logbooks.intern-list')}>Pilih Magang</Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
+
+                        {/* Add Card for Reports */}
+                        <Card>
+                            <CardHeader>
+                                <div className="flex items-center justify-between">
+                                    <CardTitle>Laporan Magang</CardTitle>
+                                    <FileText className="text-primary h-6 w-6" /> {/* Use FileText icon */}
+                                </div>
+                                <CardDescription>Kelola laporan akhir magang Anda</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="mb-4 text-sm">Unggah, perbarui, dan lihat status laporan akhir magang Anda.</p>
+                                <Button asChild variant="outline">
+                                    {/* Link to the report intern list route */}
+                                    <Link href={route('front.internships.reports.intern-list')}>Pilih Magang</Link>
                                 </Button>
                             </CardContent>
                         </Card>
