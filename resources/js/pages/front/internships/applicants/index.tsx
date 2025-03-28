@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import FrontLayout from '@/layouts/front-layout';
 import { type BreadcrumbItem } from '@/types';
-import { User } from '@/types/user';
+import { Internship } from '@/types/internship';
 import { Head, Link, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -20,24 +20,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: route('front.internships.applicants.index'),
     },
 ];
-
-export interface Internship {
-    id?: number;
-    user_id?: number;
-    user?: User;
-    type?: string;
-    application_file?: string;
-    company_name?: string;
-    company_address?: string;
-    start_date?: string;
-    end_date?: string;
-    status?: string;
-    progress?: number;
-    progress_percentage?: number;
-    created_at?: string;
-    updated_at?: string;
-    status_message?: string | null;
-}
 
 interface TableMeta {
     total: number;

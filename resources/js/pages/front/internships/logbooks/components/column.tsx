@@ -2,6 +2,7 @@
 
 import { DataTableColumnHeader } from '@/components/data-table/column-header';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -10,14 +11,33 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Logbook } from '@/types/internship';
 import { router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { MoreHorizontal } from 'lucide-react';
-import { Logbook } from '..';
 
 export const columns: ColumnDef<Logbook>[] = [
+    {
+        id: 'select',
+        header: ({ table }) => (
+            <Checkbox
+                checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
+                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                aria-label="Select all"
+            />
+        ),
+        cell: ({ row }) => (
+            <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
+        accessorKey: 'id',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
+    },
     {
         accessorKey: 'date',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Tanggal" />,
@@ -35,7 +55,7 @@ export const columns: ColumnDef<Logbook>[] = [
             const activities = row.getValue('activities');
             if (!activities || typeof activities !== 'string') return '-';
 
-            return activities.length > 100 ? `${activities.slice(0, 100)}...` : activities;
+            return activities.length > 50 ? `${activities.slice(0, 50)}...` : activities;
         },
     },
     {
@@ -45,7 +65,7 @@ export const columns: ColumnDef<Logbook>[] = [
             const notes = row.getValue('supervisor_notes');
             if (!notes || typeof notes !== 'string') return '-';
 
-            return notes.length > 100 ? `${notes.slice(0, 100)}...` : notes;
+            return notes.length > 50 ? `${notes.slice(0, 50)}...` : notes;
         },
     },
     {
@@ -99,6 +119,7 @@ export const columns: ColumnDef<Logbook>[] = [
 ];
 
 export const initialColumnVisibility = {
+    id: false,
     created_at: false,
     updated_at: false,
 };

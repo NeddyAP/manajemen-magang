@@ -1,23 +1,10 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import FrontLayout from '@/layouts/front-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
-import { Logbook } from '.';
+import { BreadcrumbItem } from '@/types'; // Import Logbook from types
+import { Logbook } from '@/types/internship';
+import { Head } from '@inertiajs/react';
+import LogbookForm from './components/form';
 
-interface Internship {
-    id: number;
-    title: string;
-}
-
-interface PageProps {
-    internship: Internship;
-    logbook: Logbook;
-}
-
+// Correct breadcrumbs
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Magang',
@@ -25,73 +12,41 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
     {
         title: 'Logbook',
-        href: route('front.internships.logbooks.index', { internship: 0 }),
+        // Dynamically set href based on logbook data
+        href: '#', // Placeholder, will be set dynamically
     },
     {
         title: 'Edit Logbook',
-        href: '#',
+        href: '#', // Current page
     },
 ];
 
-export default function LogbookEdit({ internship, logbook }: PageProps) {
-    const { data, setData, put, processing, errors } = useForm({
-        date: logbook.date,
-        activities: logbook.activities,
+interface Props {
+    logbook: Logbook;
+}
+
+// Rename component
+export default function LogbookEdit({ logbook }: Props) {
+    // Update breadcrumb dynamically
+    const dynamicBreadcrumbs = breadcrumbs.map((item) => {
+        if (item.title === 'Logbook') {
+            return { ...item, href: route('front.internships.logbooks.index', logbook.internship_id) };
+        }
+        return item;
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        put(route('front.internships.logbooks.update', [internship.id, logbook.id]));
-    };
-
     return (
-        <FrontLayout breadcrumbs={breadcrumbs}>
-            <Head title="Edit Logbook" />
+        <FrontLayout breadcrumbs={dynamicBreadcrumbs}>
+            <Head title={`Edit Logbook: ${logbook.id}`} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="container mx-auto max-w-7xl">
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl">
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 overflow-hidden rounded-xl md:min-h-min">
                         <div className="mb-6">
                             <h1 className="text-2xl font-bold">Edit Logbook</h1>
-                            <p className="text-muted-foreground">{internship.title}</p>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="space-y-2">
-                                <Label htmlFor="date">Tanggal</Label>
-                                <Input
-                                    id="date"
-                                    type="date"
-                                    value={data.date}
-                                    onChange={(e) => setData('date', e.target.value)}
-                                    className={errors.date ? 'border-destructive' : ''}
-                                />
-                                {errors.date && <p className="text-destructive text-sm">{errors.date}</p>}
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="activities">Aktivitas</Label>
-                                <Textarea
-                                    id="activities"
-                                    value={data.activities}
-                                    onChange={(e) => setData('activities', e.target.value)}
-                                    className={errors.activities ? 'border-destructive' : ''}
-                                    rows={5}
-                                />
-                                {errors.activities && <p className="text-destructive text-sm">{errors.activities}</p>}
-                            </div>
-
-                            <div className="flex gap-4">
-                                <Button type="submit" disabled={processing}>
-                                    Simpan Perubahan
-                                </Button>
-                                <Button asChild variant="outline" type="button">
-                                    <Link href={route('front.internships.logbooks.index', internship.id)}>
-                                        <ArrowLeft className="mr-2 h-4 w-4" />
-                                        Kembali
-                                    </Link>
-                                </Button>
-                            </div>
-                        </form>
+                        {/* Pass internshipId to LogbookForm */}
+                        <LogbookForm logbook={logbook} mode="edit" internshipId={logbook.internship_id} />
                     </div>
                 </div>
             </div>

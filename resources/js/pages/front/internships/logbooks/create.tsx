@@ -1,11 +1,7 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import FrontLayout from '@/layouts/front-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { Head } from '@inertiajs/react';
+import LogbookForm from './components/form'; // Import LogbookForm
 
 interface Internship {
     id: number;
@@ -24,29 +20,28 @@ const breadcrumbs: BreadcrumbItem[] = [
         title: 'Magang',
         href: route('front.internships.index'),
     },
+    // Breadcrumb href will be updated dynamically below
     {
         title: 'Logbook',
-        href: route('front.internships.logbooks.index', { internship: 0 }),
+        href: '#', // Placeholder, will be set dynamically
     },
     {
         title: 'Tambah Logbook',
         href: '#',
     },
-];
+]; // Add missing closing bracket
 
 export default function LogbookCreate({ internship }: PageProps) {
-    const { data, setData, post, processing, errors } = useForm({
-        date: new Date().toISOString().split('T')[0], // Set today's date as default
-        activities: '',
+    // Update breadcrumb dynamically
+    const dynamicBreadcrumbs = breadcrumbs.map((item) => {
+        if (item.title === 'Logbook') {
+            return { ...item, href: route('front.internships.logbooks.index', internship.id) };
+        }
+        return item;
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        post(route('front.internships.logbooks.store', internship.id));
-    };
-
     return (
-        <FrontLayout breadcrumbs={breadcrumbs}>
+        <FrontLayout breadcrumbs={dynamicBreadcrumbs}>
             <Head title="Tambah Logbook" />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="container mx-auto max-w-7xl">
@@ -72,46 +67,8 @@ export default function LogbookCreate({ internship }: PageProps) {
                             </p>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="space-y-2">
-                                <Label htmlFor="date">Tanggal</Label>
-                                <Input
-                                    id="date"
-                                    type="date"
-                                    value={data.date}
-                                    onChange={(e) => setData('date', e.target.value)}
-                                    className={errors.date ? 'border-destructive' : ''}
-                                    min={internship.start_date}
-                                    max={internship.end_date}
-                                />
-                                {errors.date && <p className="text-destructive text-sm">{errors.date}</p>}
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="activities">Aktivitas</Label>
-                                <Textarea
-                                    id="activities"
-                                    value={data.activities}
-                                    onChange={(e) => setData('activities', e.target.value)}
-                                    className={errors.activities ? 'border-destructive' : ''}
-                                    rows={5}
-                                    placeholder="Jelaskan aktivitas yang Anda lakukan hari ini..."
-                                />
-                                {errors.activities && <p className="text-destructive text-sm">{errors.activities}</p>}
-                            </div>
-
-                            <div className="flex gap-4">
-                                <Button type="submit" disabled={processing}>
-                                    Simpan
-                                </Button>
-                                <Button asChild variant="outline" type="button">
-                                    <Link href={route('front.internships.logbooks.index', internship.id)}>
-                                        <ArrowLeft className="mr-2 h-4 w-4" />
-                                        Kembali
-                                    </Link>
-                                </Button>
-                            </div>
-                        </form>
+                        {/* Use the reusable form component */}
+                        <LogbookForm mode="create" internshipId={internship.id} />
                     </div>
                 </div>
             </div>

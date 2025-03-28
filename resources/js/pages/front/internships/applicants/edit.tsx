@@ -1,22 +1,8 @@
 import FrontLayout from '@/layouts/front-layout';
 import { type BreadcrumbItem } from '@/types';
+import { Internship } from '@/types/internship';
 import { Head } from '@inertiajs/react';
 import InternshipForm from './components/form';
-
-interface Internship {
-    id: number;
-    type: 'kkl' | 'kkn';
-    application_file: string;
-    company_name: string;
-    company_address: string;
-    start_date: string;
-    end_date: string;
-    status: 'waiting' | 'accepted' | 'rejected';
-    status_message?: string | null;
-    progress: number;
-    created_at: string;
-    updated_at: string;
-}
 
 interface Props {
     internship: Internship;

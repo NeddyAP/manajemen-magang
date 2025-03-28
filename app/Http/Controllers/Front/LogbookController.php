@@ -22,7 +22,7 @@ class LogbookController extends Controller
         ]);
     }
 
-    public function index(Internship $internship)
+    public function index(Request $request, Internship $internship)
     {
         // Check if the internship belongs to the authenticated user
         if ($internship->user_id !== auth()->id()) {
@@ -34,11 +34,38 @@ class LogbookController extends Controller
             abort(403, 'Anda hanya dapat mengakses logbook untuk magang yang telah disetujui.');
         }
 
-        $logbooks = $internship->logbooks()->latest()->get();
+        $query = $internship->logbooks();
+
+        // Handle search
+        if ($request->has('search') && ! empty($request->search)) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('activities', 'like', "%{$searchTerm}%")
+                    ->orWhere('date', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        // Handle sorting
+        if ($request->has('sort_field') && ! empty($request->sort_field)) {
+            $direction = $request->sort_direction === 'desc' ? 'desc' : 'asc';
+            $query->orderBy($request->sort_field, $direction);
+        } else {
+            $query->latest();
+        }
+
+        // Paginate the results
+        $perPage = $request->per_page ?? 10;
+        $logbooks = $query->paginate($perPage)->withQueryString();
 
         return Inertia::render('front/internships/logbooks/index', [
             'internship' => $internship,
-            'logbooks' => $logbooks,
+            'logbooks' => $logbooks->items(),
+            'meta' => [
+                'total' => $logbooks->total(),
+                'per_page' => $logbooks->perPage(),
+                'current_page' => $logbooks->currentPage(),
+                'last_page' => $logbooks->lastPage(),
+            ],
         ]);
     }
 

@@ -2,32 +2,12 @@ import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
 import FrontLayout from '@/layouts/front-layout';
 import { type BreadcrumbItem } from '@/types';
+import { Internship, Logbook } from '@/types/internship';
 import { Head, Link } from '@inertiajs/react';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { Plus } from 'lucide-react';
-import { columns } from './components/column';
-
-export interface Logbook {
-    id: number;
-    internship_id: number;
-    date: string;
-    activities: string;
-    supervisor_notes: string | null;
-}
-
-interface Internship {
-    id: number;
-    company_name: string;
-    type: string;
-    start_date: string;
-    end_date: string;
-}
-
-interface PageProps {
-    internship: Internship;
-    logbooks: Logbook[];
-}
+import { columns, initialColumnVisibility } from './components/column';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -44,7 +24,23 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function LogbooksIndex({ internship, logbooks }: PageProps) {
+interface PageProps {
+    internship: Internship;
+    logbooks: Logbook[];
+    meta: TableMeta;
+}
+
+interface TableMeta {
+    total: number;
+    per_page: number;
+    current_page: number;
+    last_page: number;
+}
+
+export default function LogbooksIndex({ internship, logbooks, meta }: PageProps) {
+    if (!internship.start_date || !internship.end_date || typeof internship.start_date !== 'string' || typeof internship.end_date !== 'string')
+        return '-';
+
     return (
         <FrontLayout breadcrumbs={breadcrumbs}>
             <Head title="Logbook Magang" />
@@ -58,7 +54,7 @@ export default function LogbooksIndex({ internship, logbooks }: PageProps) {
                                     {internship.company_name} - {internship.type}
                                 </p>
                                 <p className="text-muted-foreground text-sm">
-                                    Periode: {format(new Date(internship.start_date), 'dd MMMM yyyy', { locale: id })} -{' '}
+                                    Periode: {format(parseISO(internship.start_date), 'PP', { locale: id })}; -{' '}
                                     {format(new Date(internship.end_date), 'dd MMMM yyyy', { locale: id })}
                                 </p>
                             </div>
@@ -70,7 +66,8 @@ export default function LogbooksIndex({ internship, logbooks }: PageProps) {
                             </Button>
                         </div>
 
-                        <DataTable columns={columns} data={logbooks} />
+                        <DataTable meta={meta} columns={columns} data={logbooks}
+                            initialColumnVisibility={initialColumnVisibility} />
                     </div>
                 </div>
             </div>
