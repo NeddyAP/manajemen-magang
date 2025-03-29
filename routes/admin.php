@@ -31,11 +31,15 @@ Route::middleware(['auth', 'role:superadmin|admin'])->prefix('admin')->name('adm
     Route::resource('reports', ReportController::class)->except(['create', 'store']);
     Route::post('reports/bulk-destroy', [ReportController::class, 'bulkDestroy'])->name('reports.destroy.bulk');
 
+    // Guidance Classes
     Route::resource('guidance-classes', GuidanceClassController::class);
+    Route::post('guidance-classes/bulk-destroy', [GuidanceClassController::class, 'bulkDestroy'])->name('guidance-classes.destroy.bulk');
 
     Route::resource('tutorials', TutorialController::class)->except(['show']);
     Route::post('tutorials/{tutorial}/toggle', [TutorialController::class, 'toggle'])->name('tutorials.toggle');
     Route::post('tutorials/bulk-destroy', [TutorialController::class, 'bulkDestroy'])->name('tutorials.destroy.bulk');
+
+    // Guidances
 
     // Users
     Route::resource('users', UserController::class);

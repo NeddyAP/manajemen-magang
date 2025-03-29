@@ -86,4 +86,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Report::class);
     }
+
+    public function guidanceClassAttendance()
+    {
+        return $this->hasMany(GuidanceClassAttendance::class);
+    }
 }

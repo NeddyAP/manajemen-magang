@@ -13,7 +13,18 @@ return new class extends Migration
     {
         Schema::create('guidance_classes', function (Blueprint $table) {
             $table->id();
+            $table->string('title');
+            $table->foreignId('lecturer_id')->constrained('users');
+            $table->dateTime('start_date');
+            $table->dateTime('end_date')->nullable();
+            $table->string('room')->nullable();
+            $table->text('description')->nullable();
+            $table->string('qr_code')->nullable();
+            $table->integer('max_participants')->nullable();
             $table->timestamps();
+
+            $table->index('lecturer_id');
+            $table->index('start_date');
         });
     }
 
