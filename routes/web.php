@@ -67,6 +67,7 @@ Route::middleware(['auth', 'verified'])->prefix('internships')->name('front.inte
 });
 // Guidance Class Attendance
 Route::get('guidance-classes/attend/{token}', [GuidanceClassAttendanceController::class, 'attend'])
+    ->middleware('auth')
     ->name('guidance-classes.attend');
 
 require __DIR__.'/admin.php';

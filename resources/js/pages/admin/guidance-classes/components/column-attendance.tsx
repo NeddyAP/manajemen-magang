@@ -80,7 +80,7 @@ export const columnAttendance: ColumnDef<Student>[] = [
         accessorKey: 'attendance.attended_at',
 
         header: ({ column }) => <DataTableColumnHeader column={column} title="Kehadiran" />,
-        cell: ({ row }) => (row.original.attendance.attended_at ? formatDate(row.original.attendance.attended_at) : 'Belum Hadir'),
+        cell: ({ row }) => (row.original.attendance.attended_at ? formatDate(row.original.attendance.attended_at) : 'Tidak Hadir'),
     },
     {
         accessorKey: 'attendance.attendance_method',

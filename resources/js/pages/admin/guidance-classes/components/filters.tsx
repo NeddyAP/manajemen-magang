@@ -74,7 +74,7 @@ interface AttendanceStatusFilterProps {
 export function AttendanceStatusFilter({ value, onChange }: AttendanceStatusFilterProps) {
     const options = [
         { label: 'Hadir', value: 'hadir' },
-        { label: 'Belum Hadir', value: 'belum_hadir' },
+        { label: 'Tidak Hadir', value: 'belum_hadir' },
     ];
 
     return <FilterPopover label="status kehadiran" value={value} options={options} onChange={onChange} />;

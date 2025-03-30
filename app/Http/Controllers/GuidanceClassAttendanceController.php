@@ -3,12 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\GuidanceClass;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class GuidanceClassAttendanceController extends Controller
 {
-    public function attend(Request $request, $token)
+    public function attend($token)
     {
         $user = Auth::user();
         $guidanceClass = GuidanceClass::where('qr_code', route('guidance-classes.attend', ['token' => $token]))
