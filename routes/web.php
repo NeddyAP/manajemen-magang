@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Front\GuidanceClassController;
 use App\Http\Controllers\Front\InternshipApplicantController;
 use App\Http\Controllers\Front\InternshipController;
 use App\Http\Controllers\Front\LogbookController;
@@ -63,6 +64,21 @@ Route::middleware(['auth', 'verified'])->prefix('internships')->name('front.inte
         Route::get('/reports/{internship}/{report}/edit', [ReportController::class, 'edit'])->name('reports.edit');
         Route::put('/reports/{internship}/{report}', [ReportController::class, 'update'])->name('reports.update'); // Use PUT for updates
         Route::delete('/reports/{internship}/{report}', [ReportController::class, 'destroy'])->name('reports.destroy');
+    });
+
+    // Guidance Classes routes
+    Route::middleware(['auth'])->group(function () {
+        // all front Guidance Classes route here
+        Route::get('/guidance-classes', [GuidanceClassController::class, 'index'])->name('guidance-classes.index');
+        Route::get('/guidance-classes/create', [GuidanceClassController::class, 'create'])->name('guidance-classes.create');
+        Route::post('/guidance-classes', [GuidanceClassController::class, 'store'])->name('guidance-classes.store');
+        Route::get('/guidance-classes/{id}', [GuidanceClassController::class, 'show'])->name('guidance-classes.show');
+        Route::get('/guidance-classes/{id}/edit', [GuidanceClassController::class, 'edit'])->name('guidance-classes.edit');
+        Route::put('/guidance-classes/{id}', [GuidanceClassController::class, 'update'])->name('guidance-classes.update');
+        Route::delete('/guidance-classes/{id}', [GuidanceClassController::class, 'destroy'])->name('guidance-classes.destroy');
+        Route::post('/guidance-classes/{id}/generate-qr', [GuidanceClassController::class, 'generateQrCode'])->name('guidance-classes.generate-qr');
+        Route::post('/guidance-classes/{classId}/attendance/{studentId}', [GuidanceClassController::class, 'markAttendance'])->name('guidance-classes.mark-attendance');
+        Route::delete('/guidance-classes/{classId}/attendance/{studentId}', [GuidanceClassController::class, 'resetAttendance'])->name('guidance-classes.reset-attendance');
     });
 });
 // Guidance Class Attendance

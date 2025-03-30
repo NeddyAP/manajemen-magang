@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Support\Facades\DB;
 
 class GuidanceClassAttendance extends Pivot
 {
@@ -65,10 +66,19 @@ class GuidanceClassAttendance extends Pivot
      */
     public function canAttend(): bool
     {
+        // For manually marking attendance, we'll be more lenient
+        if ($this->attendance_method === 'manual') {
+            return true;
+        }
+        
+        // Make case-insensitive check for 'active' status
+        $isActive = strtolower($this->user->mahasiswaProfile->academic_status) === 'active' || 
+                   strtolower($this->user->mahasiswaProfile->academic_status) === 'aktif';
+        
         return $this->user->mahasiswaProfile->advisor_id === $this->guidanceClass->lecturer_id
-            && $this->user->mahasiswaProfile->academic_status === 'active'
+            && $isActive
             && $this->user->internships()
-                ->whereIn('status', ['pending', 'active', 'ongoing'])
+                ->whereIn('status', ['pending', 'active', 'ongoing', 'accepted'])
                 ->exists();
     }
 

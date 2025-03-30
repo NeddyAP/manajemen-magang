@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import FrontLayout from '@/layouts/front-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { BookOpen, FileText, UserIcon } from 'lucide-react'; // Import FileText icon
+import { BookOpen, ClipboardList, FileText, UserIcon } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -23,10 +23,85 @@ interface PageProps {
     [key: string]: unknown;
 }
 
+interface CardItem {
+    id: string;
+    title: string;
+    description: string;
+    content: string;
+    icon: React.ReactNode;
+    route: string;
+    buttonText: string;
+    buttonVariant: 'default' | 'outline' | 'secondary' | 'destructive' | 'ghost' | 'link';
+    showOnlyFor?: string[];
+}
+
 export default function InternshipsIndex() {
     const { auth } = usePage<PageProps>().props;
     const user = auth.user;
     const isMahasiswa = user?.role === 'mahasiswa';
+    const isDosen = user?.role === 'dosen';
+
+    const cards: CardItem[] = [
+        {
+            id: 'apply',
+            title: 'Aplikasi Magang',
+            description: 'Ajukan program magang',
+            content: 'Kirim aplikasi magang Anda dengan dokumen dan informasi yang diperlukan',
+            icon: <UserIcon className="text-primary h-6 w-6" />,
+            route: route('front.internships.applicants.create'),
+            buttonText: 'Ajukan Sekarang',
+            buttonVariant: 'default',
+            showOnlyFor: ['mahasiswa'],
+        },
+        {
+            id: 'my-applications',
+            title: 'Aplikasi Saya',
+            description: 'Lihat aplikasi magang Anda',
+            content: 'Periksa status aplikasi Anda dan kelola progres magang Anda',
+            icon: <UserIcon className="text-primary h-6 w-6" />,
+            route: route('front.internships.applicants.index'),
+            buttonText: 'Lihat Aplikasi',
+            buttonVariant: 'outline',
+        },
+        {
+            id: 'logbooks',
+            title: 'Logbook Magang',
+            description: 'Kelola logbook magang Anda',
+            content: 'Catat dan dokumentasikan aktivitas magang Anda setiap hari',
+            icon: <BookOpen className="text-primary h-6 w-6" />,
+            route: route('front.internships.logbooks.intern-list'),
+            buttonText: 'Pilih Magang',
+            buttonVariant: 'outline',
+        },
+        {
+            id: 'reports',
+            title: 'Laporan Magang',
+            description: 'Kelola laporan akhir magang Anda',
+            content: 'Unggah, perbarui, dan lihat status laporan akhir magang Anda.',
+            icon: <FileText className="text-primary h-6 w-6" />,
+            route: route('front.internships.reports.intern-list'),
+            buttonText: 'Pilih Magang',
+            buttonVariant: 'outline',
+        },
+        {
+            id: 'classes',
+            title: 'Kelas Bimbingan',
+            description: 'Kelas dan kehadiran bimbingan',
+            content: 'Lihat jadwal kelas bimbingan, rekam kehadiran, dan ikuti bimbingan dengan dosen.',
+            icon: <ClipboardList className="text-primary h-6 w-6" />,
+            route: route('front.internships.guidance-classes.index'),
+            buttonText: 'Lihat Kelas',
+            buttonVariant: 'outline',
+        },
+    ];
+
+    // Filter cards based on user role
+    const filteredCards = cards.filter((card) => {
+        if (!card.showOnlyFor) return true;
+        if (isMahasiswa && card.showOnlyFor.includes('mahasiswa')) return true;
+        if (isDosen && card.showOnlyFor.includes('dosen')) return true;
+        return !card.showOnlyFor.length;
+    });
 
     return (
         <FrontLayout breadcrumbs={breadcrumbs}>
@@ -39,73 +114,23 @@ export default function InternshipsIndex() {
                     </div>
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {isMahasiswa && (
-                            <Card>
+                        {filteredCards.map((card) => (
+                            <Card key={card.id}>
                                 <CardHeader>
                                     <div className="flex items-center justify-between">
-                                        <CardTitle>Aplikasi Magang</CardTitle>
-                                        <UserIcon className="text-primary h-6 w-6" />
+                                        <CardTitle>{card.title}</CardTitle>
+                                        {card.icon}
                                     </div>
-                                    <CardDescription>Ajukan program magang</CardDescription>
+                                    <CardDescription>{card.description}</CardDescription>
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="mb-4 text-sm">Kirim aplikasi magang Anda dengan dokumen dan informasi yang diperlukan</p>
-                                    <Button asChild>
-                                        <Link href={route('front.internships.applicants.create')}>Ajukan Sekarang</Link>
+                                    <p className="mb-4 text-sm">{card.content}</p>
+                                    <Button asChild variant={card.buttonVariant}>
+                                        <Link href={card.route}>{card.buttonText}</Link>
                                     </Button>
                                 </CardContent>
                             </Card>
-                        )}
-
-                        <Card>
-                            <CardHeader>
-                                <div className="flex items-center justify-between">
-                                    <CardTitle>Aplikasi Saya</CardTitle>
-                                    <UserIcon className="text-primary h-6 w-6" />
-                                </div>
-                                <CardDescription>Lihat aplikasi magang Anda</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="mb-4 text-sm">Periksa status aplikasi Anda dan kelola progres magang Anda</p>
-                                <Button asChild variant="outline">
-                                    <Link href={route('front.internships.applicants.index')}>Lihat Aplikasi</Link>
-                                </Button>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardHeader>
-                                <div className="flex items-center justify-between">
-                                    <CardTitle>Logbook Magang</CardTitle>
-                                    <BookOpen className="text-primary h-6 w-6" />
-                                </div>
-                                <CardDescription>Kelola logbook magang Anda</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="mb-4 text-sm">Catat dan dokumentasikan aktivitas magang Anda setiap hari</p>
-                                <Button asChild variant="outline">
-                                    <Link href={route('front.internships.logbooks.intern-list')}>Pilih Magang</Link>
-                                </Button>
-                            </CardContent>
-                        </Card>
-
-                        {/* Add Card for Reports */}
-                        <Card>
-                            <CardHeader>
-                                <div className="flex items-center justify-between">
-                                    <CardTitle>Laporan Magang</CardTitle>
-                                    <FileText className="text-primary h-6 w-6" /> {/* Use FileText icon */}
-                                </div>
-                                <CardDescription>Kelola laporan akhir magang Anda</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="mb-4 text-sm">Unggah, perbarui, dan lihat status laporan akhir magang Anda.</p>
-                                <Button asChild variant="outline">
-                                    {/* Link to the report intern list route */}
-                                    <Link href={route('front.internships.reports.intern-list')}>Pilih Magang</Link>
-                                </Button>
-                            </CardContent>
-                        </Card>
+                        ))}
                     </div>
                 </div>
             </div>
