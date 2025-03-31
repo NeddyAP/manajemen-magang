@@ -33,19 +33,6 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
-const rightNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/admin',
-        icon: LayoutDashboard,
-    },
-    {
-        title: 'Panduan',
-        href: '/buku-panduan',
-        icon: BookOpen,
-    },
-];
-
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100 data-[theme=green]:text-[#1B4965]';
 
 interface AppHeaderProps {
@@ -72,6 +59,18 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
         );
     };
 
+    // Compute dashboard link based on role if user exists
+    const computedRightNavItems: NavItem[] = [];
+    if (auth?.role) {
+        const roleName = auth.user?.roles?.[0]?.name;
+        if (roleName && ['admin', 'superadmin'].includes(roleName)) {
+            computedRightNavItems.push({ title: 'Dashboard', href: '/admin', icon: LayoutDashboard });
+        } else if (roleName && ['mahasiswa', 'dosen'].includes(roleName)) {
+            computedRightNavItems.push({ title: 'Dashboard', href: '/internships', icon: LayoutDashboard });
+        }
+        // Always add Panduan
+        computedRightNavItems.push({ title: 'Panduan', href: '/buku-panduan', icon: BookOpen });
+    }
     return (
         <>
             <div className="border-sidebar-border/80 border-b">
@@ -108,7 +107,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                         </div>
 
                                         <div className="flex flex-col space-y-4">
-                                            {rightNavItems.map((item) => (
+                                            {computedRightNavItems.map((item) => (
                                                 <a
                                                     key={item.title}
                                                     href={item.href}
@@ -166,7 +165,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                             </Button>
                             {auth.user ? (
                                 <div className="hidden lg:flex">
-                                    {rightNavItems.map((item) => (
+                                    {computedRightNavItems.map((item) => (
                                         <TooltipProvider key={item.title} delayDuration={0}>
                                             <Tooltip>
                                                 <TooltipTrigger>

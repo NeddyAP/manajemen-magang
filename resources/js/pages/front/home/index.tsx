@@ -24,7 +24,6 @@ export default function Home({ faqCategories = [], faqsByCategory = {} }: HomePr
     const page = usePage<SharedData>();
     const { auth } = page.props;
     const { globalVariables } = page.props;
-
     return (
         <FrontLayout>
             <Head title="Selamat Datang">
