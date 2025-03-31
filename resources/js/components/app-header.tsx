@@ -46,7 +46,7 @@ const rightNavItems: NavItem[] = [
     },
 ];
 
-const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100 data-[theme=blue]:text-[#1B4965]';
+const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100 data-[theme=green]:text-[#1B4965]';
 
 interface AppHeaderProps {
     breadcrumbs?: BreadcrumbItem[];
@@ -151,7 +151,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                             {item.title}
                                         </Link>
                                         {isActive(item.href) && (
-                                            <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black data-[theme=blue]:bg-[#1B4965] dark:bg-white"></div>
+                                            <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black data-[theme=green]:bg-[#1B4965] dark:bg-white"></div>
                                         )}
                                     </NavigationMenuItem>
                                 ))}

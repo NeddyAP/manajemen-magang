@@ -34,9 +34,6 @@ interface Props {
 
 export default function ShowGuidanceClass({ class: guidanceClass, meta }: Props) {
     const studentCount = guidanceClass.students?.length || 0;
-    const maxParticipants = guidanceClass.max_participants || 0;
-    const isClassFull = maxParticipants > 0 && studentCount >= maxParticipants;
-
     const [attendanceStatusFilter, setAttendanceStatusFilter] = useState<string>('');
 
     return (
@@ -80,8 +77,8 @@ export default function ShowGuidanceClass({ class: guidanceClass, meta }: Props)
                             </div>
                             <div>
                                 <h4 className="font-medium">Kuota Peserta</h4>
-                                <Badge variant={isClassFull ? 'destructive' : 'default'}>
-                                    {studentCount}/{maxParticipants || '∞'}
+                                <Badge variant="default">
+                                    {studentCount}/{'∞'}
                                 </Badge>
                             </div>
                         </CardContent>

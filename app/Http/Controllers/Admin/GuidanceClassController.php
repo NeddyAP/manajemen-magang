@@ -40,7 +40,6 @@ class GuidanceClassController extends Controller
                 'end_date' => $class->end_date,
                 'room' => $class->room,
                 'participants_count' => $class->students()->count(),
-                'max_participants' => $class->max_participants,
             ]);
 
         $lecturers = User::role('dosen')->get(['id', 'name']);
@@ -245,7 +244,6 @@ class GuidanceClassController extends Controller
             'description' => $guidanceClass->description,
             'start_date' => $guidanceClass->start_date,
             'end_date' => $guidanceClass->end_date,
-            'max_participants' => $guidanceClass->max_participants,
             'qr_code' => $guidanceClass->qr_code, // Make sure QR code is included
             'lecturer' => [
                 'id' => $guidanceClass->lecturer->id,

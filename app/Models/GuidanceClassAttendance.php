@@ -78,7 +78,7 @@ class GuidanceClassAttendance extends Pivot
         return $this->user->mahasiswaProfile->advisor_id === $this->guidanceClass->lecturer_id
             && $isActive
             && $this->user->internships()
-                ->whereIn('status', ['pending', 'active', 'ongoing', 'accepted'])
+                ->whereIn('status', ['waiting','accepted'])
                 ->exists();
     }
 

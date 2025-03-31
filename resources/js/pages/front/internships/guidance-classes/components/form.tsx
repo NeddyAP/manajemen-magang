@@ -19,7 +19,6 @@ export default function GuidanceClassForm({ mode, guidanceClass }: Props) {
         end_date: guidanceClass?.end_date ?? '',
         room: guidanceClass?.room ?? '',
         description: guidanceClass?.description ?? '',
-        max_participants: guidanceClass?.max_participants ?? null,
     });
 
     const onSubmit: FormEventHandler = (e) => {
@@ -83,20 +82,6 @@ export default function GuidanceClassForm({ mode, guidanceClass }: Props) {
                         placeholder="Masukkan lokasi/ruangan"
                     />
                     <InputError message={errors.room} />
-                </div>
-
-                <div>
-                    <Label htmlFor="max_participants">Jumlah Maksimal Peserta (Opsional)</Label>
-                    <Input
-                        id="max_participants"
-                        type="number"
-                        value={data.max_participants === null ? '' : data.max_participants}
-                        onChange={(e) => setData('max_participants', e.target.value === '' ? null : parseInt(e.target.value, 10))}
-                        className={errors.max_participants ? 'border-destructive' : ''}
-                        placeholder="Kosongkan untuk tidak ada batasan"
-                    />
-                    <p className="text-muted-foreground mt-1 text-xs">Biarkan kosong jika tidak ada batasan jumlah peserta</p>
-                    <InputError message={errors.max_participants} />
                 </div>
 
                 <div>

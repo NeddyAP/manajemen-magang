@@ -22,7 +22,6 @@ export default function GuidanceClassForm({ mode, lecturers, guidanceClass }: Pr
         end_date: guidanceClass?.end_date ?? '',
         room: guidanceClass?.room ?? '',
         description: guidanceClass?.description ?? '',
-        max_participants: guidanceClass?.max_participants ?? null,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -99,19 +98,6 @@ export default function GuidanceClassForm({ mode, lecturers, guidanceClass }: Pr
                         className={cn(form.errors.room && 'border-destructive')}
                     />
                     {form.errors.room && <p className="text-destructive mt-1 text-sm">{form.errors.room}</p>}
-                </div>
-
-                <div>
-                    <Label htmlFor="max_participants">Maksimal Peserta</Label>
-                    <Input
-                        id="max_participants"
-                        type="number"
-                        min={1}
-                        value={form.data.max_participants ?? ''}
-                        onChange={(e) => form.setData('max_participants', e.target.value ? Number(e.target.value) : null)}
-                        className={cn(form.errors.max_participants && 'border-destructive')}
-                    />
-                    {form.errors.max_participants && <p className="text-destructive mt-1 text-sm">{form.errors.max_participants}</p>}
                 </div>
 
                 <div>

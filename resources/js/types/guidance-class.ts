@@ -15,7 +15,6 @@ export interface GuidanceClass {
     room: string | null;
     description: string | null;
     qr_code: string | null;
-    max_participants: number | null;
     participants_count?: number;
     students?: Array<{
         id: number;
@@ -51,7 +50,6 @@ export interface GuidanceClassFormData {
     end_date?: string;
     room?: string;
     description?: string;
-    max_participants?: number;
 }
 
 export interface TableMeta {

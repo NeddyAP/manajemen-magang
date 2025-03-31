@@ -20,7 +20,6 @@ return new class extends Migration
             $table->string('room')->nullable();
             $table->text('description')->nullable();
             $table->string('qr_code')->nullable();
-            $table->integer('max_participants')->nullable();
             $table->timestamps();
 
             $table->index('lecturer_id');

@@ -68,19 +68,6 @@ export const column: ColumnDef<GuidanceClass>[] = [
         cell: ({ row }) => row.original.room || '-',
     },
     {
-        accessorKey: 'participants',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Peserta" />,
-        cell: ({ row }) => {
-            const count = row.original.participants_count || 0;
-            const max = row.original.max_participants;
-            return (
-                <Badge variant="default">
-                    {count}/{max || '∞'}
-                </Badge>
-            );
-        },
-    },
-    {
         id: 'actions',
         cell: ({ row }) => {
             const guidanceClass = row.original;

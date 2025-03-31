@@ -148,9 +148,9 @@
     --sidebar-ring: oklch(0.439 0 0);
 }
 
-/* Blue Theme Variables */
-:root[data-theme='blue'] {
-    --background: #eff6ff; /* Tailwind blue-50 */
+/* Green Theme Variables */
+:root[data-theme='green'] { /* Renamed from blue to green */
+    --background: #eff6ff; /* Tailwind blue-50 */ /* Note: Background is still blue-50, consider changing if needed */
     --foreground: #000000; /* Black text */
     --card: #ffffff; /* White card background */
     --card-foreground: #000000;

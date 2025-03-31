@@ -36,7 +36,7 @@ export default function Home({ faqCategories = [], faqsByCategory = {} }: HomePr
                     id="hero"
                     className="flex min-h-screen items-center justify-center bg-gradient-to-tr from-sky-100 via-sky-200 to-teal-600 transition-colors duration-200 dark:from-gray-800 dark:via-gray-900 dark:to-black"
                 >
-                    <div className="container grid grid-cols-1 items-center gap-8 px-6 lg:grid-cols-2 lg:px-8">
+                    <div className="container mx-auto max-w-7xl grid grid-cols-1 items-center gap-8 px-6 lg:grid-cols-2 lg:px-8">
                         <div className="flex flex-col items-start space-y-8 text-left">
                             <p className="text-muted-foreground text-xl">
                                 {auth.user ? `Selamat datang, ${auth.user.name}!` : 'Selamat datang di platform manajemen magang kami!'}

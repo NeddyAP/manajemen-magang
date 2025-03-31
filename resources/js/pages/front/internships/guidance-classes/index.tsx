@@ -3,9 +3,11 @@ import { Button } from '@/components/ui/button';
 import FrontLayout from '@/layouts/front-layout';
 import { SharedData, type BreadcrumbItem } from '@/types';
 import { GuidanceClass, TableMeta } from '@/types/guidance-class';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Calendar, Plus, QrCode, Users } from 'lucide-react';
 import { columns, initialColumnVisibility } from './components/column';
+import { StatusFilter } from './components/filters';
+import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -25,6 +27,32 @@ interface PageProps {
 
 export default function GuidanceClassIndex({ classes, meta }: PageProps) {
     const { auth } = usePage<SharedData>().props;
+    const [selectedStatus, setSelectedStatus] = useState<string>('');
+
+    // Initialize filters from URL on mount
+    useEffect(() => {
+        const url = new URL(window.location.href);
+        const status = url.searchParams.get('status');
+
+        if (status) {
+            setSelectedStatus(status);
+        }
+    }, []);
+
+    const handleStatusChange = (status: string) => {
+        setSelectedStatus(status);
+
+        // Build query object
+        const query: Record<string, string> = {};
+        if (status) query.status = status;
+
+        router.get(route('front.internships.guidance-classes.index'), query, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
+    };
+
     const isDosen = auth.user?.roles?.[0]?.name === 'dosen';
     return (
         <FrontLayout breadcrumbs={breadcrumbs}>
@@ -39,8 +67,8 @@ export default function GuidanceClassIndex({ classes, meta }: PageProps) {
                             </div>
                         </div>
 
-                        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
-                            <div className="bg-card text-card-foreground rounded-lg p-6 shadow">
+                        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+                            <div className="bg-card text-card-foreground rounded-lg p-6 shadow border">
                                 <div className="flex items-center justify-between">
                                     <h3 className="font-medium">Kelas Aktif</h3>
                                     <Calendar className="text-primary h-5 w-5" />
@@ -53,23 +81,16 @@ export default function GuidanceClassIndex({ classes, meta }: PageProps) {
                                     }
                                 </p>
                             </div>
-                            <div className="bg-card text-card-foreground rounded-lg p-6 shadow">
+                            <div className="bg-card text-card-foreground rounded-lg p-6 shadow border">
                                 <div className="flex items-center justify-between">
                                     <h3 className="font-medium">Total Kelas</h3>
                                     <Users className="text-primary h-5 w-5" />
                                 </div>
                                 <p className="mt-2 text-2xl font-bold">{classes.length}</p>
                             </div>
-                            <div className="bg-card text-card-foreground rounded-lg p-6 shadow">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="font-medium">Kehadiran</h3>
-                                    <QrCode className="text-primary h-5 w-5" />
-                                </div>
-                                <p className="mt-2 text-2xl font-bold">
-                                    {classes.filter((c) => c.students?.some((s) => s.attendance.attended_at !== null)).length}
-                                </p>
-                            </div>
                         </div>
+
+                        <StatusFilter value={selectedStatus} onChange={handleStatusChange} />
 
                         <div className="mt-4 flex justify-end">
                             {isDosen && (
@@ -82,7 +103,11 @@ export default function GuidanceClassIndex({ classes, meta }: PageProps) {
                             )}
                         </div>
 
-                        <DataTable meta={meta} columns={columns} data={classes} initialColumnVisibility={initialColumnVisibility} />
+                        <DataTable meta={meta} columns={columns} data={classes}
+                            filters={[
+                                { id: 'status', value: selectedStatus },
+                            ]}
+                            initialColumnVisibility={initialColumnVisibility} />
                     </div>
                 </div>
             </div>

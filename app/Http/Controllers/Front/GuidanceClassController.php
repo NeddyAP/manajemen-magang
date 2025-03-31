@@ -20,14 +20,16 @@ class GuidanceClassController extends Controller
      *
      * @return \Inertia\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
-        $classes = [];
+
+        // Base query
+        $query = null;
 
         if ($user->hasRole('dosen')) {
             // Dosen melihat kelas yang mereka ampu
-            $classes = GuidanceClass::where('lecturer_id', $user->id)
+            $query = GuidanceClass::where('lecturer_id', $user->id)
                 ->with(['lecturer', 'students' => function ($query) {
                     $query->select('users.id', 'name', 'student_number', 'study_program', 'semester')
                         ->with('internships', function ($query) {
@@ -35,13 +37,11 @@ class GuidanceClassController extends Controller
                                 ->latest()
                                 ->first();
                         });
-                }])
-                ->latest()
-                ->paginate(10);
+                }]);
         } elseif ($user->hasRole('mahasiswa')) {
             // Mahasiswa melihat kelas dari dosen pembimbing mereka
             if ($user->mahasiswaProfile && $user->mahasiswaProfile->advisor_id) {
-                $classes = GuidanceClass::where('lecturer_id', $user->mahasiswaProfile->advisor_id)
+                $query = GuidanceClass::where('lecturer_id', $user->mahasiswaProfile->advisor_id)
                     ->with(['lecturer', 'students' => function ($query) use ($user) {
                         $query->where('users.id', $user->id)
                             ->select('users.id', 'name', 'student_number', 'study_program', 'semester')
@@ -50,15 +50,66 @@ class GuidanceClassController extends Controller
                                     ->latest()
                                     ->first();
                             });
-                    }])
-                    ->latest()
-                    ->paginate(10);
+                    }]);
             } else {
-                $classes = GuidanceClass::where('id', 0)->paginate(10); // Empty paginator
+                $query = GuidanceClass::where('id', 0); // Empty query
             }
         } else {
-            $classes = GuidanceClass::where('id', 0)->paginate(10); // Empty paginator
+            $query = GuidanceClass::where('id', 0); // Empty query
         }
+
+        // Handle search
+        if ($request->has('search')) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('title', 'like', "%{$searchTerm}%")
+                    ->orWhere('room', 'like', "%{$searchTerm}%")
+                    ->orWhere('description', 'like', "%{$searchTerm}%")
+                    ->orWhereHas('lecturer', function ($subQuery) use ($searchTerm) {
+                        $subQuery->where('name', 'like', "%{$searchTerm}%");
+                    });
+            });
+        }
+
+        // Handle filters
+        if ($request->has('filter')) {
+            $now = now();
+            foreach ($request->filter as $column => $value) {
+                if ($column === 'status' && $value) {
+                    switch ($value) {
+                        case 'upcoming':
+                            $query->where('start_date', '>', $now);
+                            break;
+                        case 'ongoing':
+                            $query->where('start_date', '<=', $now)
+                                ->where(function ($q) use ($now) {
+                                    $q->whereNull('end_date')
+                                      ->orWhere('end_date', '>=', $now);
+                                });
+                            break;
+                        case 'finished':
+                            $query->whereNotNull('end_date')
+                                ->where('end_date', '<', $now);
+                            break;
+                    }
+                } elseif ($value) {
+                    // Apply default 'like' filter for other columns
+                    $query->where($column, 'like', "%{$value}%");
+                }
+            }
+        }
+
+        // Handle sorting
+        if ($request->has('sort_field')) {
+            $direction = $request->input('sort_direction', 'asc');
+            $query->orderBy($request->sort_field, $direction);
+        } else {
+            $query->latest();
+        }
+
+        // Paginate the results
+        $perPage = $request->input('per_page', 10);
+        $classes = $query->paginate($perPage)->withQueryString();
 
         return Inertia::render('front/internships/guidance-classes/index', [
             'classes' => $classes->items(),
@@ -67,6 +118,9 @@ class GuidanceClassController extends Controller
                 'per_page' => $classes->perPage(),
                 'current_page' => $classes->currentPage(),
                 'last_page' => $classes->lastPage(),
+                'from' => $classes->firstItem(),
+                'to' => $classes->lastItem(),
+                'links' => $classes->linkCollection()->toArray(),
             ],
         ]);
     }
@@ -108,7 +162,6 @@ class GuidanceClassController extends Controller
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'room' => 'nullable|string|max:100',
             'description' => 'nullable|string',
-            'max_participants' => 'nullable|integer|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -122,7 +175,6 @@ class GuidanceClassController extends Controller
         $guidanceClass->end_date = $request->end_date;
         $guidanceClass->room = $request->room;
         $guidanceClass->description = $request->description;
-        $guidanceClass->max_participants = $request->max_participants;
         $guidanceClass->save();
 
         return redirect()->route('front.internships.guidance-classes.show', $guidanceClass->id)
@@ -151,8 +203,10 @@ class GuidanceClassController extends Controller
             abort(403, 'Anda tidak memiliki akses ke kelas bimbingan ini.');
         }
 
-        if ($userRole === 'mahasiswa' &&
-            (! $user->mahasiswaProfile || $user->mahasiswaProfile->advisor_id !== $guidanceClass->lecturer_id)) {
+        if (
+            $userRole === 'mahasiswa' &&
+            (! $user->mahasiswaProfile || $user->mahasiswaProfile->advisor_id !== $guidanceClass->lecturer_id)
+        ) {
             abort(403, 'Anda tidak memiliki akses ke kelas bimbingan ini.');
         }
 
@@ -218,7 +272,6 @@ class GuidanceClassController extends Controller
             'description' => $guidanceClass->description,
             'start_date' => $guidanceClass->start_date,
             'end_date' => $guidanceClass->end_date,
-            'max_participants' => $guidanceClass->max_participants,
             'qr_code' => $guidanceClass->qr_code,
             'lecturer' => [
                 'id' => $guidanceClass->lecturer->id,
@@ -298,7 +351,6 @@ class GuidanceClassController extends Controller
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'room' => 'nullable|string|max:100',
             'description' => 'nullable|string',
-            'max_participants' => 'nullable|integer|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -310,7 +362,6 @@ class GuidanceClassController extends Controller
         $guidanceClass->end_date = $request->end_date;
         $guidanceClass->room = $request->room;
         $guidanceClass->description = $request->description;
-        $guidanceClass->max_participants = $request->max_participants;
         $guidanceClass->save();
 
         return redirect()->route('front.internships.guidance-classes.show', $guidanceClass->id)
@@ -387,14 +438,14 @@ class GuidanceClassController extends Controller
 
         // Get notes from request or use default
         $notes = $request->input('notes', 'Ditandai secara manual oleh dosen.');
-        
+
         try {
             // When dosen manually marks attendance, directly update the record
             $attendance->attended_at = now();
             $attendance->attendance_method = 'manual';
             $attendance->notes = $notes;
             $attendance->save();
-            
+
             return back()->with('success', 'Kehadiran mahasiswa berhasil dicatat.');
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal mencatat kehadiran: ' . $e->getMessage());

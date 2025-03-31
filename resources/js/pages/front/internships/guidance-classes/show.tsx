@@ -33,70 +33,8 @@ interface Props {
     isAttended: boolean;
 }
 
-interface ClassInfoCardProps {
-    guidanceClass: GuidanceClass;
-    formatDate: (date: string) => string;
-    studentCount: number;
-    maxParticipants: number;
-    attendedStudentCount: number;
-}
-
-const ClassInfoCard: React.FC<ClassInfoCardProps> = ({
-    guidanceClass,
-    formatDate,
-    studentCount,
-    maxParticipants,
-    attendedStudentCount,
-}) => (
-    <Card>
-        <CardHeader>
-            <CardTitle>Informasi Kelas</CardTitle>
-            <CardDescription>Detail kelas bimbingan</CardDescription>
-        </CardHeader>
-        <CardContent>
-            <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3">
-                <div className="flex items-start">
-                    <Clock className="text-muted-foreground mt-0.5 mr-3 h-5 w-5" />
-                    <div>
-                        <h3 className="font-medium">Waktu</h3>
-                        <p>Mulai: {formatDate(guidanceClass.start_date)}</p>
-                        {guidanceClass.end_date && <p>Selesai: {formatDate(guidanceClass.end_date)}</p>}
-                    </div>
-                </div>
-
-                <div className="flex items-start">
-                    <MapPin className="text-muted-foreground mt-0.5 mr-3 h-5 w-5" />
-                    <div>
-                        <h3 className="font-medium">Lokasi</h3>
-                        <p>{guidanceClass.room || 'Tidak ditentukan'}</p>
-                    </div>
-                </div>
-
-                <div className="flex items-start">
-                    <Users className="text-muted-foreground mt-0.5 mr-3 h-5 w-5" />
-                    <div>
-                        <h3 className="font-medium">Partisipan</h3>
-                        <p>
-                            {studentCount} Mahasiswa {maxParticipants > 0 ? `(Maks. ${maxParticipants})` : ''}
-                        </p>
-                        <p className="text-muted-foreground text-sm">{attendedStudentCount} Hadir</p>
-                    </div>
-                </div>
-            </div>
-            {guidanceClass.description && (
-                <div className="mt-4 border-t pt-4">
-                    <h3 className="mb-2 font-medium">Deskripsi</h3>
-                    <p className="text-muted-foreground text-sm">{guidanceClass.description}</p>
-                </div>
-            )}
-        </CardContent>
-    </Card>
-);
-
-
 export default function ShowGuidanceClass({ class: guidanceClass, meta, userRole, isAttended }: Props) {
     const studentCount = guidanceClass.students?.length || 0;
-    const maxParticipants = guidanceClass.max_participants || 0;
     const attendedStudentCount = guidanceClass.students?.filter((s) => s.attendance.attended_at !== null).length || 0;
 
     const isClassActive =
@@ -124,13 +62,50 @@ export default function ShowGuidanceClass({ class: guidanceClass, meta, userRole
 
                         {userRole === 'dosen' ? (
                             <div className="space-y-6">
-                                <ClassInfoCard
-                                    guidanceClass={guidanceClass}
-                                    formatDate={formatDate}
-                                    studentCount={studentCount}
-                                    maxParticipants={maxParticipants}
-                                    attendedStudentCount={attendedStudentCount}
-                                />
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Informasi Kelas</CardTitle>
+                                        <CardDescription>Detail kelas bimbingan</CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+                                            <div className="flex items-start">
+                                                <Clock className="text-muted-foreground mt-0.5 mr-3 h-5 w-5" />
+                                                <div>
+                                                    <h3 className="font-medium">Waktu</h3>
+                                                    <p>Mulai: {formatDate(guidanceClass.start_date)}</p>
+                                                    {guidanceClass.end_date && <p>Selesai: {formatDate(guidanceClass.end_date)}</p>}
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-start">
+                                                <MapPin className="text-muted-foreground mt-0.5 mr-3 h-5 w-5" />
+                                                <div>
+                                                    <h3 className="font-medium">Lokasi</h3>
+                                                    <p>{guidanceClass.room || 'Tidak ditentukan'}</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-start">
+                                                <Users className="text-muted-foreground mt-0.5 mr-3 h-5 w-5" />
+                                                <div>
+                                                    <h3 className="font-medium">Partisipan</h3>
+                                                    <p>
+                                                        {studentCount} Mahasiswa
+                                                    </p>
+                                                    <p className="text-muted-foreground text-sm">{attendedStudentCount} Hadir</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {guidanceClass.description && (
+                                            <div className="mt-4 border-t pt-4 md:col-span-3">
+                                                <h3 className="mb-2 font-medium">Deskripsi</h3>
+                                                <p className="text-muted-foreground text-sm">{guidanceClass.description}</p>
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                </Card>
+
                                 <ManageAttendance
                                     classId={guidanceClass.id}
                                     students={guidanceClass.students || []}
@@ -139,22 +114,52 @@ export default function ShowGuidanceClass({ class: guidanceClass, meta, userRole
                                 />
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                <div className="flex flex-col gap-6"> {/* Use flex-col and gap-6 for consistent spacing */}
-                                    <ClassInfoCard
-                                        guidanceClass={guidanceClass}
-                                        formatDate={formatDate}
-                                        studentCount={studentCount}
-                                        maxParticipants={maxParticipants}
-                                        attendedStudentCount={attendedStudentCount}
-                                    />
-                                </div>
+                            <div className="space-y-6">
+                                <Card className="mb-4">
+                                    <CardHeader>
+                                        <CardTitle>Informasi Kelas</CardTitle>
+                                        <CardDescription>Detail kelas bimbingan</CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+                                            <div className="flex items-start">
+                                                <Clock className="text-muted-foreground mt-0.5 mr-2 h-5 w-5" />
+                                                <div>
+                                                    <h3 className="font-medium">Waktu</h3>
+                                                    <p>Mulai: {formatDate(guidanceClass.start_date)}</p>
+                                                    {guidanceClass.end_date && <p>Selesai: {formatDate(guidanceClass.end_date)}</p>}
+                                                </div>
+                                            </div>
+                                            <div className="flex items-start">
+                                                <MapPin className="text-muted-foreground mt-0.5 mr-2 h-5 w-5" />
+                                                <div>
+                                                    <h3 className="font-medium">Lokasi</h3>
+                                                    <p>{guidanceClass.room || 'Tidak ditentukan'}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-start">
+                                                <Users className="text-muted-foreground mt-0.5 mr-2 h-5 w-5" />
+                                                <div>
+                                                    <h3 className="font-medium">Partisipan</h3>
+                                                    <p>{studentCount} Mahasiswa</p>
+                                                    <p className="text-muted-foreground text-sm">{attendedStudentCount} Hadir</p>
+                                                </div>
+                                            </div>
+                                            {guidanceClass.description && (
+                                                <div className="mt-4 border-t pt-4 md:col-span-3">
+                                                    <h3 className="mb-2 font-medium">Deskripsi</h3>
+                                                    <p className="text-muted-foreground text-sm">{guidanceClass.description}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </CardContent>
+                                </Card>
 
-                                <div>
+                                {userRole === 'mahasiswa' && isClassActive && (
                                     <Card>
                                         <CardHeader>
-                                            <CardTitle>Status Kehadiran Anda</CardTitle>
-                                            <CardDescription>Informasi status kehadiran Anda di kelas ini</CardDescription>
+                                            <CardTitle>Kehadiran</CardTitle>
+                                            <CardDescription>Rekam kehadiran Anda untuk kelas ini</CardDescription>
                                         </CardHeader>
                                         <CardContent>
                                             {isAttended ? (
@@ -162,24 +167,23 @@ export default function ShowGuidanceClass({ class: guidanceClass, meta, userRole
                                                     <div className="mb-4 rounded-full bg-green-100 p-3 text-green-700">
                                                         <Users className="h-6 w-6" />
                                                     </div>
-                                                    <h3 className="text-lg font-medium text-green-700">Hadir</h3>
+                                                    <h3 className="text-lg font-medium text-green-700">Kehadiran Terekam</h3>
                                                     <p className="text-muted-foreground mt-2 text-center">
                                                         Anda sudah tercatat hadir di kelas bimbingan ini.
                                                     </p>
                                                 </div>
                                             ) : (
                                                 <div className="flex flex-col items-center">
-                                                    {isClassActive && guidanceClass.qr_code ? (
+                                                    {guidanceClass.qr_code ? (
                                                         <div className="flex flex-col items-center">
                                                             <div className="mb-4 rounded-lg bg-white p-4">
                                                                 <QRCodeSVG value={guidanceClass.qr_code} size={200} />
                                                             </div>
-                                                            <h3 className="text-lg font-medium text-yellow-700 mb-2">Belum Hadir</h3>
-                                                            <p className="text-muted-foreground text-center text-sm">
+                                                            <p className="text-muted-foreground mt-2 text-center text-sm">
                                                                 Scan QR code di atas dengan kamera ponsel Anda untuk merekam kehadiran
                                                             </p>
                                                         </div>
-                                                    ) : isClassActive ? (
+                                                    ) : (
                                                         <div className="flex flex-col items-center justify-center p-4 text-center">
                                                             <div className="mb-4 rounded-full bg-yellow-100 p-3 text-yellow-700">
                                                                 <Clock className="h-6 w-6" />
@@ -189,22 +193,33 @@ export default function ShowGuidanceClass({ class: guidanceClass, meta, userRole
                                                                 QR Code kehadiran belum dibuat oleh dosen.
                                                             </p>
                                                         </div>
-                                                    ) : (
-                                                        <div className="flex flex-col items-center justify-center p-4 text-center">
-                                                            <div className="mb-4 rounded-full bg-yellow-100 p-3 text-yellow-700">
-                                                                <Clock className="h-6 w-6" />
-                                                            </div>
-                                                            <h3 className="text-lg font-medium text-yellow-700">Belum Hadir</h3>
-                                                            <p className="text-muted-foreground mt-2">
-                                                                Anda belum tercatat hadir di kelas bimbingan ini.
-                                                            </p>
-                                                        </div>
                                                     )}
                                                 </div>
                                             )}
                                         </CardContent>
                                     </Card>
-                                </div>
+                                )}
+
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Mahasiswa</CardTitle>
+                                        <CardDescription>Daftar mahasiswa yang terdaftar</CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        {guidanceClass.students && guidanceClass.students.length > 0 ? (
+                                            <DataTable
+                                                meta={meta}
+                                                columns={userColumns}
+                                                data={guidanceClass.students}
+                                                initialColumnVisibility={{}}
+                                            />
+                                        ) : (
+                                            <div className="text-muted-foreground py-4 text-center">
+                                                Belum ada mahasiswa yang terdaftar.
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                </Card>
                             </div>
                         )}
                     </div>

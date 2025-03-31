@@ -20,7 +20,6 @@ class UpdateGuidanceClassRequest extends FormRequest
             'end_date' => ['nullable', 'date', 'after:start_date'],
             'room' => ['nullable', 'string', 'max:100'],
             'description' => ['nullable', 'string'],
-            'max_participants' => ['nullable', 'integer', 'min:1'],
         ];
     }
 
@@ -33,7 +32,6 @@ class UpdateGuidanceClassRequest extends FormRequest
             'end_date' => 'Tanggal Selesai',
             'room' => 'Ruangan',
             'description' => 'Deskripsi',
-            'max_participants' => 'Maksimal Peserta',
         ];
     }
 }

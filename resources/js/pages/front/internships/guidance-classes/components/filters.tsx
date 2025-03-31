@@ -73,24 +73,10 @@ interface StatusFilterProps {
 
 export function StatusFilter({ value, onChange }: StatusFilterProps) {
     const options = [
-        { label: 'Menunggu', value: 'waiting' },
-        { label: 'Disetujui', value: 'accepted' },
-        { label: 'Ditolak', value: 'rejected' },
+        { label: 'Akan Datang', value: 'upcoming' },
+        { label: 'Sedang Berlangsung', value: 'ongoing' },
+        { label: 'Selesai', value: 'finished' },
     ];
 
     return <FilterPopover label="Status" value={value} options={options} onChange={onChange} />;
-}
-
-interface TypeFilterProps {
-    value?: string;
-    onChange: (value: string) => void;
-}
-
-export function TypeFilter({ value, onChange }: TypeFilterProps) {
-    const options = [
-        { label: 'KKL', value: 'kkl' },
-        { label: 'KKN', value: 'kkn' },
-    ];
-
-    return <FilterPopover label="Jenis" value={value} options={options} onChange={onChange} />;
 }

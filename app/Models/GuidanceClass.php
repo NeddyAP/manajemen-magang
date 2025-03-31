@@ -17,7 +17,6 @@ class GuidanceClass extends Model
         'room',
         'description',
         'qr_code',
-        'max_participants',
     ];
 
     protected $casts = [
@@ -139,11 +138,7 @@ class GuidanceClass extends Model
      */
     public function hasAvailableSpots(): bool
     {
-        if (! $this->max_participants) {
-            return true;
-        }
-
-        return $this->students()->count() < $this->max_participants;
+        return true; // Class always has available spots
     }
 
     /**
