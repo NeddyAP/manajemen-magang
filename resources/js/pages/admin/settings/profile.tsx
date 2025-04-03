@@ -11,6 +11,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
+import { CalendarIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -22,14 +30,32 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface ProfileForm {
     name: string;
     email: string;
+    employee_id: string;
+    department: string;
+    position: string;
+    employment_status: string;
+    join_date: string;
+    phone_number: string;
+    address: string;
+    supervisor_name: string;
+    work_location: string;
 }
 
-export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
+export default function Profile({ mustVerifyEmail, status, profile }: { mustVerifyEmail: boolean; status?: string; profile?: any }) {
     const { auth } = usePage<SharedData>().props;
 
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
         name: auth.user.name,
         email: auth.user.email,
+        employee_id: profile?.employee_id || '',
+        department: profile?.department || '',
+        position: profile?.position || '',
+        employment_status: profile?.employment_status || '',
+        join_date: profile?.join_date || '',
+        phone_number: profile?.phone_number || '',
+        address: profile?.address || '',
+        supervisor_name: profile?.supervisor_name || '',
+        work_location: profile?.work_location || '',
     });
 
     const submit: FormEventHandler = (e) => {
@@ -46,66 +72,216 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Profile information" description="Update your name and email address" />
+                    <HeadingSmall title="Profile information" description="Update your profile information" />
 
                     <form onSubmit={submit} className="space-y-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="name">Name</Label>
+                            <Label htmlFor="name">Nama</Label>
 
                             <Input
                                 id="name"
-                                className="mt-1 block w-full"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
                                 required
                                 autoComplete="name"
-                                placeholder="Full name"
+                                placeholder="Nama lengkap"
                             />
 
-                            <InputError className="mt-2" message={errors.name} />
+                            <InputError message={errors.name} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="email">Email address</Label>
+                            <Label htmlFor="email">Alamat Email</Label>
 
                             <Input
                                 id="email"
                                 type="email"
-                                className="mt-1 block w-full"
                                 value={data.email}
                                 onChange={(e) => setData('email', e.target.value)}
                                 required
                                 autoComplete="username"
-                                placeholder="Email address"
+                                placeholder="Alamat email"
                             />
 
-                            <InputError className="mt-2" message={errors.email} />
+                            <InputError message={errors.email} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="employee_id">Nomor Induk Pegawai</Label>
+
+                            <Input
+                                id="employee_id"
+                                value={data.employee_id}
+                                onChange={(e) => setData('employee_id', e.target.value)}
+                                required
+                                placeholder="Nomor induk pegawai"
+                            />
+
+                            <InputError message={errors.employee_id} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="department">Departemen</Label>
+
+                            <Input
+                                id="department"
+                                value={data.department}
+                                onChange={(e) => setData('department', e.target.value)}
+                                required
+                                placeholder="Departemen"
+                            />
+
+                            <InputError message={errors.department} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="position">Jabatan</Label>
+
+                            <Input
+                                id="position"
+                                value={data.position}
+                                onChange={(e) => setData('position', e.target.value)}
+                                required
+                                placeholder="Jabatan"
+                            />
+
+                            <InputError message={errors.position} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label>Status Kepegawaian</Label>
+
+                            <Select
+                                value={data.employment_status}
+                                onValueChange={(value) => setData('employment_status', value)}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Pilih status kepegawaian" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Tetap">Tetap</SelectItem>
+                                    <SelectItem value="Kontrak">Kontrak</SelectItem>
+                                    <SelectItem value="Magang">Magang</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            <InputError message={errors.employment_status} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label>Tanggal Bergabung</Label>
+
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className={cn(
+                                            'w-full justify-start text-left font-normal',
+                                            !data.join_date && 'text-muted-foreground'
+                                        )}
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {data.join_date ? (
+                                            format(new Date(data.join_date), 'PPP', { locale: id })
+                                        ) : (
+                                            <span>Pilih tanggal</span>
+                                        )}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0">
+                                    <Calendar
+                                        mode="single"
+                                        selected={data.join_date ? new Date(data.join_date) : undefined}
+                                        onSelect={(date) => setData('join_date', date?.toISOString() || '')}
+                                        initialFocus
+                                        locale={id}
+                                    />
+                                </PopoverContent>
+                            </Popover>
+
+                            <InputError message={errors.join_date} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="phone_number">Nomor Telepon</Label>
+
+                            <Input
+                                id="phone_number"
+                                value={data.phone_number}
+                                onChange={(e) => setData('phone_number', e.target.value)}
+                                required
+                                placeholder="Nomor telepon"
+                            />
+
+                            <InputError message={errors.phone_number} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="address">Alamat</Label>
+
+                            <Textarea
+                                id="address"
+                                value={data.address}
+                                onChange={(e) => setData('address', e.target.value)}
+                                required
+                                placeholder="Alamat lengkap"
+                            />
+
+                            <InputError message={errors.address} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="supervisor_name">Nama Supervisor</Label>
+
+                            <Input
+                                id="supervisor_name"
+                                value={data.supervisor_name}
+                                onChange={(e) => setData('supervisor_name', e.target.value)}
+                                required
+                                placeholder="Nama supervisor"
+                            />
+
+                            <InputError message={errors.supervisor_name} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="work_location">Lokasi Kerja</Label>
+
+                            <Input
+                                id="work_location"
+                                value={data.work_location}
+                                onChange={(e) => setData('work_location', e.target.value)}
+                                required
+                                placeholder="Lokasi kerja"
+                            />
+
+                            <InputError message={errors.work_location} />
                         </div>
 
                         {mustVerifyEmail && auth.user.email_verified_at === null && (
                             <div>
                                 <p className="text-muted-foreground -mt-4 text-sm">
-                                    Your email address is unverified.{' '}
+                                    Alamat email Anda belum terverifikasi.{' '}
                                     <Link
                                         href={route('verification.send')}
                                         method="post"
                                         as="button"
                                         className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
                                     >
-                                        Click here to resend the verification email.
+                                        Klik di sini untuk mengirim ulang email verifikasi.
                                     </Link>
                                 </p>
 
                                 {status === 'verification-link-sent' && (
                                     <div className="mt-2 text-sm font-medium text-green-600">
-                                        A new verification link has been sent to your email address.
+                                        Tautan verifikasi baru telah dikirim ke alamat email Anda.
                                     </div>
                                 )}
                             </div>
                         )}
 
                         <div className="flex items-center gap-4">
-                            <Button disabled={processing}>Save</Button>
+                            <Button disabled={processing}>Simpan</Button>
 
                             <Transition
                                 show={recentlySuccessful}
@@ -114,7 +290,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                 leave="transition ease-in-out"
                                 leaveTo="opacity-0"
                             >
-                                <p className="text-sm text-neutral-600">Saved</p>
+                                <p className="text-sm text-neutral-600">Tersimpan</p>
                             </Transition>
                         </div>
                     </form>

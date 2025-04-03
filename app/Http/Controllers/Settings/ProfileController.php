@@ -18,16 +18,28 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
-        $userRole = $request->user()->roles->pluck('name');
+        $user = $request->user();
+        $userRole = $user->roles->pluck('name');
 
         $route = 'front/settings/profile';
         if ($userRole->contains('admin') || $userRole->contains('superadmin')) {
             $route = 'admin/settings/profile';
         }
 
+        // Load the appropriate profile based on role
+        $profile = null;
+        if ($user->hasRole('admin') || $user->hasRole('superadmin')) {
+            $profile = $user->adminProfile;
+        } elseif ($user->hasRole('dosen')) {
+            $profile = $user->dosenProfile;
+        } elseif ($user->hasRole('mahasiswa')) {
+            $profile = $user->mahasiswaProfile;
+        }
+
         return Inertia::render($route, [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
+            'profile' => $profile,
         ]);
     }
 
@@ -36,15 +48,37 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $userRole = $user->roles->pluck('name');
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        // Update user data
+        $user->fill($request->validated());
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $user->save();
 
-        return to_route('profile.edit');
+        // Update role-specific profile
+        if ($user->hasRole('admin') || $user->hasRole('superadmin')) {
+            $user->adminProfile()->updateOrCreate(
+                ['user_id' => $user->id],
+                $request->validated()
+            );
+        } elseif ($user->hasRole('dosen')) {
+            $user->dosenProfile()->updateOrCreate(
+                ['user_id' => $user->id],
+                $request->validated()
+            );
+        } elseif ($user->hasRole('mahasiswa')) {
+            $user->mahasiswaProfile()->updateOrCreate(
+                ['user_id' => $user->id],
+                $request->validated()
+            );
+        }
+
+        return to_route('profile.edit')->with('success', 'Profile berhasil di update');
     }
 
     /**
@@ -65,7 +99,7 @@ class ProfileController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/')->with('success', 'Akun berhasil dihapus');;
     }
 
     public function appearance(Request $request)

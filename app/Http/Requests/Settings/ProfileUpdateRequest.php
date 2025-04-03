@@ -16,17 +16,53 @@ class ProfileUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $user = $this->user();
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
-
             'email' => [
                 'required',
                 'string',
                 'lowercase',
                 'email',
                 'max:255',
-                Rule::unique(User::class)->ignore($this->user()->id),
+                Rule::unique(User::class)->ignore($user->id),
             ],
         ];
+
+        // Add role-specific validation rules
+        if ($user->hasRole('admin') || $user->hasRole('superadmin')) {
+            $rules = array_merge($rules, [
+                'employee_id' => ['required', 'string', 'max:255', Rule::unique('admin_profiles')->ignore($user->id, 'user_id')],
+                'department' => ['required', 'string', 'max:255'],
+                'position' => ['required', 'string', 'max:255'],
+                'employment_status' => ['required', 'string', Rule::in(['Tetap', 'Kontrak', 'Magang'])],
+                'join_date' => ['required', 'date'],
+                'phone_number' => ['required', 'string', 'max:255'],
+                'address' => ['required', 'string', 'max:255'],
+                'supervisor_name' => ['required', 'string', 'max:255'],
+                'work_location' => ['required', 'string', 'max:255'],
+            ]);
+        } elseif ($user->hasRole('dosen')) {
+            $rules = array_merge($rules, [
+                'employee_number' => ['required', 'string', 'max:255', Rule::unique('dosen_profiles')->ignore($user->id, 'user_id')],
+                'expertise' => ['required', 'string', 'max:255'],
+                'last_education' => ['required', 'string', 'max:255'],
+                'academic_position' => ['required', 'string', 'max:255'],
+                'employment_status' => ['required', 'string', Rule::in(['PNS', 'Non-PNS'])],
+                'teaching_start_year' => ['required', 'integer', 'min:1900', 'max:'.date('Y')],
+            ]);
+        } elseif ($user->hasRole('mahasiswa')) {
+            $rules = array_merge($rules, [
+                'student_number' => ['required', 'string', 'max:255', Rule::unique('mahasiswa_profiles')->ignore($user->id, 'user_id')],
+                'study_program' => ['required', 'string', 'max:255'],
+                'class_year' => ['required', 'integer', 'min:1900', 'max:'.(date('Y') + 4)],
+                'academic_status' => ['required', 'string', Rule::in(['Aktif', 'Cuti', 'Lulus'])],
+                'semester' => ['required', 'integer', 'min:1', 'max:14'],
+                'advisor_id' => ['nullable', 'exists:users,id'],
+                'gpa' => ['nullable', 'numeric', 'min:0', 'max:4'],
+            ]);
+        }
+
+        return $rules;
     }
 }

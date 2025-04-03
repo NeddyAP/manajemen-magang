@@ -57,7 +57,7 @@ interface LogbookProps {
 }
 
 export default function Logbooks({ logbooks, meta }: LogbookProps) {
-    console.log(logbooks);
+    
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Logbook" />

@@ -354,7 +354,6 @@ class UserController extends Controller
 
     public function bulkDestroy(Request $request)
     {
-        dd($request->all());
         try {
             DB::beginTransaction();
 
