@@ -29,11 +29,17 @@ export default function AuthSplitLayout({ children, title, description }: PropsW
                 className="relative hidden h-full flex-col p-10 text-white lg:flex dark:border-r"
             >
                 <div className="absolute inset-0 bg-gradient-to-tr from-sky-100 via-sky-200 to-teal-600 transition-colors duration-200 dark:from-gray-800 dark:via-gray-900 dark:to-black" />
-                <img src="/assets/hero-image.webp" alt="Background" className="absolute inset-0 object-cover p-6" />
                 <Link href={route('home')} className="relative z-20 flex items-center text-lg font-medium">
                     <AppLogoIcon width={54} height={24} />
                     {name}
                 </Link>
+                <div className="relative z-10 flex h-full items-center justify-center">
+                    <img 
+                        src="/assets/hero-image.webp" 
+                        alt="Background" 
+                        className="h-auto w-full max-w-2xl object-contain p-6" 
+                    />
+                </div>
             </div>
         </div>
     );
