@@ -2,7 +2,7 @@ import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import FrontLayout from '@/layouts/front-layout';
-import { type BreadcrumbItem } from '@/types';
+import { TableMeta, type BreadcrumbItem } from '@/types';
 import { Internship } from '@/types/internship';
 import { Head, Link, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
@@ -20,13 +20,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: route('front.internships.applicants.index'),
     },
 ];
-
-interface TableMeta {
-    total: number;
-    per_page: number;
-    current_page: number;
-    last_page: number;
-}
 
 interface InternshipsProps {
     internships: Internship[];

@@ -1,15 +1,8 @@
 import FrontLayout from '@/layouts/front-layout';
 import { type BreadcrumbItem } from '@/types';
+import { Internship } from '@/types/internship';
 import { Head } from '@inertiajs/react';
 import LogbookForm from './components/form'; // Import LogbookForm
-
-interface Internship {
-    id: number;
-    company_name: string;
-    type: string;
-    start_date: string;
-    end_date: string;
-}
 
 interface PageProps {
     internship: Internship;
@@ -53,22 +46,30 @@ export default function LogbookCreate({ internship }: PageProps) {
                             </p>
                             <p className="text-muted-foreground text-sm">
                                 Periode:{' '}
-                                {new Date(internship.start_date).toLocaleDateString('id-ID', {
-                                    day: 'numeric',
-                                    month: 'long',
-                                    year: 'numeric',
-                                })}{' '}
+                                {internship.start_date
+                                    ? new Date(internship.start_date).toLocaleDateString('id-ID', {
+                                          year: 'numeric',
+                                          month: 'long',
+                                          day: 'numeric',
+                                      })
+                                    : 'Belum ditentukan'}{' '}
                                 -{' '}
-                                {new Date(internship.end_date).toLocaleDateString('id-ID', {
-                                    day: 'numeric',
-                                    month: 'long',
-                                    year: 'numeric',
-                                })}
+                                {internship.end_date
+                                    ? new Date(internship.end_date).toLocaleDateString('id-ID', {
+                                          year: 'numeric',
+                                          month: 'long',
+                                          day: 'numeric',
+                                      })
+                                    : 'Belum ditentukan'}
                             </p>
                         </div>
 
                         {/* Use the reusable form component */}
-                        <LogbookForm mode="create" internshipId={internship.id} />
+                        {internship.id ? (
+                            <LogbookForm mode="create" internshipId={internship.id} />
+                        ) : (
+                            <div className="text-center text-red-500">ID Magang tidak valid</div>
+                        )}
                     </div>
                 </div>
             </div>

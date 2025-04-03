@@ -1,18 +1,8 @@
 import FrontLayout from '@/layouts/front-layout';
+import { Tutorial } from '@/types/tutorial';
 import { Head, router } from '@inertiajs/react';
 import { BookOpen, CalendarDays, Download, GraduationCap, Search, ShieldCheck, User, Users, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-
-export interface Tutorial {
-    id: number;
-    title: string;
-    content: string;
-    file_name: string;
-    file_path: string;
-    access_level: 'all' | 'admin' | 'mahasiswa' | 'dosen';
-    created_at: string;
-    updated_at: string;
-}
 
 export default function Tutorials({ tutorials }: { tutorials: Tutorial[] }) {
     const urlParams = new URLSearchParams(window.location.search);
@@ -20,7 +10,7 @@ export default function Tutorials({ tutorials }: { tutorials: Tutorial[] }) {
 
     const [searchTerm, setSearchTerm] = useState(initialSearch);
     const [isSearching, setIsSearching] = useState(false);
-    const [animatedCards, setAnimatedCards] = useState<Record<number, boolean>>({});
+    const [animatedCards, setAnimatedCards] = useState<Record<string, boolean>>({});
 
     // Animation effect for cards
     useEffect(() => {
@@ -29,7 +19,7 @@ export default function Tutorials({ tutorials }: { tutorials: Tutorial[] }) {
                 setTimeout(() => {
                     setAnimatedCards((prev) => ({
                         ...prev,
-                        [tutorial.id]: true,
+                        [tutorial.id.toString()]: true,
                     }));
                 }, index * 100); // Stagger the animations
             });
@@ -99,7 +89,7 @@ export default function Tutorials({ tutorials }: { tutorials: Tutorial[] }) {
         <div
             key={tutorial.id}
             className={`flex h-full transform flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-700 dark:bg-gray-800 ${
-                animatedCards[tutorial.id] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+                tutorial.id && animatedCards[tutorial.id.toString()] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
             }`}
             style={{ transitionDelay: `${tutorials.findIndex((t) => t.id === tutorial.id) * 50}ms` }}
         >
@@ -115,7 +105,7 @@ export default function Tutorials({ tutorials }: { tutorials: Tutorial[] }) {
 
             <div className="flex items-center gap-3 px-5 pb-4 text-sm text-gray-500 dark:text-gray-400">
                 <CalendarDays className="h-4 w-4" />
-                <span>{new Date(tutorial.created_at).toLocaleDateString()}</span>
+                <span>{tutorial.created_at ? new Date(tutorial.created_at).toLocaleDateString() : 'Tanggal tidak tersedia'}</span>
             </div>
 
             <div className="mt-auto border-t border-gray-100 p-4 dark:border-gray-700">

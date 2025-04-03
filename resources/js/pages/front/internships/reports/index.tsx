@@ -1,7 +1,7 @@
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
 import FrontLayout from '@/layouts/front-layout';
-import { type BreadcrumbItem } from '@/types';
+import { TableMeta, type BreadcrumbItem } from '@/types';
 import { type Internship, type Report } from '@/types/internship';
 import { Head, Link, router } from '@inertiajs/react';
 import { format, parseISO } from 'date-fns';
@@ -30,13 +30,6 @@ interface PageProps {
     internship: Internship;
     reports: Report[];
     meta: TableMeta;
-}
-
-interface TableMeta {
-    total: number;
-    per_page: number;
-    current_page: number;
-    last_page: number;
 }
 
 export default function ReportsIndex({ internship, reports, meta }: PageProps) {

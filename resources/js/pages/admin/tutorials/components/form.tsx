@@ -4,9 +4,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tutorial } from '@/types/tutorial';
 import { router, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
-import { Tutorial } from '..';
 
 interface Props {
     tutorial?: Tutorial;
@@ -68,7 +68,10 @@ export default function TutorialForm({ tutorial, mode }: Props) {
                     </div>
                     <div className="space-y-4">
                         <Label htmlFor="access_level">Level Akses</Label>
-                        <Select value={data.access_level} onValueChange={(value) => setData('access_level', value)}>
+                        <Select
+                            value={data.access_level}
+                            onValueChange={(value) => setData('access_level', value as 'all' | 'admin' | 'mahasiswa' | 'dosen')}
+                        >
                             <SelectTrigger>
                                 <SelectValue placeholder="Select access level" />
                             </SelectTrigger>

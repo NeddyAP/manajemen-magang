@@ -4,9 +4,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Faq } from '@/types/faq';
 import { router, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
-import { Faq } from '..';
 
 interface Props {
     faq?: Faq;

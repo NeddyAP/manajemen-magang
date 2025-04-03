@@ -131,54 +131,57 @@ export const columns: ColumnDef<GuidanceClass>[] = [
     },
     {
         id: 'actions',
-        cell: ({ row }) => {
-            const guidanceClass = row.original;
-            const { auth } = usePage<SharedData>().props;
-            const isDosen = auth.user?.roles?.[0]?.name === 'dosen';
-            const isLecturer = isDosen && guidanceClass.lecturer && auth.user.id === guidanceClass.lecturer.id;
-
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Buka menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(String(guidanceClass.id))}>Salin ID</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                            <Link href={route('front.internships.guidance-classes.show', guidanceClass.id)}>Lihat Detail</Link>
-                        </DropdownMenuItem>
-                        {isLecturer && (
-                            <>
-                                <DropdownMenuItem asChild>
-                                    <Link href={route('front.internships.guidance-classes.edit', guidanceClass.id)}>Edit</Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    className="text-red-500"
-                                    onClick={() => {
-                                        if (confirm('Apakah Anda yakin ingin menghapus kelas bimbingan ini?')) {
-                                            router.delete(route('front.internships.guidance-classes.destroy', guidanceClass.id), {
-                                                preserveScroll: true,
-                                            });
-                                        }
-                                    }}
-                                >
-                                    Hapus
-                                </DropdownMenuItem>
-                            </>
-                        )}
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            );
-        },
+        cell: ({ row }) => <ActionsCell row={row} />,
     },
 ];
 
 export const initialColumnVisibility = {
     id: false,
     room: false,
+};
+
+// Create a proper React component for the actions cell
+const ActionsCell = ({ row }: { row: { original: GuidanceClass } }) => {
+    const { user } = usePage<SharedData>().props.auth;
+    const guidanceClass = row.original;
+    const isDosen = user?.roles?.[0]?.name === 'dosen';
+    const isLecturer = isDosen && guidanceClass.lecturer && user.id === guidanceClass.lecturer.id;
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Buka menu</span>
+                    <MoreHorizontal className="h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => navigator.clipboard.writeText(String(guidanceClass.id))}>Salin ID</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                    <Link href={route('front.internships.guidance-classes.show', guidanceClass.id)}>Lihat Detail</Link>
+                </DropdownMenuItem>
+                {isLecturer && (
+                    <>
+                        <DropdownMenuItem asChild>
+                            <Link href={route('front.internships.guidance-classes.edit', guidanceClass.id)}>Edit</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            className="text-red-500"
+                            onClick={() => {
+                                if (confirm('Apakah Anda yakin ingin menghapus kelas bimbingan ini?')) {
+                                    router.delete(route('front.internships.guidance-classes.destroy', guidanceClass.id), {
+                                        preserveScroll: true,
+                                    });
+                                }
+                            }}
+                        >
+                            Hapus
+                        </DropdownMenuItem>
+                    </>
+                )}
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
 };

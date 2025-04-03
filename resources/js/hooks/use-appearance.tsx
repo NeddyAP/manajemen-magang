@@ -26,7 +26,8 @@ const applyTheme = (appearance: Appearance) => {
     document.documentElement.classList.remove('dark');
     document.documentElement.removeAttribute('data-theme');
 
-    if (appearance === 'green') { // Changed 'blue' to 'green'
+    if (appearance === 'green') {
+        // Changed 'blue' to 'green'
         document.documentElement.setAttribute('data-theme', 'green'); // Changed 'blue' to 'green'
     } else {
         // Apply dark class only if not green theme and conditions met

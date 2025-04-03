@@ -76,7 +76,7 @@ interface RoleFilterProps {
 export function RoleFilter({ roles, value, onChange }: RoleFilterProps) {
     const options = roles.map((role) => ({
         label: role.name,
-        value: role.name,
+        value: role.name as string,
     }));
 
     return <FilterPopover label="role" value={value} options={options} onChange={onChange} />;

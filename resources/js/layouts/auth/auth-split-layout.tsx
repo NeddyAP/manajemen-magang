@@ -9,7 +9,7 @@ interface AuthLayoutProps {
 }
 
 export default function AuthSplitLayout({ children, title, description }: PropsWithChildren<AuthLayoutProps>) {
-    const { name, quote } = usePage<SharedData>().props;
+    const { name } = usePage<SharedData>().props;
 
     return (
         <div className="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
@@ -25,20 +25,14 @@ export default function AuthSplitLayout({ children, title, description }: PropsW
                     {children}
                 </div>
             </div>
-            <div
-                className="relative hidden h-full flex-col p-10 text-white lg:flex dark:border-r"
-            >
+            <div className="relative hidden h-full flex-col p-10 text-white lg:flex dark:border-r">
                 <div className="absolute inset-0 bg-gradient-to-tr from-sky-100 via-sky-200 to-teal-600 transition-colors duration-200 dark:from-gray-800 dark:via-gray-900 dark:to-black" />
                 <Link href={route('home')} className="relative z-20 flex items-center text-lg font-medium">
                     <AppLogoIcon width={54} height={24} />
                     {name}
                 </Link>
                 <div className="relative z-10 flex h-full items-center justify-center">
-                    <img 
-                        src="/assets/hero-image.webp" 
-                        alt="Background" 
-                        className="h-auto w-full max-w-2xl object-contain p-6" 
-                    />
+                    <img src="/assets/hero-image.webp" alt="Background" className="h-auto w-full max-w-2xl object-contain p-6" />
                 </div>
             </div>
         </div>

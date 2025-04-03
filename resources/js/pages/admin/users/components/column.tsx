@@ -85,8 +85,8 @@ export const columns: ColumnDef<User>[] = [
         accessorKey: 'created_at',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Dibuat Pada" />,
         cell: ({ row }) => {
-            const createdAt = row.getValue('created_at');
-            if (!createdAt || typeof createdAt !== 'string') return '-';
+            const createdAt = row.getValue('created_at') as string | undefined;
+            if (!createdAt) return '-';
 
             try {
                 // Format date to Indonesian locale
@@ -101,8 +101,8 @@ export const columns: ColumnDef<User>[] = [
         accessorKey: 'updated_at',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Diperbarui Pada" />,
         cell: ({ row }) => {
-            const updatedAt = row.getValue('updated_at');
-            if (!updatedAt || typeof updatedAt !== 'string') return '-';
+            const updatedAt = row.getValue('updated_at') as string | undefined;
+            if (!updatedAt) return '-';
 
             try {
                 // Format date to Indonesian locale
@@ -128,7 +128,7 @@ export const columns: ColumnDef<User>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(users.id)}>Salin ID pengguna</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(users.id.toString())}>Salin ID pengguna</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                             <a href={route('admin.users.edit', users.id)}>Edit</a>

@@ -19,15 +19,7 @@ interface ConfirmationDialogProps {
     cancelText: string;
 }
 
-export function ConfirmationDialog({
-    isOpen,
-    onClose,
-    onConfirm,
-    title,
-    description,
-    confirmText,
-    cancelText,
-}: ConfirmationDialogProps) {
+export function ConfirmationDialog({ isOpen, onClose, onConfirm, title, description, confirmText, cancelText }: ConfirmationDialogProps) {
     return (
         <AlertDialog open={isOpen} onOpenChange={onClose}>
             <AlertDialogContent>
@@ -42,4 +34,4 @@ export function ConfirmationDialog({
             </AlertDialogContent>
         </AlertDialog>
     );
-} 
+}

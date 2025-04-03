@@ -1,8 +1,8 @@
 import { DataTable } from '@/components/data-table/data-table';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { User } from '@/types/user';
+import { TableMeta, type BreadcrumbItem } from '@/types';
+import { Report } from '@/types/internship';
 import { Head, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { columns, initialColumnVisibility } from './components/column';
@@ -14,30 +14,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/admin/reports',
     },
 ];
-
-export interface Report {
-    id?: number;
-    user_id?: number;
-    user?: User;
-    internship_id?: number;
-    internship?: {
-        company_name?: string;
-    };
-    title?: string;
-    report_file?: string;
-    version?: number;
-    status?: 'pending' | 'approved' | 'rejected';
-    reviewer_notes?: string;
-    created_at?: string;
-    updated_at?: string;
-}
-
-interface TableMeta {
-    total: number;
-    per_page: number;
-    current_page: number;
-    last_page: number;
-}
 
 interface ReportsProps {
     reports: Report[];

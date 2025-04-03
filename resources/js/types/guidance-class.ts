@@ -34,14 +34,6 @@ export interface GuidanceClass {
     }>;
 }
 
-export interface Internship {
-    id: number;
-    company_name: string;
-    status: 'pending' | 'active' | 'ongoing' | 'completed' | 'cancelled';
-    start_date: string | null;
-    end_date: string | null;
-}
-
 export interface GuidanceClassFormData {
     [key: string]: unknown;
     title: string;

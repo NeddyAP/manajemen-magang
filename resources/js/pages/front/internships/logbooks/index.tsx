@@ -1,7 +1,7 @@
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
 import FrontLayout from '@/layouts/front-layout';
-import { type BreadcrumbItem } from '@/types';
+import { TableMeta, type BreadcrumbItem } from '@/types';
 import { Internship, Logbook } from '@/types/internship';
 import { Head, Link } from '@inertiajs/react';
 import { format, parseISO } from 'date-fns';
@@ -28,13 +28,6 @@ interface PageProps {
     internship: Internship;
     logbooks: Logbook[];
     meta: TableMeta;
-}
-
-interface TableMeta {
-    total: number;
-    per_page: number;
-    current_page: number;
-    last_page: number;
 }
 
 export default function LogbooksIndex({ internship, logbooks, meta }: PageProps) {

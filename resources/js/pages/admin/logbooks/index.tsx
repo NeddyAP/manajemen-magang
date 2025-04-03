@@ -1,8 +1,8 @@
 import { DataTable } from '@/components/data-table/data-table';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { User } from '@/types/user';
+import { TableMeta, type BreadcrumbItem } from '@/types';
+import { Logbook } from '@/types/internship';
 import { Head } from '@inertiajs/react';
 import { columns, initialColumnVisibility } from './components/column';
 
@@ -12,44 +12,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/admin/logbooks',
     },
 ];
-export interface Logbook {
-    id: number;
-    internship_id: number;
-    date: string;
-    activities: string;
-    supervisor_notes: string;
-    created_at: string;
-    updated_at: string;
-    internship: {
-        id: number;
-        company_name: string;
-        company_address: string;
-        start_date: string;
-        end_date: string;
-        user: User & {
-            mahasiswaProfile: {
-                id: number;
-                nim: string;
-                study_program: string;
-                advisor: {
-                    id: number;
-                    name: string;
-                    dosenProfile: {
-                        id: number;
-                        nip: string;
-                    };
-                };
-            };
-        };
-    };
-}
-
-interface TableMeta {
-    total: number;
-    per_page: number;
-    current_page: number;
-    last_page: number;
-}
 
 interface LogbookProps {
     logbooks: Logbook[];
@@ -57,7 +19,6 @@ interface LogbookProps {
 }
 
 export default function Logbooks({ logbooks, meta }: LogbookProps) {
-    
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Logbook" />

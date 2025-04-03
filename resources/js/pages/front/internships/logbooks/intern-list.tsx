@@ -3,23 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import FrontLayout from '@/layouts/front-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react'; // Import Link
+import { Internship } from '@/types/internship';
+import { Head, Link } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { PlusCircle } from 'lucide-react'; // Import an icon for the button
-
-interface Internship {
-    id: number;
-    user_id: number;
-    type: string;
-    company_name: string;
-    company_address: string;
-    start_date: string;
-    end_date: string;
-    status: string;
-    progress: number;
-    logbooks_count: number;
-}
+import { PlusCircle } from 'lucide-react';
 
 interface PageProps {
     internships: Internship[];
@@ -66,8 +54,14 @@ export default function InternshipList({ internships }: PageProps) {
                                                 </div>
                                                 <div>
                                                     <p className="text-muted-foreground text-sm">
-                                                        Periode: {format(new Date(internship.start_date), 'dd MMMM yyyy', { locale: id })} -{' '}
-                                                        {format(new Date(internship.end_date), 'dd MMMM yyyy', { locale: id })}
+                                                        Periode:{' '}
+                                                        {internship.start_date
+                                                            ? format(new Date(internship.start_date), 'dd MMMM yyyy', { locale: id })
+                                                            : 'Belum ditentukan'}{' '}
+                                                        -{' '}
+                                                        {internship.end_date
+                                                            ? format(new Date(internship.end_date), 'dd MMMM yyyy', { locale: id })
+                                                            : 'Belum ditentukan'}
                                                     </p>
                                                 </div>
                                                 <div>

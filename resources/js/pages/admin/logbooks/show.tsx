@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
+import { Logbook } from '@/types/internship';
 import { Head } from '@inertiajs/react';
-import { Logbook } from '.';
 import LogbookForm from './components/form';
 
 const breadcrumbs: BreadcrumbItem[] = [

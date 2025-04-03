@@ -7,9 +7,9 @@ use App\Http\Controllers\Admin\GuidanceClassController;
 use App\Http\Controllers\Admin\InternshipController;
 use App\Http\Controllers\Admin\LogbookController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\TrashController;
 use App\Http\Controllers\Admin\TutorialController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\TrashController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/dashboard', '/admin/dashboard');

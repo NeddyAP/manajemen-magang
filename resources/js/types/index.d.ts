@@ -4,7 +4,7 @@ import type { Config } from 'ziggy-js';
 
 export interface Auth {
     user: User;
-    role: String;
+    role: string;
 }
 
 export interface BreadcrumbItem {
@@ -43,4 +43,11 @@ export interface User {
     created_at: string;
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
+}
+
+interface TableMeta {
+    total: number;
+    per_page: number;
+    current_page: number;
+    last_page: number;
 }

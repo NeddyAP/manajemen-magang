@@ -70,15 +70,15 @@ class GuidanceClassAttendance extends Pivot
         if ($this->attendance_method === 'manual') {
             return true;
         }
-        
+
         // Make case-insensitive check for 'active' status
-        $isActive = strtolower($this->user->mahasiswaProfile->academic_status) === 'active' || 
+        $isActive = strtolower($this->user->mahasiswaProfile->academic_status) === 'active' ||
                    strtolower($this->user->mahasiswaProfile->academic_status) === 'aktif';
-        
+
         return $this->user->mahasiswaProfile->advisor_id === $this->guidanceClass->lecturer_id
             && $isActive
             && $this->user->internships()
-                ->whereIn('status', ['waiting','accepted'])
+                ->whereIn('status', ['waiting', 'accepted'])
                 ->exists();
     }
 

@@ -2,7 +2,8 @@ import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { TableMeta, type BreadcrumbItem } from '@/types';
+import { Faq } from '@/types/faq';
 import { Head, Link } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { columns, initialColumnVisibility } from './components/column';
@@ -13,23 +14,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/admin/faqs',
     },
 ];
-export interface Faq {
-    id?: number;
-    question: string;
-    answer: string;
-    category: string;
-    is_active: boolean;
-    order: number;
-    created_at?: string;
-    updated_at?: string;
-}
-
-interface TableMeta {
-    total: number;
-    per_page: number;
-    current_page: number;
-    last_page: number;
-}
 
 interface FaqsProps {
     faqs: Faq[];

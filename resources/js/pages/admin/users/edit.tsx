@@ -11,7 +11,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
     {
         title: 'Edit Pengguna',
-        href: '/admin/user/{id}/edit',
+        href: `/admin/users/edit`,
     },
 ];
 interface Props {

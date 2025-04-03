@@ -46,7 +46,11 @@ export default function LogbookEdit({ logbook }: Props) {
                         </div>
 
                         {/* Pass internshipId to LogbookForm */}
-                        <LogbookForm logbook={logbook} mode="edit" internshipId={logbook.internship_id} />
+                        {logbook.internship_id ? (
+                            <LogbookForm logbook={logbook} mode="edit" internshipId={logbook.internship_id} />
+                        ) : (
+                            <div className="text-center text-red-500">ID Magang tidak valid</div>
+                        )}
                     </div>
                 </div>
             </div>

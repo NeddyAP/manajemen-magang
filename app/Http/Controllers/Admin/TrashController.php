@@ -12,7 +12,6 @@ use App\Models\Report;
 use App\Models\Tutorial;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 
 class TrashController extends Controller
 {
@@ -63,7 +62,7 @@ class TrashController extends Controller
             default => null,
         };
 
-        if (!$model) {
+        if (! $model) {
             return back()->with('error', 'Tipe data tidak valid.');
         }
 
@@ -88,7 +87,7 @@ class TrashController extends Controller
             default => null,
         };
 
-        if (!$model) {
+        if (! $model) {
             return back()->with('error', 'Tipe data tidak valid.');
         }
 
@@ -98,4 +97,4 @@ class TrashController extends Controller
 
         return back()->with('success', 'Data berhasil dihapus permanen.');
     }
-} 
+}

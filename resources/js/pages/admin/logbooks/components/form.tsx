@@ -1,6 +1,6 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Logbook } from '..';
+import { Logbook } from '@/types/internship';
 
 interface Props {
     logbook: Logbook;

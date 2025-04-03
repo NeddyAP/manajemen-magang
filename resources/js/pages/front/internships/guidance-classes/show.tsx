@@ -90,9 +90,7 @@ export default function ShowGuidanceClass({ class: guidanceClass, meta, userRole
                                                 <Users className="text-muted-foreground mt-0.5 mr-3 h-5 w-5" />
                                                 <div>
                                                     <h3 className="font-medium">Partisipan</h3>
-                                                    <p>
-                                                        {studentCount} Mahasiswa
-                                                    </p>
+                                                    <p>{studentCount} Mahasiswa</p>
                                                     <p className="text-muted-foreground text-sm">{attendedStudentCount} Hadir</p>
                                                 </div>
                                             </div>
@@ -189,9 +187,7 @@ export default function ShowGuidanceClass({ class: guidanceClass, meta, userRole
                                                                 <Clock className="h-6 w-6" />
                                                             </div>
                                                             <h3 className="text-lg font-medium text-yellow-700">QR Code tidak tersedia</h3>
-                                                            <p className="text-muted-foreground mt-2">
-                                                                QR Code kehadiran belum dibuat oleh dosen.
-                                                            </p>
+                                                            <p className="text-muted-foreground mt-2">QR Code kehadiran belum dibuat oleh dosen.</p>
                                                         </div>
                                                     )}
                                                 </div>
@@ -207,16 +203,9 @@ export default function ShowGuidanceClass({ class: guidanceClass, meta, userRole
                                     </CardHeader>
                                     <CardContent>
                                         {guidanceClass.students && guidanceClass.students.length > 0 ? (
-                                            <DataTable
-                                                meta={meta}
-                                                columns={userColumns}
-                                                data={guidanceClass.students}
-                                                initialColumnVisibility={{}}
-                                            />
+                                            <DataTable meta={meta} columns={userColumns} data={guidanceClass.students} initialColumnVisibility={{}} />
                                         ) : (
-                                            <div className="text-muted-foreground py-4 text-center">
-                                                Belum ada mahasiswa yang terdaftar.
-                                            </div>
+                                            <div className="text-muted-foreground py-4 text-center">Belum ada mahasiswa yang terdaftar.</div>
                                         )}
                                     </CardContent>
                                 </Card>

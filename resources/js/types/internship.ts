@@ -1,4 +1,4 @@
-import { User } from '.';
+import { User } from './user';
 
 export interface Internship {
     id?: number;
@@ -16,31 +16,55 @@ export interface Internship {
     created_at?: string;
     updated_at?: string;
     status_message?: string | null;
-    logbooks_count?: number; // Optional count
-    reports_count?: number; // Optional count
+    logbooks_count?: number;
+    reports_count?: number;
 }
 
 export interface Logbook {
-    id: number;
-    internship_id: number;
-    date: string;
-    activities: string;
-    supervisor_notes: string | null;
+    id?: number;
+    internship_id?: number;
+    date?: string;
+    activities?: string;
+    supervisor_notes?: string;
     created_at?: string;
     updated_at?: string;
+    internship?: {
+        id?: number;
+        company_name?: string;
+        company_address?: string;
+        start_date?: string;
+        end_date?: string;
+        user?: User & {
+            mahasiswaProfile?: {
+                id?: number;
+                nim?: string;
+                study_program?: string;
+                advisor?: {
+                    id?: number;
+                    name?: string;
+                    dosenProfile?: {
+                        id?: number;
+                        nip?: string;
+                    };
+                };
+            };
+        };
+    };
 }
 
 export interface Report {
-    id: number;
-    user_id: number;
-    internship_id: number;
-    title: string;
-    report_file: string; // Path to the file
-    version: number;
-    status: 'pending' | 'approved' | 'rejected';
-    reviewer_notes?: string | null;
-    created_at: string; // Assuming timestamps are returned
-    updated_at: string;
+    id?: number;
+    user_id?: number;
+    user?: User;
+    internship_id?: number;
+    internship?: {
+        company_name?: string;
+    };
+    title?: string;
+    report_file?: string;
+    version?: number;
+    status?: 'pending' | 'approved' | 'rejected';
+    reviewer_notes?: string;
+    created_at?: string;
+    updated_at?: string;
 }
-
-// You might have other related types here

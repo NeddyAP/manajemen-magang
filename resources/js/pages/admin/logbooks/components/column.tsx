@@ -11,12 +11,12 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Logbook } from '@/types/internship';
 import { router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { MoreHorizontal } from 'lucide-react';
-import { Logbook } from '..';
 
 export const columns: ColumnDef<Logbook>[] = [
     {

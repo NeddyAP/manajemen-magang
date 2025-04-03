@@ -7,18 +7,18 @@ import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AppLayout from '@/layouts/app-layout';
-import SettingsLayout from '@/layouts/settings/layout';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import AppLayout from '@/layouts/app-layout';
+import SettingsLayout from '@/layouts/settings/layout';
+import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { CalendarIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -41,7 +41,20 @@ interface ProfileForm {
     work_location: string;
 }
 
-export default function Profile({ mustVerifyEmail, status, profile }: { mustVerifyEmail: boolean; status?: string; profile?: any }) {
+interface ProfileData {
+    employee_id?: string;
+    department?: string;
+    position?: string;
+    employment_status?: string;
+    join_date?: string;
+    phone_number?: string;
+    address?: string;
+    supervisor_name?: string;
+    work_location?: string;
+    [key: string]: string | undefined;
+}
+
+export default function Profile({ mustVerifyEmail, status, profile }: { mustVerifyEmail: boolean; status?: string; profile?: ProfileData }) {
     const { auth } = usePage<SharedData>().props;
 
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
@@ -151,10 +164,7 @@ export default function Profile({ mustVerifyEmail, status, profile }: { mustVeri
                         <div className="grid gap-2">
                             <Label>Status Kepegawaian</Label>
 
-                            <Select
-                                value={data.employment_status}
-                                onValueChange={(value) => setData('employment_status', value)}
-                            >
+                            <Select value={data.employment_status} onValueChange={(value) => setData('employment_status', value)}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Pilih status kepegawaian" />
                                 </SelectTrigger>
@@ -175,17 +185,10 @@ export default function Profile({ mustVerifyEmail, status, profile }: { mustVeri
                                 <PopoverTrigger asChild>
                                     <Button
                                         variant="outline"
-                                        className={cn(
-                                            'w-full justify-start text-left font-normal',
-                                            !data.join_date && 'text-muted-foreground'
-                                        )}
+                                        className={cn('w-full justify-start text-left font-normal', !data.join_date && 'text-muted-foreground')}
                                     >
                                         <CalendarIcon className="mr-2 h-4 w-4" />
-                                        {data.join_date ? (
-                                            format(new Date(data.join_date), 'PPP', { locale: id })
-                                        ) : (
-                                            <span>Pilih tanggal</span>
-                                        )}
+                                        {data.join_date ? format(new Date(data.join_date), 'PPP', { locale: id }) : <span>Pilih tanggal</span>}
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto p-0">

@@ -42,7 +42,7 @@ export default function Users({ users, meta }: UsersProps) {
 
     const handleRoleChange = (role: string) => {
         setSelectedRole(role);
-        const query = role ? { role } : {};
+        const query = role ? { role: role as string } : {};
         router.get('/admin/users', query, {
             preserveState: true,
             preserveScroll: true,

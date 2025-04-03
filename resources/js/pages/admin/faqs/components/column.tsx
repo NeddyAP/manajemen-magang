@@ -12,12 +12,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Faq } from '@/types/faq';
 import { router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { MoreHorizontal } from 'lucide-react';
-import { Faq } from '..';
 import { DataTableColumnHeader } from '../../../../components/data-table/column-header';
 
 export const columns: ColumnDef<Faq>[] = [

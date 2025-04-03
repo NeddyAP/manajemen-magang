@@ -12,12 +12,12 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Internship } from '@/types/internship';
 import { router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { FileSpreadsheet, MoreHorizontal } from 'lucide-react';
-import { Internship } from '..';
 
 export const columns: ColumnDef<Internship>[] = [
     {
@@ -58,7 +58,13 @@ export const columns: ColumnDef<Internship>[] = [
         accessorKey: 'lecturer',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Dosen Pembimbing" />,
         cell: ({ row }) => {
-            const advisor = row.original?.user?.mahasiswa_profile?.advisor;
+            const advisor = row.original?.user?.mahasiswa_profile?.advisor as
+                | {
+                      name: string;
+                      email: string;
+                      dosen_profile?: { expertise: string };
+                  }
+                | undefined;
             if (!advisor) return <span className="text-muted-foreground text-sm">Belum ditentukan</span>;
 
             return (

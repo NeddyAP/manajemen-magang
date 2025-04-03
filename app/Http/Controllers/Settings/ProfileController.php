@@ -99,7 +99,7 @@ class ProfileController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/')->with('success', 'Akun berhasil dihapus');;
+        return redirect('/')->with('success', 'Akun berhasil dihapus');
     }
 
     public function appearance(Request $request)

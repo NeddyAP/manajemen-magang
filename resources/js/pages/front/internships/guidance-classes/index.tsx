@@ -4,10 +4,10 @@ import FrontLayout from '@/layouts/front-layout';
 import { SharedData, type BreadcrumbItem } from '@/types';
 import { GuidanceClass, TableMeta } from '@/types/guidance-class';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Calendar, Plus, QrCode, Users } from 'lucide-react';
+import { Calendar, Plus, Users } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { columns, initialColumnVisibility } from './components/column';
 import { StatusFilter } from './components/filters';
-import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -68,7 +68,7 @@ export default function GuidanceClassIndex({ classes, meta }: PageProps) {
                         </div>
 
                         <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
-                            <div className="bg-card text-card-foreground rounded-lg p-6 shadow border">
+                            <div className="bg-card text-card-foreground rounded-lg border p-6 shadow">
                                 <div className="flex items-center justify-between">
                                     <h3 className="font-medium">Kelas Aktif</h3>
                                     <Calendar className="text-primary h-5 w-5" />
@@ -81,7 +81,7 @@ export default function GuidanceClassIndex({ classes, meta }: PageProps) {
                                     }
                                 </p>
                             </div>
-                            <div className="bg-card text-card-foreground rounded-lg p-6 shadow border">
+                            <div className="bg-card text-card-foreground rounded-lg border p-6 shadow">
                                 <div className="flex items-center justify-between">
                                     <h3 className="font-medium">Total Kelas</h3>
                                     <Users className="text-primary h-5 w-5" />
@@ -103,11 +103,13 @@ export default function GuidanceClassIndex({ classes, meta }: PageProps) {
                             )}
                         </div>
 
-                        <DataTable meta={meta} columns={columns} data={classes}
-                            filters={[
-                                { id: 'status', value: selectedStatus },
-                            ]}
-                            initialColumnVisibility={initialColumnVisibility} />
+                        <DataTable
+                            meta={meta}
+                            columns={columns}
+                            data={classes}
+                            filters={[{ id: 'status', value: selectedStatus }]}
+                            initialColumnVisibility={initialColumnVisibility}
+                        />
                     </div>
                 </div>
             </div>

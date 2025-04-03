@@ -68,22 +68,22 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
         // Convert numeric fields based on role
         if (selectedRole === 'dosen') {
             if (data.teaching_start_year) {
-                setData('teaching_start_year', parseInt(data.teaching_start_year.toString()));
+                setData('teaching_start_year', parseInt(data.teaching_start_year.toString()) || 0);
             }
         }
 
         if (selectedRole === 'mahasiswa') {
             if (data.class_year) {
-                setData('class_year', parseInt(data.class_year.toString()));
+                setData('class_year', parseInt(data.class_year.toString()) || 0);
             }
             if (data.semester) {
-                setData('semester', parseInt(data.semester.toString()));
+                setData('semester', parseInt(data.semester.toString()) || 0);
             }
             if (data.gpa) {
-                setData('gpa', parseFloat(data.gpa.toString()));
+                setData('gpa', parseFloat(data.gpa.toString()) || 0);
             }
             if (data.advisor_id) {
-                setData('advisor_id', parseInt(data.advisor_id.toString()));
+                setData('advisor_id', parseInt(data.advisor_id.toString()) || 0);
             }
         }
 

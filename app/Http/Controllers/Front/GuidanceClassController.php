@@ -8,7 +8,6 @@ use App\Models\GuidanceClassAttendance;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -84,7 +83,7 @@ class GuidanceClassController extends Controller
                             $query->where('start_date', '<=', $now)
                                 ->where(function ($q) use ($now) {
                                     $q->whereNull('end_date')
-                                      ->orWhere('end_date', '>=', $now);
+                                        ->orWhere('end_date', '>=', $now);
                                 });
                             break;
                         case 'finished':
@@ -424,7 +423,7 @@ class GuidanceClassController extends Controller
             ->where('user_id', $studentId)
             ->first();
 
-        if (!$attendance) {
+        if (! $attendance) {
             // Create attendance record if it doesn't exist
             $attendance = new GuidanceClassAttendance([
                 'guidance_class_id' => $classId,
@@ -448,7 +447,7 @@ class GuidanceClassController extends Controller
 
             return back()->with('success', 'Kehadiran mahasiswa berhasil dicatat.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Gagal mencatat kehadiran: ' . $e->getMessage());
+            return back()->with('error', 'Gagal mencatat kehadiran: '.$e->getMessage());
         }
     }
 

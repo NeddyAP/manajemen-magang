@@ -18,11 +18,11 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'; // Import Tabs components
 import { Textarea } from '@/components/ui/textarea';
+import { Internship } from '@/types/internship';
 import { router, useForm } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
-import { Internship } from '..';
 
 interface Props {
     internship: Internship;
@@ -60,7 +60,9 @@ export default function InternshipForm({ internship }: Props) {
     };
 
     // Get the advisor/lecturer information from the mahasiswa_profile relation
-    const advisor = internship?.user?.mahasiswa_profile?.advisor;
+    const advisor = internship?.user?.mahasiswa_profile?.advisor as
+        | { name: string; email: string; dosen_profile?: { expertise: string; academic_position: string } }
+        | undefined;
     return (
         <form onSubmit={onSubmit}>
             <Tabs defaultValue="internship" className="w-full">

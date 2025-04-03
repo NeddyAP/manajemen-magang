@@ -1,14 +1,18 @@
 import { DataTable } from '@/components/data-table/data-table';
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
-import { columns, initialColumnVisibility } from './components/column';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import AppLayout from '@/layouts/app-layout';
+import { TableMeta, type BreadcrumbItem } from '@/types';
+import { Faq } from '@/types/faq';
+import { GlobalVariable } from '@/types/global-variable';
+import { GuidanceClass } from '@/types/guidance-class';
+import { Internship, Logbook } from '@/types/internship';
+import { Tutorial } from '@/types/tutorial';
+import { User } from '@/types/user';
+import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
-import { router } from '@inertiajs/react';
 import { toast } from 'sonner';
+import { columns, initialColumnVisibility } from './components/column';
 import { ConfirmationDialog } from './components/confirmation-dialog';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -19,20 +23,15 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface TrashProps {
-    users: any[];
-    tutorials: any[];
-    internships: any[];
-    logbooks: any[];
-    reports: any[];
-    faqs: any[];
-    globalVariables: any[];
-    guidanceClasses: any[];
-    meta: {
-        total: number;
-        per_page: number;
-        current_page: number;
-        last_page: number;
-    };
+    users: User[];
+    tutorials: Tutorial[];
+    internships: Internship[];
+    logbooks: Logbook[];
+    reports: Report[];
+    faqs: Faq[];
+    globalVariables: GlobalVariable[];
+    guidanceClasses: GuidanceClass[];
+    meta: TableMeta;
 }
 
 export default function Trash({ users, tutorials, internships, logbooks, reports, faqs, globalVariables, guidanceClasses, meta }: TrashProps) {
@@ -71,15 +70,19 @@ export default function Trash({ users, tutorials, internships, logbooks, reports
         if (!dialogState.id) return;
 
         if (dialogState.type === 'restore') {
-            router.post(route('admin.trash.restore', { type: selectedType, id: dialogState.id }), {}, {
-                onSuccess: () => {
-                    toast.success('Data berhasil dipulihkan');
-                    setDialogState({ isOpen: false, type: 'restore', id: null });
+            router.post(
+                route('admin.trash.restore', { type: selectedType, id: dialogState.id }),
+                {},
+                {
+                    onSuccess: () => {
+                        toast.success('Data berhasil dipulihkan');
+                        setDialogState({ isOpen: false, type: 'restore', id: null });
+                    },
+                    onError: () => {
+                        toast.error('Gagal memulihkan data');
+                    },
                 },
-                onError: () => {
-                    toast.error('Gagal memulihkan data');
-                },
-            });
+            );
         } else {
             router.delete(route('admin.trash.force-delete', { type: selectedType, id: dialogState.id }), {
                 onSuccess: () => {
@@ -104,9 +107,22 @@ export default function Trash({ users, tutorials, internships, logbooks, reports
         { value: 'guidanceClasses', label: 'Kelas Bimbingan', data: guidanceClasses, count: guidanceClasses.length },
     ];
 
-    const getCurrentData = () => {
-        const option = typeOptions.find(opt => opt.value === selectedType);
-        return option?.data || [];
+    // Define a type that matches what DataTable expects
+    interface TrashItem {
+        id: number;
+        name: string;
+        type: string;
+        deleted_at: string;
+        [key: string]: string | number | boolean | null | undefined;
+    }
+
+    const getCurrentData = (): TrashItem[] => {
+        const option = typeOptions.find((opt) => opt.value === selectedType);
+        // Filter out any items without an id or cast undefined ids to -1
+        return (option?.data || []).map((item) => ({
+            ...item,
+            id: (item as { id: number }).id || -1, // Ensure id is always a number
+        })) as TrashItem[];
     };
 
     const getDialogContent = () => {
@@ -167,4 +183,4 @@ export default function Trash({ users, tutorials, internships, logbooks, reports
             />
         </AppLayout>
     );
-} 
+}

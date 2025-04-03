@@ -1,8 +1,8 @@
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
+import { Report } from '@/types/internship';
 import { Head } from '@inertiajs/react';
 import ReportForm from './components/form';
-import { Report } from './index';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

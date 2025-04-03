@@ -9,15 +9,9 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import FrontLayout from '@/layouts/front-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
-import { CalendarIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -44,10 +38,16 @@ interface ProfileForm {
     gpa?: string;
 }
 
-export default function Profile({ mustVerifyEmail, status, profile }: { mustVerifyEmail: boolean; status?: string; profile?: any }) {
+interface ProfileProps {
+    mustVerifyEmail: boolean;
+    status?: string;
+    profile?: Partial<ProfileForm>;
+}
+
+export default function Profile({ mustVerifyEmail, status, profile = {} }: ProfileProps) {
     const { auth } = usePage<SharedData>().props;
-    const isDosen = auth.user.roles?.some(role => role.name === 'dosen');
-    const isMahasiswa = auth.user.roles?.some(role => role.name === 'mahasiswa');
+    const isDosen = auth.user.roles?.some((role) => role.name === 'dosen');
+    const isMahasiswa = auth.user.roles?.some((role) => role.name === 'mahasiswa');
 
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
         name: auth.user.name,
@@ -69,7 +69,7 @@ export default function Profile({ mustVerifyEmail, status, profile }: { mustVeri
         gpa: profile?.gpa || '',
     });
 
-    const submit: FormEventHandler = (e) => {
+    const submit: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
 
         patch(route('profile.update'), {
@@ -118,7 +118,7 @@ export default function Profile({ mustVerifyEmail, status, profile }: { mustVeri
                         </div>
 
                         {isDosen && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                 <div className="space-y-6">
                                     <div className="grid gap-2">
                                         <Label htmlFor="employee_number">Nomor Induk Dosen</Label>
@@ -138,7 +138,7 @@ export default function Profile({ mustVerifyEmail, status, profile }: { mustVeri
                                             id="expertise"
                                             value={data.expertise}
                                             onChange={(e) => setData('expertise', e.target.value)}
-                                            required
+                                            required={isDosen}
                                             placeholder="Bidang keahlian"
                                         />
                                         <InputError message={errors.expertise} />
@@ -150,7 +150,7 @@ export default function Profile({ mustVerifyEmail, status, profile }: { mustVeri
                                             id="last_education"
                                             value={data.last_education}
                                             onChange={(e) => setData('last_education', e.target.value)}
-                                            required
+                                            required={isDosen}
                                             placeholder="Pendidikan terakhir"
                                         />
                                         <InputError message={errors.last_education} />
@@ -172,10 +172,7 @@ export default function Profile({ mustVerifyEmail, status, profile }: { mustVeri
                                 <div className="space-y-6">
                                     <div className="grid gap-2">
                                         <Label>Status Kepegawaian</Label>
-                                        <Select
-                                            value={data.employment_status}
-                                            onValueChange={(value) => setData('employment_status', value)}
-                                        >
+                                        <Select value={data.employment_status} onValueChange={(value) => setData('employment_status', value)}>
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Pilih status kepegawaian" />
                                             </SelectTrigger>
@@ -206,7 +203,7 @@ export default function Profile({ mustVerifyEmail, status, profile }: { mustVeri
                         )}
 
                         {isMahasiswa && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                 <div className="space-y-6">
                                     <div className="grid gap-2">
                                         <Label htmlFor="student_number">Nomor Induk Mahasiswa</Label>
@@ -251,10 +248,7 @@ export default function Profile({ mustVerifyEmail, status, profile }: { mustVeri
                                 <div className="space-y-6">
                                     <div className="grid gap-2">
                                         <Label>Status Akademik</Label>
-                                        <Select
-                                            value={data.academic_status}
-                                            onValueChange={(value) => setData('academic_status', value)}
-                                        >
+                                        <Select value={data.academic_status} onValueChange={(value) => setData('academic_status', value)}>
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Pilih status akademik" />
                                             </SelectTrigger>
@@ -308,7 +302,7 @@ export default function Profile({ mustVerifyEmail, status, profile }: { mustVeri
                                         href={route('verification.send')}
                                         method="post"
                                         as="button"
-                                        className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
+                                        className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current dark:decoration-neutral-500"
                                     >
                                         Klik di sini untuk mengirim ulang email verifikasi.
                                     </Link>
@@ -329,7 +323,9 @@ export default function Profile({ mustVerifyEmail, status, profile }: { mustVeri
                                 show={recentlySuccessful}
                                 enter="transition ease-in-out"
                                 enterFrom="opacity-0"
+                                enterTo="opacity-100"
                                 leave="transition ease-in-out"
+                                leaveFrom="opacity-100"
                                 leaveTo="opacity-0"
                             >
                                 <p className="text-sm text-neutral-600">Tersimpan</p>

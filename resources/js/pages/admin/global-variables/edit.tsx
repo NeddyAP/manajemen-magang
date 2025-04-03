@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
+import { GlobalVariable } from '@/types/global-variable';
 import { Head } from '@inertiajs/react';
-import { GlobalVariable } from '.';
 import GlobalVariableForm from './components/form';
 
 const breadcrumbs: BreadcrumbItem[] = [

@@ -2,7 +2,8 @@ import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { TableMeta, type BreadcrumbItem } from '@/types';
+import { GlobalVariable } from '@/types/global-variable';
 import { Head, Link } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { columns, initialColumnVisibility } from './components/column';
@@ -13,24 +14,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/admin/global-variables',
     },
 ];
-export interface GlobalVariable {
-    id?: number;
-    key: string;
-    slug: string;
-    value: string;
-    description?: string;
-    type?: string;
-    is_active?: boolean;
-    created_at?: string;
-    updated_at?: string;
-}
-
-interface TableMeta {
-    total: number;
-    per_page: number;
-    current_page: number;
-    last_page: number;
-}
 
 interface GlobalVariablesProps {
     globalVariables: GlobalVariable[];

@@ -13,12 +13,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Tutorial } from '@/types/tutorial';
 import { router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { FileSpreadsheet, MoreHorizontal } from 'lucide-react';
-import { Tutorial } from '..';
 import { DataTableColumnHeader } from '../../../../components/data-table/column-header';
 
 export const columns: ColumnDef<Tutorial>[] = [
