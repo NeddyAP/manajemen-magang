@@ -13,7 +13,7 @@ const socialIcons = {
 };
 
 const pages = [
-    { name: 'Buku Panduan', href: '/bukupanduan' },
+    { name: 'Buku Panduan', href: '/buku-panduan' },
     { name: 'Dashboard Magang', href: '/internships' },
 ];
 

@@ -23,7 +23,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Panduan',
-        href: '/bukupanduan',
+        href: '/buku-panduan',
         icon: BookOpen,
     },
     {
@@ -69,7 +69,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
             computedRightNavItems.push({ title: 'Dashboard', href: '/internships', icon: LayoutDashboard });
         }
         // Always add Panduan
-        computedRightNavItems.push({ title: 'Panduan', href: '/bukupanduan', icon: BookOpen });
+        computedRightNavItems.push({ title: 'Panduan', href: '/buku-panduan', icon: BookOpen });
     }
     return (
         <>
