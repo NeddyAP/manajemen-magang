@@ -41,7 +41,7 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user(),
-                'role' => $request->user() ? $request->user()->roles[0]->name : null,
+                'role' => $request->user() && $request->user()->roles->isNotEmpty() ? $request->user()->roles[0]->name : null,
             ],
             'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),

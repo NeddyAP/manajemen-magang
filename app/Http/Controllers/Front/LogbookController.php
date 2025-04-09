@@ -10,18 +10,6 @@ use Inertia\Inertia;
 
 class LogbookController extends Controller
 {
-    public function internList()
-    {
-        $internships = Internship::where('user_id', auth()->id())
-            ->where('status', 'accepted')
-            ->withCount('logbooks')
-            ->get();
-
-        return Inertia::render('front/internships/logbooks/intern-list', [
-            'internships' => $internships,
-        ]);
-    }
-
     public function index(Request $request, Internship $internship)
     {
         // Check if the internship belongs to the authenticated user
@@ -116,5 +104,17 @@ class LogbookController extends Controller
 
         return redirect()->route('front.internships.logbooks.index', $internship)
             ->with('success', 'Logbook berhasil dihapus');
+    }
+
+    public function internList()
+    {
+        $internships = Internship::where('user_id', auth()->id())
+            ->where('status', 'accepted')
+            ->withCount('logbooks')
+            ->get();
+
+        return Inertia::render('front/internships/logbooks/intern-list', [
+            'internships' => $internships,
+        ]);
     }
 }
