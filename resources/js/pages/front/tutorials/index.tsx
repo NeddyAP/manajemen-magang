@@ -88,9 +88,8 @@ export default function Tutorials({ tutorials }: { tutorials: Tutorial[] }) {
     const renderTutorialCard = (tutorial: Tutorial) => (
         <div
             key={tutorial.id}
-            className={`flex h-full transform flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-700 dark:bg-gray-800 ${
-                tutorial.id && animatedCards[tutorial.id.toString()] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-            }`}
+            className={`flex h-full transform flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-700 dark:bg-gray-800 ${tutorial.id && animatedCards[tutorial.id.toString()] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+                }`}
             style={{ transitionDelay: `${tutorials.findIndex((t) => t.id === tutorial.id) * 50}ms` }}
         >
             <div className="flex-grow p-5">
@@ -123,21 +122,7 @@ export default function Tutorials({ tutorials }: { tutorials: Tutorial[] }) {
     return (
         <FrontLayout>
             <Head title="Buku Panduan" />
-            <div className="container mx-auto px-4 py-20 transition-colors duration-300 md:px-6 lg:px-20 dark:bg-gray-900">
-                <div className="mx-auto max-w-6xl">
-                    <div className="mb-10 text-center">
-                        <h1 className="mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-3xl font-bold text-transparent md:text-4xl lg:text-5xl dark:from-blue-400 dark:to-purple-400">
-                            Buku Panduan
-                        </h1>
-                        <p className="mx-auto max-w-2xl text-base text-gray-700 md:text-lg dark:text-gray-300">
-                            Selamat datang di bagian Buku Panduan! Di sini Anda akan menemukan berbagai sumber daya untuk membantu Anda menavigasi
-                            sistem manajemen magang.
-                        </p>
-                    </div>
-
-                    
-                </div>
-            </div>
+            <div>test 123</div>
         </FrontLayout>
     );
 }
