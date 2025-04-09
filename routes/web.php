@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('/bukupanduan', [TutorialController::class, 'index'])->name('tutorials.index');
+Route::get('/buku-panduan', [TutorialController::class, 'index'])->name('tutorials.index');
 
 // Front Internship Routes
 Route::middleware(['auth', 'verified'])->prefix('internships')->name('front.internships.')->group(function () {
