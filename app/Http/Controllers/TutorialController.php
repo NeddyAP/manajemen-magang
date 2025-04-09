@@ -11,22 +11,25 @@ class TutorialController extends Controller
     public function index(Request $request)
     {
         // Determine user role access levels more efficiently
-        if (Auth::guest()) {
-            $userRoles = 'guest';
-        } else {
+        $userRoles = collect(); // Initialize as an empty collection
+        if (Auth::check()) { // Check if user is authenticated
             $userRoles = Auth::user()->roles->pluck('name');
         }
-        $accessLevels = ['all'];
 
-        if ($userRoles === 'guest') {
-            $accessLevels[] = 'all';
-        } elseif ($userRoles->contains('admin') || $userRoles->contains('superadmin')) {
+        $accessLevels = ['all']; // Start with 'all' access
+
+        // Add access levels based on roles (works correctly on the collection)
+        if ($userRoles->contains('admin') || $userRoles->contains('superadmin')) {
             $accessLevels = array_merge($accessLevels, ['admin', 'dosen', 'mahasiswa']);
-        } elseif ($userRoles->contains('dosen')) {
+        }
+        if ($userRoles->contains('dosen')) {
             $accessLevels[] = 'dosen';
-        } elseif ($userRoles->contains('mahasiswa')) {
+        }
+        if ($userRoles->contains('mahasiswa')) {
             $accessLevels[] = 'mahasiswa';
         }
+        // Ensure unique access levels
+        $accessLevels = array_unique($accessLevels);
 
         // Build the base query
         $query = Tutorial::where('is_active', 1)
