@@ -4,7 +4,7 @@ import { Head, router } from '@inertiajs/react';
 import { BookOpen, CalendarDays, Download, GraduationCap, Search, ShieldCheck, User, Users, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-export default function Tutorials({ tutorials }: { tutorials: Tutorial[] }) {
+export default function Tutorials() {
 
     return (
         <FrontLayout>
