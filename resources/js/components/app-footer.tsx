@@ -13,7 +13,7 @@ const socialIcons = {
 };
 
 const pages = [
-    { name: 'Buku Panduan', href: '/buku-panduan' },
+    { name: 'Buku Panduan', href: '/bukupanduan' },
     { name: 'Dashboard Magang', href: '/internships' },
 ];
 
@@ -24,12 +24,12 @@ export default function AppFooter() {
     // Filter global variables by type
     const socialLinks = globalVariables
         ? Object.entries(globalVariables)
-              .filter(([, variable]) => variable.type === 'social_media' && variable.is_active)
-              .map(([, variable]) => ({
-                  icon: socialIcons[variable.slug as keyof typeof socialIcons],
-                  href: variable.value,
-                  label: variable.key,
-              }))
+            .filter(([, variable]) => variable.type === 'social_media' && variable.is_active)
+            .map(([, variable]) => ({
+                icon: socialIcons[variable.slug as keyof typeof socialIcons],
+                href: variable.value,
+                label: variable.key,
+            }))
         : [];
 
     // Get contact information
