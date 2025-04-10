@@ -21,21 +21,10 @@ interface Props {
 
 type InternshipType = 'kkl' | 'kkn';
 
-interface InternshipFormData {
-    type: InternshipType;
-    application_file?: File | null;
-    company_name: string;
-    company_address: string;
-    start_date: string;
-    end_date: string;
-    _method: string;
-    [key: string]: string | File | null | InternshipType | undefined;
-}
-
 export default function InternshipForm({ internship, mode, disabled = false }: Props) {
-    const form = useForm<InternshipFormData>({
+    const form = useForm({
         type: (internship?.type as InternshipType) ?? 'kkl',
-        application_file: null,
+        application_file: null as File | null | undefined,
         company_name: internship?.company_name ?? '',
         company_address: internship?.company_address ?? '',
         start_date: internship?.start_date ?? '',
