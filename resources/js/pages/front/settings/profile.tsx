@@ -1,6 +1,11 @@
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import * as React from 'react';
 import { FormEventHandler } from 'react';
 
 import DeleteUser from '@/components/delete-user';
@@ -44,10 +49,16 @@ interface ProfileProps {
     profile?: Partial<ProfileForm>;
 }
 
+// Generate year options for the combobox
+const currentYear = new Date().getFullYear();
+const years = Array.from({ length: currentYear - 1970 + 1 }, (_, i) => (currentYear - i).toString()); // currentYear down to 1970
+
 export default function Profile({ mustVerifyEmail, status, profile = {} }: ProfileProps) {
     const { auth } = usePage<SharedData>().props;
     const isDosen = auth.user.roles?.some((role) => role.name === 'dosen');
     const isMahasiswa = auth.user.roles?.some((role) => role.name === 'mahasiswa');
+    const [openTeachingYearCombobox, setOpenTeachingYearCombobox] = React.useState(false);
+    const [openClassYearCombobox, setOpenClassYearCombobox] = React.useState(false);
 
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
         name: auth.user.name,
@@ -58,11 +69,11 @@ export default function Profile({ mustVerifyEmail, status, profile = {} }: Profi
         last_education: profile?.last_education || '',
         academic_position: profile?.academic_position || '',
         employment_status: profile?.employment_status || '',
-        teaching_start_year: profile?.teaching_start_year || '',
+        teaching_start_year: profile?.teaching_start_year?.toString() || '', // Ensure it's string
         // Mahasiswa fields
         student_number: profile?.student_number || '',
         study_program: profile?.study_program || '',
-        class_year: profile?.class_year || '',
+        class_year: profile?.class_year?.toString() || '', // Ensure it's string
         academic_status: profile?.academic_status || '',
         semester: profile?.semester || '',
         advisor_id: profile?.advisor_id || '',
@@ -186,16 +197,48 @@ export default function Profile({ mustVerifyEmail, status, profile = {} }: Profi
 
                                     <div className="grid gap-2">
                                         <Label>Tahun Mulai Mengajar</Label>
-                                        <Input
-                                            id="teaching_start_year"
-                                            type="number"
-                                            value={data.teaching_start_year}
-                                            onChange={(e) => setData('teaching_start_year', e.target.value)}
-                                            required
-                                            min="1900"
-                                            max={new Date().getFullYear()}
-                                            placeholder="Tahun mulai mengajar"
-                                        />
+                                        <Popover open={openTeachingYearCombobox} onOpenChange={setOpenTeachingYearCombobox}>
+                                            <PopoverTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    role="combobox"
+                                                    aria-expanded={openTeachingYearCombobox}
+                                                    className={cn('w-full justify-between', !data.teaching_start_year && 'text-muted-foreground')}
+                                                >
+                                                    {data.teaching_start_year ? data.teaching_start_year : 'Pilih tahun'}
+                                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-[200px] p-0" align="start">
+                                                <Command>
+                                                    <CommandInput placeholder="Cari tahun..." />
+                                                    <CommandEmpty>Tahun tidak ditemukan.</CommandEmpty>
+                                                    <CommandGroup style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                                        {years.map((year) => (
+                                                            <CommandItem
+                                                                key={year}
+                                                                value={year}
+                                                                onSelect={(currentValue) => {
+                                                                    setData(
+                                                                        'teaching_start_year',
+                                                                        currentValue === data.teaching_start_year ? '' : currentValue,
+                                                                    );
+                                                                    setOpenTeachingYearCombobox(false);
+                                                                }}
+                                                            >
+                                                                <Check
+                                                                    className={cn(
+                                                                        'mr-2 h-4 w-4',
+                                                                        data.teaching_start_year === year ? 'opacity-100' : 'opacity-0',
+                                                                    )}
+                                                                />
+                                                                {year}
+                                                            </CommandItem>
+                                                        ))}
+                                                    </CommandGroup>
+                                                </Command>
+                                            </PopoverContent>
+                                        </Popover>
                                         <InputError message={errors.teaching_start_year} />
                                     </div>
                                 </div>
@@ -231,16 +274,45 @@ export default function Profile({ mustVerifyEmail, status, profile = {} }: Profi
 
                                     <div className="grid gap-2">
                                         <Label htmlFor="class_year">Tahun Angkatan</Label>
-                                        <Input
-                                            id="class_year"
-                                            type="number"
-                                            value={data.class_year}
-                                            onChange={(e) => setData('class_year', e.target.value)}
-                                            required
-                                            min="1900"
-                                            max={new Date().getFullYear() + 4}
-                                            placeholder="Tahun angkatan"
-                                        />
+                                        <Popover open={openClassYearCombobox} onOpenChange={setOpenClassYearCombobox}>
+                                            <PopoverTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    role="combobox"
+                                                    aria-expanded={openClassYearCombobox}
+                                                    className={cn('w-full justify-between', !data.class_year && 'text-muted-foreground')}
+                                                >
+                                                    {data.class_year ? data.class_year : 'Pilih tahun'}
+                                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-[200px] p-0" align="start">
+                                                <Command>
+                                                    <CommandInput placeholder="Cari tahun..." />
+                                                    <CommandEmpty>Tahun tidak ditemukan.</CommandEmpty>
+                                                    <CommandGroup style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                                        {years.map((year) => (
+                                                            <CommandItem
+                                                                key={year}
+                                                                value={year}
+                                                                onSelect={(currentValue) => {
+                                                                    setData('class_year', currentValue === data.class_year ? '' : currentValue);
+                                                                    setOpenClassYearCombobox(false);
+                                                                }}
+                                                            >
+                                                                <Check
+                                                                    className={cn(
+                                                                        'mr-2 h-4 w-4',
+                                                                        data.class_year === year ? 'opacity-100' : 'opacity-0',
+                                                                    )}
+                                                                />
+                                                                {year}
+                                                            </CommandItem>
+                                                        ))}
+                                                    </CommandGroup>
+                                                </Command>
+                                            </PopoverContent>
+                                        </Popover>
                                         <InputError message={errors.class_year} />
                                     </div>
                                 </div>

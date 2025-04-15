@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { Lecturer, Role, User } from '@/types/user';
 import { router, useForm } from '@inertiajs/react';
 import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 import { CalendarIcon, Check, ChevronsUpDown } from 'lucide-react';
 import * as React from 'react';
 import { FormEventHandler } from 'react';
@@ -24,11 +25,17 @@ interface Props {
     mode: 'create' | 'edit';
 }
 
+// Generate year options for the combobox
+const currentYear = new Date().getFullYear();
+const years = Array.from({ length: currentYear - 1970 + 1 }, (_, i) => (currentYear - i).toString()); // currentYear down to 1970
+
 export default function UserForm({ roles, user, lecturers, mode }: Props) {
     const [activeTab, setActiveTab] = React.useState('user');
     const [openCombobox, setOpenCombobox] = React.useState(false);
+    const [openTeachingYearCombobox, setOpenTeachingYearCombobox] = React.useState(false);
+    const [openClassYearCombobox, setOpenClassYearCombobox] = React.useState(false);
 
-    const { data, setData, post, put, errors, processing } = useForm({
+    const { data, setData, post, errors, processing } = useForm({
         name: user?.name || '',
         email: user?.email || '',
         password: '',
@@ -49,11 +56,11 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
         expertise: user?.dosen_profile?.expertise || '',
         last_education: user?.dosen_profile?.last_education || '',
         academic_position: user?.dosen_profile?.academic_position || '',
-        teaching_start_year: user?.dosen_profile?.teaching_start_year || '',
+        teaching_start_year: user?.dosen_profile?.teaching_start_year?.toString() || '',
         // Mahasiswa Profile
         student_number: user?.mahasiswa_profile?.student_number || '',
         study_program: user?.mahasiswa_profile?.study_program || '',
-        class_year: user?.mahasiswa_profile?.class_year || '',
+        class_year: user?.mahasiswa_profile?.class_year?.toString() || '',
         academic_status: user?.mahasiswa_profile?.academic_status || 'Aktif',
         semester: user?.mahasiswa_profile?.semester || '',
         advisor_id: user?.mahasiswa_profile?.advisor_id || '',
@@ -65,44 +72,33 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
     const onSubmit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        // Convert numeric fields based on role
-        if (selectedRole === 'dosen') {
-            if (data.teaching_start_year) {
-                setData('teaching_start_year', parseInt(data.teaching_start_year.toString()) || 0);
-            }
-        }
+        // Prepare payload with a general record type using 'any'
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const payload: Record<string, any> = { ...data };
 
         if (selectedRole === 'mahasiswa') {
-            if (data.class_year) {
-                setData('class_year', parseInt(data.class_year.toString()) || 0);
-            }
-            if (data.semester) {
-                setData('semester', parseInt(data.semester.toString()) || 0);
-            }
-            if (data.gpa) {
-                setData('gpa', parseFloat(data.gpa.toString()) || 0);
-            }
-            if (data.advisor_id) {
-                setData('advisor_id', parseInt(data.advisor_id.toString()) || 0);
-            }
+            payload.semester = data.semester ? parseInt(data.semester.toString(), 10) || null : null;
+            payload.gpa = data.gpa ? parseFloat(data.gpa.toString()) || null : null;
+            payload.advisor_id = data.advisor_id ? parseInt(data.advisor_id.toString(), 10) || null : null;
         }
 
-        // Submit the form
+        // Use payload in post/put calls
         if (mode === 'create') {
-            post(route('admin.users.store'));
+            post(route('admin.users.store'), payload);
         } else {
-            put(route('admin.users.update', user?.id));
+            router.put(route('admin.users.update', user?.id), payload, {
+                preserveScroll: true,
+                preserveState: true,
+            });
         }
     };
 
     const onRoleChange = (value: string) => {
         setData('roles', [value]);
-        // Reset to user tab when role changes
         setActiveTab('user');
     };
 
     const onTabChange = (value: string) => {
-        // Only allow changing to profile tab if role is selected
         if (value === 'profile' && !selectedRole && mode === 'create') {
             return;
         }
@@ -111,7 +107,6 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
 
     return (
         <form onSubmit={onSubmit}>
-            {/* Progress bar */}
             <Progress value={activeTab === 'user' ? 50 : 100} className="mb-4" />
 
             <Tabs value={activeTab} className="w-full" onValueChange={onTabChange}>
@@ -129,7 +124,6 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
                 <TabsContent value="user">
                     <Card>
                         <CardContent className="space-y-4 pt-6">
-                            {/* Role Selection - Only shown on create */}
                             {mode === 'create' && (
                                 <div className="space-y-2">
                                     <Label htmlFor="role">Role</Label>
@@ -152,20 +146,29 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
                                 </div>
                             )}
 
-                            {/* Basic User Info */}
                             <div className="space-y-2">
                                 <Label htmlFor="name">Nama</Label>
-                                <Input id="name" value={data.name} onChange={(e) => setData('name', e.target.value)} />
+                                <Input
+                                    id="name"
+                                    value={data.name}
+                                    onChange={(e) => setData('name', e.target.value)}
+                                    placeholder="Masukkan nama lengkap"
+                                />
                                 <InputError message={errors.name} />
                             </div>
 
                             <div className="space-y-2">
                                 <Label htmlFor="email">Email</Label>
-                                <Input id="email" type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} />
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    value={data.email}
+                                    onChange={(e) => setData('email', e.target.value)}
+                                    placeholder="Masukkan alamat email"
+                                />
                                 <InputError message={errors.email} />
                             </div>
 
-                            {/* Password fields - Required on create, optional on edit */}
                             {(mode === 'create' || data.password) && (
                                 <>
                                     <div className="space-y-2">
@@ -175,6 +178,7 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
                                             type="password"
                                             value={data.password}
                                             onChange={(e) => setData('password', e.target.value)}
+                                            placeholder={mode === 'create' ? 'Masukkan password' : 'Kosongkan jika tidak ingin mengubah'}
                                         />
                                         <InputError message={errors.password} />
                                     </div>
@@ -186,6 +190,7 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
                                             type="password"
                                             value={data.password_confirmation}
                                             onChange={(e) => setData('password_confirmation', e.target.value)}
+                                            placeholder="Konfirmasi password baru"
                                         />
                                     </div>
                                 </>
@@ -197,22 +202,36 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
                 <TabsContent value="profile">
                     <Card>
                         <CardContent className="space-y-4 pt-6">
-                            {/* Admin Profile Fields */}
                             {selectedRole === 'admin' && (
                                 <>
                                     <div className="space-y-2">
                                         <Label htmlFor="employee_id">ID Karyawan</Label>
-                                        <Input id="employee_id" value={data.employee_id} onChange={(e) => setData('employee_id', e.target.value)} />
+                                        <Input
+                                            id="employee_id"
+                                            value={data.employee_id}
+                                            onChange={(e) => setData('employee_id', e.target.value)}
+                                            placeholder="Masukkan ID Karyawan"
+                                        />
                                         <InputError message={errors.employee_id} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="department">Departemen</Label>
-                                        <Input id="department" value={data.department} onChange={(e) => setData('department', e.target.value)} />
+                                        <Input
+                                            id="department"
+                                            value={data.department}
+                                            onChange={(e) => setData('department', e.target.value)}
+                                            placeholder="Masukkan departemen"
+                                        />
                                         <InputError message={errors.department} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="position">Posisi</Label>
-                                        <Input id="position" value={data.position} onChange={(e) => setData('position', e.target.value)} />
+                                        <Input
+                                            id="position"
+                                            value={data.position}
+                                            onChange={(e) => setData('position', e.target.value)}
+                                            placeholder="Masukkan posisi"
+                                        />
                                         <InputError message={errors.position} />
                                     </div>
                                     <div className="space-y-2">
@@ -241,15 +260,20 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
                                                     )}
                                                 >
                                                     <CalendarIcon className="mr-2 h-4 w-4" />
-                                                    {data.join_date ? format(new Date(data.join_date), 'PPP') : <span>Pilih tanggal</span>}
+                                                    {data.join_date ? (
+                                                        format(new Date(data.join_date), 'PPP', { locale: id })
+                                                    ) : (
+                                                        <span>Pilih tanggal</span>
+                                                    )}
                                                 </Button>
                                             </PopoverTrigger>
                                             <PopoverContent className="w-auto p-0" align="start">
                                                 <Calendar
                                                     mode="single"
                                                     selected={data.join_date ? new Date(data.join_date) : undefined}
-                                                    onSelect={(date) => setData('join_date', date ? date.toISOString().split('T')[0] : '')}
+                                                    onSelect={(date) => setData('join_date', date ? format(date, 'yyyy-MM-dd') : '')}
                                                     initialFocus
+                                                    locale={id}
                                                 />
                                             </PopoverContent>
                                         </Popover>
@@ -261,12 +285,18 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
                                             id="phone_number"
                                             value={data.phone_number}
                                             onChange={(e) => setData('phone_number', e.target.value)}
+                                            placeholder="Masukkan nomor telepon"
                                         />
                                         <InputError message={errors.phone_number} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="address">Alamat</Label>
-                                        <Input id="address" value={data.address} onChange={(e) => setData('address', e.target.value)} />
+                                        <Input
+                                            id="address"
+                                            value={data.address}
+                                            onChange={(e) => setData('address', e.target.value)}
+                                            placeholder="Masukkan alamat"
+                                        />
                                         <InputError message={errors.address} />
                                     </div>
                                     <div className="space-y-2">
@@ -275,6 +305,7 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
                                             id="supervisor_name"
                                             value={data.supervisor_name}
                                             onChange={(e) => setData('supervisor_name', e.target.value)}
+                                            placeholder="Masukkan nama supervisor"
                                         />
                                         <InputError message={errors.supervisor_name} />
                                     </div>
@@ -284,13 +315,13 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
                                             id="work_location"
                                             value={data.work_location}
                                             onChange={(e) => setData('work_location', e.target.value)}
+                                            placeholder="Masukkan lokasi kerja"
                                         />
                                         <InputError message={errors.work_location} />
                                     </div>
                                 </>
                             )}
 
-                            {/* Dosen Profile Fields */}
                             {selectedRole === 'dosen' && (
                                 <>
                                     <div className="space-y-2">
@@ -299,12 +330,18 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
                                             id="employee_number"
                                             value={data.employee_number}
                                             onChange={(e) => setData('employee_number', e.target.value)}
+                                            placeholder="Masukkan NIP"
                                         />
                                         <InputError message={errors.employee_number} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="expertise">Keahlian</Label>
-                                        <Input id="expertise" value={data.expertise} onChange={(e) => setData('expertise', e.target.value)} />
+                                        <Input
+                                            id="expertise"
+                                            value={data.expertise}
+                                            onChange={(e) => setData('expertise', e.target.value)}
+                                            placeholder="Masukkan bidang keahlian"
+                                        />
                                         <InputError message={errors.expertise} />
                                     </div>
                                     <div className="space-y-2">
@@ -313,6 +350,7 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
                                             id="last_education"
                                             value={data.last_education}
                                             onChange={(e) => setData('last_education', e.target.value)}
+                                            placeholder="Contoh: S2 Teknik Informatika"
                                         />
                                         <InputError message={errors.last_education} />
                                     </div>
@@ -322,6 +360,7 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
                                             id="academic_position"
                                             value={data.academic_position}
                                             onChange={(e) => setData('academic_position', e.target.value)}
+                                            placeholder="Contoh: Lektor Kepala"
                                         />
                                         <InputError message={errors.academic_position} />
                                     </div>
@@ -340,29 +379,46 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="teaching_start_year">Tahun Mulai Mengajar</Label>
-                                        <Popover>
+                                        <Popover open={openTeachingYearCombobox} onOpenChange={setOpenTeachingYearCombobox}>
                                             <PopoverTrigger asChild>
                                                 <Button
-                                                    variant={'outline'}
-                                                    className={cn(
-                                                        'w-full justify-start text-left font-normal',
-                                                        !data.teaching_start_year && 'text-muted-foreground',
-                                                    )}
+                                                    variant="outline"
+                                                    role="combobox"
+                                                    aria-expanded={openTeachingYearCombobox}
+                                                    className={cn('w-full justify-between', !data.teaching_start_year && 'text-muted-foreground')}
                                                 >
-                                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                                    {data.teaching_start_year || <span>Pilih tahun</span>}
+                                                    {data.teaching_start_year ? data.teaching_start_year : 'Pilih tahun'}
+                                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                 </Button>
                                             </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-0" align="start">
-                                                <Calendar
-                                                    mode="single"
-                                                    captionLayout="dropdown-buttons"
-                                                    selected={data.teaching_start_year ? new Date(Number(data.teaching_start_year), 0) : undefined}
-                                                    onSelect={(date) => setData('teaching_start_year', date ? date.getFullYear() : '')}
-                                                    fromYear={1950}
-                                                    toYear={new Date().getFullYear()}
-                                                    initialFocus
-                                                />
+                                            <PopoverContent className="w-[200px] p-0" align="start">
+                                                <Command>
+                                                    <CommandInput placeholder="Cari tahun..." />
+                                                    <CommandEmpty>Tahun tidak ditemukan.</CommandEmpty>
+                                                    <CommandGroup style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                                        {years.map((year) => (
+                                                            <CommandItem
+                                                                key={year}
+                                                                value={year}
+                                                                onSelect={(currentValue) => {
+                                                                    setData(
+                                                                        'teaching_start_year',
+                                                                        currentValue === data.teaching_start_year ? '' : currentValue,
+                                                                    );
+                                                                    setOpenTeachingYearCombobox(false);
+                                                                }}
+                                                            >
+                                                                <Check
+                                                                    className={cn(
+                                                                        'mr-2 h-4 w-4',
+                                                                        data.teaching_start_year === year ? 'opacity-100' : 'opacity-0',
+                                                                    )}
+                                                                />
+                                                                {year}
+                                                            </CommandItem>
+                                                        ))}
+                                                    </CommandGroup>
+                                                </Command>
                                             </PopoverContent>
                                         </Popover>
                                         <InputError message={errors.teaching_start_year} />
@@ -370,7 +426,6 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
                                 </>
                             )}
 
-                            {/* Mahasiswa Profile Fields */}
                             {selectedRole === 'mahasiswa' && (
                                 <>
                                     <div className="space-y-2">
@@ -379,6 +434,7 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
                                             id="student_number"
                                             value={data.student_number}
                                             onChange={(e) => setData('student_number', e.target.value)}
+                                            placeholder="Masukkan NIM"
                                         />
                                         <InputError message={errors.student_number} />
                                     </div>
@@ -443,34 +499,49 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
                                             id="study_program"
                                             value={data.study_program}
                                             onChange={(e) => setData('study_program', e.target.value)}
+                                            placeholder="Masukkan program studi"
                                         />
                                         <InputError message={errors.study_program} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="class_year">Tahun Angkatan</Label>
-                                        <Popover>
+                                        <Popover open={openClassYearCombobox} onOpenChange={setOpenClassYearCombobox}>
                                             <PopoverTrigger asChild>
                                                 <Button
-                                                    variant={'outline'}
-                                                    className={cn(
-                                                        'w-full justify-start text-left font-normal',
-                                                        !data.class_year && 'text-muted-foreground',
-                                                    )}
+                                                    variant="outline"
+                                                    role="combobox"
+                                                    aria-expanded={openClassYearCombobox}
+                                                    className={cn('w-full justify-between', !data.class_year && 'text-muted-foreground')}
                                                 >
-                                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                                    {data.class_year || <span>Pilih tahun</span>}
+                                                    {data.class_year ? data.class_year : 'Pilih tahun'}
+                                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                 </Button>
                                             </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-0" align="start">
-                                                <Calendar
-                                                    mode="single"
-                                                    captionLayout="dropdown-buttons"
-                                                    selected={data.class_year ? new Date(Number(data.class_year), 0) : undefined}
-                                                    onSelect={(date) => setData('class_year', date ? date.getFullYear() : '')}
-                                                    fromYear={2000}
-                                                    toYear={new Date().getFullYear()}
-                                                    initialFocus
-                                                />
+                                            <PopoverContent className="w-[200px] p-0" align="start">
+                                                <Command>
+                                                    <CommandInput placeholder="Cari tahun..." />
+                                                    <CommandEmpty>Tahun tidak ditemukan.</CommandEmpty>
+                                                    <CommandGroup style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                                        {years.map((year) => (
+                                                            <CommandItem
+                                                                key={year}
+                                                                value={year}
+                                                                onSelect={(currentValue) => {
+                                                                    setData('class_year', currentValue === data.class_year ? '' : currentValue);
+                                                                    setOpenClassYearCombobox(false);
+                                                                }}
+                                                            >
+                                                                <Check
+                                                                    className={cn(
+                                                                        'mr-2 h-4 w-4',
+                                                                        data.class_year === year ? 'opacity-100' : 'opacity-0',
+                                                                    )}
+                                                                />
+                                                                {year}
+                                                            </CommandItem>
+                                                        ))}
+                                                    </CommandGroup>
+                                                </Command>
                                             </PopoverContent>
                                         </Popover>
                                         <InputError message={errors.class_year} />
@@ -498,6 +569,7 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
                                             max="14"
                                             value={data.semester}
                                             onChange={(e) => setData('semester', e.target.value)}
+                                            placeholder="Masukkan semester saat ini (1-14)"
                                         />
                                         <InputError message={errors.semester} />
                                     </div>
@@ -511,6 +583,7 @@ export default function UserForm({ roles, user, lecturers, mode }: Props) {
                                             max="4"
                                             value={data.gpa}
                                             onChange={(e) => setData('gpa', e.target.value)}
+                                            placeholder="Masukkan IPK (0.00 - 4.00)"
                                         />
                                         <InputError message={errors.gpa} />
                                     </div>

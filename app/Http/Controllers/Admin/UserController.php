@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\User\StoreRequest;
+use App\Http\Requests\Admin\User\UpdateRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -114,14 +115,14 @@ class UserController extends Controller
                         'last_education' => $request->last_education,
                         'academic_position' => $request->academic_position,
                         'employment_status' => $request->employment_status,
-                        'teaching_start_year' => $request->teaching_start_year,
+                        'teaching_start_year' => (int) $request->teaching_start_year,
                     ]);
                     break;
                 case 'mahasiswa':
                     $user->mahasiswaProfile()->create([
                         'student_number' => $request->student_number,
                         'study_program' => $request->study_program,
-                        'class_year' => $request->class_year,
+                        'class_year' => (int) $request->class_year,
                         'academic_status' => $request->academic_status,
                         'semester' => $request->semester,
                         'advisor_id' => $request->advisor_id,
@@ -162,7 +163,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function update(Request $request, User $user)
+    public function update(UpdateRequest $request, User $user)
     {
         try {
             DB::beginTransaction();
@@ -219,14 +220,14 @@ class UserController extends Controller
                             'last_education' => $request->last_education,
                             'academic_position' => $request->academic_position,
                             'employment_status' => $request->employment_status,
-                            'teaching_start_year' => $request->teaching_start_year,
+                            'teaching_start_year' => (int) $request->teaching_start_year,
                         ]);
                         break;
                     case 'mahasiswa':
                         $user->mahasiswaProfile()->create([
                             'student_number' => $request->student_number,
                             'study_program' => $request->study_program,
-                            'class_year' => $request->class_year,
+                            'class_year' => (int) $request->class_year,
                             'academic_status' => $request->academic_status,
                             'semester' => $request->semester,
                             'advisor_id' => $request->advisor_id,
@@ -272,7 +273,7 @@ class UserController extends Controller
                                 'last_education' => $request->last_education,
                                 'academic_position' => $request->academic_position,
                                 'employment_status' => $request->employment_status,
-                                'teaching_start_year' => $request->teaching_start_year,
+                                'teaching_start_year' => (int) $request->teaching_start_year,
                             ]);
                         } else {
                             $user->dosenProfile()->create([
@@ -281,7 +282,7 @@ class UserController extends Controller
                                 'last_education' => $request->last_education,
                                 'academic_position' => $request->academic_position,
                                 'employment_status' => $request->employment_status,
-                                'teaching_start_year' => $request->teaching_start_year,
+                                'teaching_start_year' => (int) $request->teaching_start_year,
                             ]);
                         }
                         break;
@@ -290,7 +291,7 @@ class UserController extends Controller
                             $user->mahasiswaProfile->update([
                                 'student_number' => $request->student_number,
                                 'study_program' => $request->study_program,
-                                'class_year' => $request->class_year,
+                                'class_year' => (int) $request->class_year,
                                 'academic_status' => $request->academic_status,
                                 'semester' => $request->semester,
                                 'advisor_id' => $request->advisor_id,
@@ -300,7 +301,7 @@ class UserController extends Controller
                             $user->mahasiswaProfile()->create([
                                 'student_number' => $request->student_number,
                                 'study_program' => $request->study_program,
-                                'class_year' => $request->class_year,
+                                'class_year' => (int) $request->class_year,
                                 'academic_status' => $request->academic_status,
                                 'semester' => $request->semester,
                                 'advisor_id' => $request->advisor_id,

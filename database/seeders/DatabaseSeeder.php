@@ -98,5 +98,13 @@ class DatabaseSeeder extends Seeder
         $this->call(TutorialSeeder::class);
         $this->call(GlobalVariableSeeder::class);
         $this->call(ReportSeeder::class); // Add ReportSeeder
+
+        // Test data
+        User::factory()->create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'email_verified_at' => now(),
+            'password' => bcrypt('password'),
+        ])->assignRole('mahasiswa');
     }
 }

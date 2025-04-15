@@ -1,12 +1,17 @@
 import { Button } from '@/components/ui/button';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { DateTimePicker } from '@/components/ui/datetime-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { GuidanceClass } from '@/types/guidance-class';
 import { User } from '@/types/user';
 import { useForm } from '@inertiajs/react';
+import { id } from 'date-fns/locale';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import * as React from 'react';
 
 interface Props {
     mode: 'create' | 'edit';
@@ -15,11 +20,13 @@ interface Props {
 }
 
 export default function GuidanceClassForm({ mode, lecturers, guidanceClass }: Props) {
+    const [open, setOpen] = React.useState(false);
+
     const form = useForm({
         title: guidanceClass?.title ?? '',
         lecturer_id: guidanceClass?.lecturer.id ?? 0,
-        start_date: guidanceClass?.start_date ?? '',
-        end_date: guidanceClass?.end_date ?? '',
+        start_date: guidanceClass?.start_date ? new Date(guidanceClass.start_date) : undefined,
+        end_date: guidanceClass?.end_date ? new Date(guidanceClass.end_date) : undefined,
         room: guidanceClass?.room ?? '',
         description: guidanceClass?.description ?? '',
     });
@@ -50,40 +57,78 @@ export default function GuidanceClassForm({ mode, lecturers, guidanceClass }: Pr
 
                 <div>
                     <Label htmlFor="lecturer_id">Dosen</Label>
-                    <Select value={String(form.data.lecturer_id)} onValueChange={(value) => form.setData('lecturer_id', Number(value))}>
-                        <SelectTrigger className={cn(form.errors.lecturer_id && 'border-destructive')}>
-                            <SelectValue placeholder="Pilih dosen" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {lecturers.map((lecturer) => (
-                                <SelectItem key={lecturer.id} value={String(lecturer.id)}>
-                                    {lecturer.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant="outline"
+                                role="combobox"
+                                aria-expanded={open}
+                                className={cn(
+                                    'w-full justify-between',
+                                    !form.data.lecturer_id && 'text-muted-foreground',
+                                    form.errors.lecturer_id && 'border-destructive',
+                                )}
+                            >
+                                {form.data.lecturer_id ? lecturers.find((lecturer) => lecturer.id === form.data.lecturer_id)?.name : 'Pilih dosen...'}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                            <Command>
+                                <CommandInput placeholder="Cari dosen..." />
+                                <CommandList>
+                                    <CommandEmpty>Dosen tidak ditemukan.</CommandEmpty>
+                                    <CommandGroup>
+                                        {lecturers.map((lecturer) => (
+                                            <CommandItem
+                                                key={lecturer.id}
+                                                value={String(lecturer.id)}
+                                                onSelect={(currentValue) => {
+                                                    const selectedId = Number(currentValue);
+                                                    form.setData('lecturer_id', selectedId === form.data.lecturer_id ? 0 : selectedId);
+                                                    setOpen(false);
+                                                }}
+                                            >
+                                                <Check
+                                                    className={cn(
+                                                        'mr-2 h-4 w-4',
+                                                        form.data.lecturer_id === lecturer.id ? 'opacity-100' : 'opacity-0',
+                                                    )}
+                                                />
+                                                {lecturer.name}
+                                            </CommandItem>
+                                        ))}
+                                    </CommandGroup>
+                                </CommandList>
+                            </Command>
+                        </PopoverContent>
+                    </Popover>
                     {form.errors.lecturer_id && <p className="text-destructive mt-1 text-sm">{form.errors.lecturer_id}</p>}
                 </div>
 
                 <div>
-                    <Label htmlFor="start_date">Tanggal Mulai</Label>
-                    <Input
-                        id="start_date"
-                        type="datetime-local"
+                    <Label htmlFor="start_date">Tanggal & Waktu Mulai</Label>
+                    <DateTimePicker
+                        locale={id}
                         value={form.data.start_date}
-                        onChange={(e) => form.setData('start_date', e.target.value)}
+                        onChange={(date) => form.setData('start_date', date)}
+                        granularity="minute"
+                        hourCycle={24}
+                        placeholder="Pilih tanggal dan waktu mulai"
                         className={cn(form.errors.start_date && 'border-destructive')}
                     />
                     {form.errors.start_date && <p className="text-destructive mt-1 text-sm">{form.errors.start_date}</p>}
                 </div>
 
                 <div>
-                    <Label htmlFor="end_date">Tanggal Selesai</Label>
-                    <Input
-                        id="end_date"
-                        type="datetime-local"
+                    <Label htmlFor="end_date">Tanggal & Waktu Selesai</Label>
+                    <DateTimePicker
+                        locale={id}
                         value={form.data.end_date}
-                        onChange={(e) => form.setData('end_date', e.target.value)}
+                        onChange={(date) => form.setData('end_date', date)}
+                        granularity="minute"
+                        hourCycle={24}
+                        placeholder="Pilih tanggal dan waktu selesai"
                         className={cn(form.errors.end_date && 'border-destructive')}
                     />
                     {form.errors.end_date && <p className="text-destructive mt-1 text-sm">{form.errors.end_date}</p>}
@@ -114,6 +159,9 @@ export default function GuidanceClassForm({ mode, lecturers, guidanceClass }: Pr
             </div>
 
             <div className="flex justify-end gap-4">
+                <Button type="button" variant="outline" onClick={() => window.history.back()}>
+                    Batal
+                </Button>
                 <Button type="submit" disabled={form.processing}>
                     {mode === 'create' ? 'Buat Kelas' : 'Simpan Perubahan'}
                 </Button>

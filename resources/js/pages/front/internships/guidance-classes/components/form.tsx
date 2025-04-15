@@ -1,10 +1,13 @@
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
+import { DateTimePicker } from '@/components/ui/datetime-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { GuidanceClass } from '@/types/guidance-class';
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 import { FormEventHandler } from 'react';
 
 interface Props {
@@ -13,10 +16,10 @@ interface Props {
 }
 
 export default function GuidanceClassForm({ mode, guidanceClass }: Props) {
-    const { data, setData, post, put, errors, processing } = useForm({
+    const { data, setData, errors, processing, reset } = useForm({
         title: guidanceClass?.title ?? '',
-        start_date: guidanceClass?.start_date ?? '',
-        end_date: guidanceClass?.end_date ?? '',
+        start_date: guidanceClass?.start_date ? new Date(guidanceClass.start_date) : undefined,
+        end_date: guidanceClass?.end_date ? new Date(guidanceClass.end_date) : undefined,
         room: guidanceClass?.room ?? '',
         description: guidanceClass?.description ?? '',
     });
@@ -24,10 +27,21 @@ export default function GuidanceClassForm({ mode, guidanceClass }: Props) {
     const onSubmit: FormEventHandler = (e) => {
         e.preventDefault();
 
+        const payload = {
+            ...data,
+            start_date: data.start_date ? format(data.start_date, 'yyyy-MM-dd HH:mm:ss') : null,
+            end_date: data.end_date ? format(data.end_date, 'yyyy-MM-dd HH:mm:ss') : null,
+        };
+
+        const options = {
+            preserveScroll: true,
+            onSuccess: () => reset(),
+        };
+
         if (mode === 'create') {
-            post(route('front.internships.guidance-classes.store'));
+            router.post(route('front.internships.guidance-classes.store'), payload, options);
         } else if (guidanceClass) {
-            put(route('front.internships.guidance-classes.update', guidanceClass.id));
+            router.put(route('front.internships.guidance-classes.update', guidanceClass.id), payload, options);
         }
     };
 
@@ -49,11 +63,13 @@ export default function GuidanceClassForm({ mode, guidanceClass }: Props) {
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div>
                         <Label htmlFor="start_date">Tanggal Mulai</Label>
-                        <Input
-                            id="start_date"
-                            type="datetime-local"
+                        <DateTimePicker
+                            locale={id}
                             value={data.start_date}
-                            onChange={(e) => setData('start_date', e.target.value)}
+                            onChange={(date) => setData('start_date', date)}
+                            granularity="minute"
+                            hourCycle={24}
+                            placeholder="Pilih tanggal mulai"
                             className={errors.start_date ? 'border-destructive' : ''}
                         />
                         <InputError message={errors.start_date} />
@@ -61,11 +77,13 @@ export default function GuidanceClassForm({ mode, guidanceClass }: Props) {
 
                     <div>
                         <Label htmlFor="end_date">Tanggal Selesai (Opsional)</Label>
-                        <Input
-                            id="end_date"
-                            type="datetime-local"
+                        <DateTimePicker
+                            locale={id}
                             value={data.end_date}
-                            onChange={(e) => setData('end_date', e.target.value)}
+                            onChange={(date) => setData('end_date', date)}
+                            granularity="minute"
+                            hourCycle={24}
+                            placeholder="Pilih tanggal selesai"
                             className={errors.end_date ? 'border-destructive' : ''}
                         />
                         <InputError message={errors.end_date} />

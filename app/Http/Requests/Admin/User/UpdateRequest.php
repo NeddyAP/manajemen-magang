@@ -46,13 +46,13 @@ class UpdateRequest extends FormRequest
                 'last_education' => ['required', 'string', 'max:255'],
                 'academic_position' => ['required', 'string', 'max:255'],
                 'employment_status' => ['required', 'string', Rule::in(['PNS', 'Non-PNS'])],
-                'teaching_start_year' => ['required', 'integer', 'min:1900', 'max:'.date('Y')],
+                'teaching_start_year' => ['required', 'integer', 'min:1970', 'max:'.date('Y')],
             ]);
         } elseif ($selectedRole === 'mahasiswa') {
             $rules = array_merge($rules, [
                 'student_number' => ['required', 'string', 'max:255', Rule::unique('mahasiswa_profiles')->ignore($this->user->id, 'user_id')],
                 'study_program' => ['required', 'string', 'max:255'],
-                'class_year' => ['required', 'integer', 'min:1900', 'max:'.(date('Y') + 4)],
+                'class_year' => ['required', 'integer', 'min:1970', 'max:'.date('Y')],
                 'academic_status' => ['required', 'string', Rule::in(['Aktif', 'Cuti', 'Lulus'])],
                 'semester' => ['required', 'integer', 'min:1', 'max:14'],
                 'advisor_id' => ['nullable', 'exists:users,id'],
@@ -139,9 +139,9 @@ class UpdateRequest extends FormRequest
                 'employment_status.string' => 'Status Kepegawaian harus berupa string.',
                 'employment_status.in' => 'Status Kepegawaian tidak valid.',
                 'teaching_start_year.required' => 'Tahun Mulai Mengajar harus diisi.',
-                'teaching_start_year.integer' => 'Tahun Mulai Mengajar harus berupa integer.',
-                'teaching_start_year.min' => 'Tahun Mulai Mengajar minimal 1900.',
-                'teaching_start_year.max' => 'Tahun Mulai Mengajar tidak valid.',
+                'teaching_start_year.integer' => 'Tahun Mulai Mengajar harus berupa angka tahun.',
+                'teaching_start_year.min' => 'Tahun Mulai Mengajar minimal 1970.',
+                'teaching_start_year.max' => 'Tahun Mulai Mengajar tidak boleh melebihi tahun ini.',
             ]);
         } elseif ($selectedRole === 'mahasiswa') {
             $messages = array_merge($messages, [
@@ -153,9 +153,9 @@ class UpdateRequest extends FormRequest
                 'study_program.string' => 'Program Studi harus berupa string.',
                 'study_program.max' => 'Program Studi maksimal 255 karakter.',
                 'class_year.required' => 'Tahun Angkatan harus diisi.',
-                'class_year.integer' => 'Tahun Angkatan harus berupa integer.',
-                'class_year.min' => 'Tahun Angkatan minimal 1900.',
-                'class_year.max' => 'Tahun Angkatan tidak valid.',
+                'class_year.integer' => 'Tahun Angkatan harus berupa angka tahun.',
+                'class_year.min' => 'Tahun Angkatan minimal 1970.',
+                'class_year.max' => 'Tahun Angkatan tidak boleh melebihi tahun ini.',
                 'academic_status.required' => 'Status Akademik harus diisi.',
                 'academic_status.string' => 'Status Akademik harus berupa string.',
                 'academic_status.in' => 'Status Akademik tidak valid.',
