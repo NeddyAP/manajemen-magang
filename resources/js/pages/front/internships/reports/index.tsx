@@ -1,9 +1,10 @@
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
-import FrontLayout from '@/layouts/front-layout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'; // Import Card components
+import FrontLayout from '@/layouts/front-layout'; // Ensure FrontLayout is imported
 import { TableMeta, type BreadcrumbItem } from '@/types';
-import { type Internship, type Report } from '@/types/internship';
-import { Head, Link, router } from '@inertiajs/react';
+import { type Internship, type Report, type ReportStats } from '@/types/internship'; // Import ReportStats
+import { Head, Link, router } from '@inertiajs/react'; // Correct inertia import
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { Plus } from 'lucide-react';
@@ -22,17 +23,18 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
     {
         title: 'Detail Laporan',
-        href: '#',
+        href: '#', // Keep as # or update if a specific route exists
     },
 ];
 
 interface PageProps {
     internship: Internship;
     reports: Report[];
+    reportStats: ReportStats; // Add reportStats prop
     meta: TableMeta;
 }
 
-export default function ReportsIndex({ internship, reports, meta }: PageProps) {
+export default function ReportsIndex({ internship, reports, reportStats, meta }: PageProps) {
     const [selectedStatus, setSelectedStatus] = useState<string>('');
 
     useEffect(() => {
@@ -46,7 +48,8 @@ export default function ReportsIndex({ internship, reports, meta }: PageProps) {
     const handleStatusChange = (status: string) => {
         setSelectedStatus(status);
         const query = status ? { status } : {};
-        router.get(`/internships/reports/${internship.id}`, query, {
+        // Use route helper if available, otherwise keep string path
+        router.get(route('front.internships.reports.index', internship.id), query, {
             preserveState: true,
             preserveScroll: true,
             replace: true,
@@ -80,6 +83,43 @@ export default function ReportsIndex({ internship, reports, meta }: PageProps) {
                             </Button>
                         </div>
 
+                        {/* Analytics Cards */}
+                        <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">Total Laporan</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">{reportStats.total ?? 0}</div>
+                                </CardContent>
+                            </Card>
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">Menunggu Review</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">{reportStats.pending ?? 0}</div>
+                                </CardContent>
+                            </Card>
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">Disetujui</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">{reportStats.approved ?? 0}</div>
+                                </CardContent>
+                            </Card>
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">Ditolak</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">{reportStats.rejected ?? 0}</div>
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        {/* Data Table */}
                         <DataTable
                             meta={meta}
                             columns={columns}

@@ -1,9 +1,9 @@
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'; // Import Card components
 import FrontLayout from '@/layouts/front-layout';
 import { TableMeta, type BreadcrumbItem } from '@/types';
-import { Internship } from '@/types/internship';
+import { Internship, InternshipStats } from '@/types/internship'; // Import InternshipStats
 import { Head, Link, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -23,10 +23,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface InternshipsProps {
     internships: Internship[];
+    stats: InternshipStats; // Add stats prop
     meta: TableMeta;
 }
 
-export default function Applicants({ internships, meta }: InternshipsProps) {
+export default function Applicants({ internships, stats, meta }: InternshipsProps) {
     const [selectedStatus, setSelectedStatus] = useState<string>('');
     const [selectedType, setSelectedType] = useState<string>('');
 
@@ -79,16 +80,45 @@ export default function Applicants({ internships, meta }: InternshipsProps) {
             <Head title="Permohonan Magang" />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="container mx-auto max-w-7xl">
-                    <div className="grid auto-rows-min gap-4 md:grid-cols-2">
-                        <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">
-                            <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                        </div>
-                        <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">
-                            <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                        </div>
+                    {/* Analytics Cards */}
+                    <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Total Aplikasi</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{stats.total ?? 0}</div>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Menunggu</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{stats.waiting ?? 0}</div>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Diterima</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{stats.accepted ?? 0}</div>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Ditolak</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{stats.rejected ?? 0}</div>
+                            </CardContent>
+                        </Card>
                     </div>
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 overflow-hidden rounded-xl md:min-h-min">
-                        <div className="mt-5 mb-4 flex items-center justify-between">
+
+                    {/* Data Table Section */}
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[60vh] flex-1 overflow-hidden rounded-xl border p-4 md:min-h-min">
+                        <div className="mb-4 flex items-center justify-between">
                             <div className="flex gap-2">
                                 <StatusFilter value={selectedStatus} onChange={handleStatusChange} />
                                 <TypeFilter value={selectedType} onChange={handleTypeChange} />

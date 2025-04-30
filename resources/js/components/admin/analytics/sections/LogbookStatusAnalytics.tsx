@@ -73,14 +73,22 @@ const LogbookStatusAnalytics: React.FC = () => {
                         {Object.entries(stats.by_status).map(([status, count]) => (
                             <div key={status} className="flex items-center justify-between">
                                 <Badge variant={getBadgeVariant(status as keyof LogbookStatusCounts)} className="capitalize">
-                                    {status === 'pending' ? 'Menunggu' : status === 'approved' ? 'Disetujui' : status === 'rejected' ? 'Ditolak' : status}
+                                    {status === 'pending'
+                                        ? 'Menunggu'
+                                        : status === 'approved'
+                                          ? 'Disetujui'
+                                          : status === 'rejected'
+                                            ? 'Ditolak'
+                                            : status}
                                 </Badge>
                                 <span className="font-medium">{count}</span>
                             </div>
                         ))}
                     </div>
                 )}
-                {!loading && !error && (!stats || !stats.by_status) && <p className="text-muted-foreground text-sm">Tidak ada data status tersedia.</p>}
+                {!loading && !error && (!stats || !stats.by_status) && (
+                    <p className="text-muted-foreground text-sm">Tidak ada data status tersedia.</p>
+                )}
             </CardContent>
         </Card>
     );

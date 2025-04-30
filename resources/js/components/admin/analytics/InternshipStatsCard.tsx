@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
@@ -35,15 +34,14 @@ const TYPE_NAMES_ID: { [key: string]: string } = {
 
 interface InternshipStatsData {
     total_internships: number;
-    by_status: { [key: string]: number };  // Changed to object structure
-    by_type: { [key: string]: number };    // Changed to object structure
+    by_status: { [key: string]: number }; // Changed to object structure
+    by_type: { [key: string]: number }; // Changed to object structure
 }
 
 export function InternshipStatsCard() {
     const [stats, setStats] = useState<InternshipStatsData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const { props: _props } = usePage(); // Access shared props if needed, e.g., for auth token - Prefixed to fix lint error
 
     useEffect(() => {
         setLoading(true);
@@ -127,14 +125,7 @@ export function InternshipStatsCard() {
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={prepareTypeDataForChart()} margin={{ top: 5, right: 5, left: 0, bottom: 25 }}>
                                     <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis
-                                        dataKey="displayName"
-                                        fontSize={10}
-                                        interval={0}
-                                        angle={-45}
-                                        textAnchor="end"
-                                        height={40}
-                                    />
+                                    <XAxis dataKey="displayName" fontSize={10} interval={0} angle={-45} textAnchor="end" height={40} />
                                     <YAxis allowDecimals={false} width={25} fontSize={10} />
                                     <Tooltip formatter={(value: number) => [`${value} magang`, null]} /> {/* Translated tooltip */}
                                     {/* <Legend /> */}

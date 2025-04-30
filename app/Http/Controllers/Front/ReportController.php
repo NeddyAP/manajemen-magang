@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Internship;
 use App\Models\Report; // Use Report model
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; // Add DB facade
 use Illuminate\Support\Facades\Storage; // For file handling
 
 class ReportController extends Controller
@@ -50,13 +51,27 @@ class ReportController extends Controller
             $query->latest();
         }
 
+        // Clone query for analytics before pagination/filtering
+        $analyticsQuery = $internship->reports();
+
         // Paginate the results
         $perPage = $request->per_page ?? 10;
         $reports = $query->paginate($perPage)->withQueryString();
 
+        // Calculate analytics for the specific internship
+        $reportStats = $analyticsQuery
+            ->select(
+                DB::raw('count(*) as total'),
+                DB::raw("sum(case when status = 'pending' then 1 else 0 end) as pending"),
+                DB::raw("sum(case when status = 'approved' then 1 else 0 end) as approved"),
+                DB::raw("sum(case when status = 'rejected' then 1 else 0 end) as rejected")
+            )
+            ->first();
+
         return inertia('front/internships/reports/index', [
             'internship' => $internship,
             'reports' => $reports->items(),
+            'reportStats' => $reportStats, // Pass stats to the view
             'meta' => [
                 'total' => $reports->total(),
                 'per_page' => $reports->perPage(),

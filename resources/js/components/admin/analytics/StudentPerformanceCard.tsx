@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Legend, PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ResponsiveContainer, Tooltip } from 'recharts';
@@ -14,7 +13,6 @@ export function StudentPerformanceCard() {
     const [performance, setPerformance] = useState<StudentPerformanceData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const { props: _props } = usePage(); // Prefixed to fix lint error
 
     useEffect(() => {
         setLoading(true);

@@ -8,6 +8,7 @@ use App\Models\GuidanceClassAttendance;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB; // Add DB facade
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -56,6 +57,9 @@ class GuidanceClassController extends Controller
         } else {
             $query = GuidanceClass::where('id', 0); // Empty query
         }
+
+        // Clone the base query for analytics before applying filters/search
+        $analyticsQuery = clone $query;
 
         // Handle search
         if ($request->has('search')) {
@@ -106,12 +110,24 @@ class GuidanceClassController extends Controller
             $query->latest();
         }
 
-        // Paginate the results
+        // Calculate analytics using the cloned query
+        $now = now();
+        $guidanceClassStats = $analyticsQuery
+            ->select(
+                DB::raw('count(*) as total'),
+                DB::raw("sum(case when start_date > '{$now}' then 1 else 0 end) as upcoming"),
+                DB::raw("sum(case when start_date <= '{$now}' and (end_date is null or end_date >= '{$now}') then 1 else 0 end) as ongoing"),
+                DB::raw("sum(case when end_date is not null and end_date < '{$now}' then 1 else 0 end) as finished")
+            )
+            ->first();
+
+        // Paginate the results (using the potentially filtered/searched query)
         $perPage = $request->input('per_page', 10);
         $classes = $query->paginate($perPage)->withQueryString();
 
         return Inertia::render('front/internships/guidance-classes/index', [
             'classes' => $classes->items(),
+            'guidanceClassStats' => $guidanceClassStats, // Pass stats to the view
             'meta' => [
                 'total' => $classes->total(),
                 'per_page' => $classes->perPage(),

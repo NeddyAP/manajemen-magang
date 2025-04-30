@@ -68,3 +68,31 @@ export interface Report {
     created_at?: string;
     updated_at?: string;
 }
+
+/**
+ * Represents statistics related to internships.
+ * - `total`: Total number of internships.
+ * - `waiting`: Number of internships waiting for approval.
+ * - `accepted`: Number of approved internships.
+ * - `rejected`: Number of rejected internships.
+ */
+export interface InternshipStats {
+    total: number;
+    waiting: number;
+    accepted: number;
+    rejected: number;
+}
+
+/**
+ * Represents statistics related to reports.
+ * - `total`: Total number of reports.
+ * - `pending`: Number of reports pending review.
+ * - `approved`: Number of approved reports.
+ * - `rejected`: Number of rejected reports.
+ */
+export interface ReportStats {
+    total: number;
+    pending: number;
+    approved: number;
+    rejected: number;
+}

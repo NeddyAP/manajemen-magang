@@ -93,6 +93,7 @@ This document tracks the current status, progress, and evolution of the internsh
 2. Controller logic refinements
 3. File handling optimizations
 4. Security enhancements
+5. Modified front-end controllers (`InternshipApplicantController`, `LogbookController`, `ReportController`, `GuidanceClassController`, `InternshipController`) to calculate and pass aggregate statistics (counts, status breakdowns) to their respective index views.
 
 ### Frontend Changes
 
@@ -100,6 +101,7 @@ This document tracks the current status, progress, and evolution of the internsh
 2. Form validation improvements
 3. TypeScript type definitions
 4. Layout system implementation
+5. Added analytics cards/badges to front-end internship index pages (applicants, logbooks, reports, guidance classes, main hub) displaying summary statistics.
 
 ## Known Issues
 

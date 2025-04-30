@@ -51,3 +51,11 @@ export interface TableMeta {
     last_page: number;
     lecturers: User[];
 }
+
+// Define the guidance class stats type
+export interface GuidanceClassStats {
+    total: number;
+    upcoming: number;
+    ongoing: number;
+    finished: number;
+}

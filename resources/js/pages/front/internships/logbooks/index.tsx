@@ -1,5 +1,6 @@
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'; // Import Card components
 import FrontLayout from '@/layouts/front-layout';
 import { TableMeta, type BreadcrumbItem } from '@/types';
 import { Internship, Logbook } from '@/types/internship';
@@ -27,10 +28,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface PageProps {
     internship: Internship;
     logbooks: Logbook[];
+    totalLogbookCount: number; // Add totalLogbookCount prop
     meta: TableMeta;
 }
 
-export default function LogbooksIndex({ internship, logbooks, meta }: PageProps) {
+export default function LogbooksIndex({ internship, logbooks, totalLogbookCount, meta }: PageProps) {
     if (!internship.start_date || !internship.end_date || typeof internship.start_date !== 'string' || typeof internship.end_date !== 'string')
         return '-';
 
@@ -57,6 +59,19 @@ export default function LogbooksIndex({ internship, logbooks, meta }: PageProps)
                                     Tambah Logbook
                                 </Link>
                             </Button>
+                        </div>
+
+                        {/* Analytics Card */}
+                        <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">Total Entri Logbook</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">{totalLogbookCount ?? 0}</div>
+                                </CardContent>
+                            </Card>
+                            {/* Add more cards here if needed */}
                         </div>
 
                         <DataTable meta={meta} columns={columns} data={logbooks} initialColumnVisibility={initialColumnVisibility} />

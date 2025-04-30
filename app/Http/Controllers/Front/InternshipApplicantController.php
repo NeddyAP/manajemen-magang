@@ -7,6 +7,7 @@ use App\Http\Requests\StoreInternshipRequest;
 use App\Http\Requests\UpdateInternshipRequest;
 use App\Models\Internship;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; // Add DB facade
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -48,12 +49,26 @@ class InternshipApplicantController extends Controller
             $query->latest();
         }
 
+        // Clone the query for analytics before pagination
+        $analyticsQuery = clone $query;
+
         // Paginate the results
         $perPage = $request->per_page ?? 10;
         $internships = $query->paginate($perPage);
 
+        // Calculate analytics for the current user
+        $stats = $analyticsQuery
+            ->select(
+                DB::raw('count(*) as total'),
+                DB::raw("sum(case when status = 'waiting' then 1 else 0 end) as waiting"),
+                DB::raw("sum(case when status = 'accepted' then 1 else 0 end) as accepted"),
+                DB::raw("sum(case when status = 'rejected' then 1 else 0 end) as rejected")
+            )
+            ->first();
+
         return Inertia::render('front/internships/applicants/index', [
             'internships' => $internships->items(),
+            'stats' => $stats, // Pass stats to the view
             'meta' => [
                 'total' => $internships->total(),
                 'per_page' => $internships->perPage(),

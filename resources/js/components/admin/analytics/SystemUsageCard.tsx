@@ -1,6 +1,5 @@
 import { Icon } from '@/components/icon';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { BookOpen, Briefcase, Users } from 'lucide-react'; // Import specific icons
 import { useEffect, useState } from 'react';
@@ -16,7 +15,6 @@ export function SystemUsageCard() {
     const [usage, setUsage] = useState<SystemUsageData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const { props: _props } = usePage(); // Prefixed to fix lint error
 
     useEffect(() => {
         setLoading(true);

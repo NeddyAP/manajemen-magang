@@ -1,10 +1,11 @@
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'; // Import Card components
 import FrontLayout from '@/layouts/front-layout';
 import { SharedData, type BreadcrumbItem } from '@/types';
-import { GuidanceClass, TableMeta } from '@/types/guidance-class';
+import { GuidanceClass, GuidanceClassStats, TableMeta } from '@/types/guidance-class'; // Import GuidanceClassStats
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Calendar, Plus, Users } from 'lucide-react';
+import { CalendarCheck, CalendarClock, CalendarOff, CalendarPlus, Plus } from 'lucide-react'; // Import more icons
 import { useEffect, useState } from 'react';
 import { columns, initialColumnVisibility } from './components/column';
 import { StatusFilter } from './components/filters';
@@ -22,10 +23,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface PageProps {
     classes: GuidanceClass[];
+    guidanceClassStats: GuidanceClassStats; // Add guidanceClassStats prop
     meta: TableMeta;
 }
 
-export default function GuidanceClassIndex({ classes, meta }: PageProps) {
+export default function GuidanceClassIndex({ classes, guidanceClassStats, meta }: PageProps) {
     const { auth } = usePage<SharedData>().props;
     const [selectedStatus, setSelectedStatus] = useState<string>('');
 
@@ -67,32 +69,49 @@ export default function GuidanceClassIndex({ classes, meta }: PageProps) {
                             </div>
                         </div>
 
-                        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
-                            <div className="bg-card text-card-foreground rounded-lg border p-6 shadow">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="font-medium">Kelas Aktif</h3>
-                                    <Calendar className="text-primary h-5 w-5" />
-                                </div>
-                                <p className="mt-2 text-2xl font-bold">
-                                    {
-                                        classes.filter(
-                                            (c) => new Date(c.start_date) <= new Date() && (!c.end_date || new Date(c.end_date) >= new Date()),
-                                        ).length
-                                    }
-                                </p>
-                            </div>
-                            <div className="bg-card text-card-foreground rounded-lg border p-6 shadow">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="font-medium">Total Kelas</h3>
-                                    <Users className="text-primary h-5 w-5" />
-                                </div>
-                                <p className="mt-2 text-2xl font-bold">{classes.length}</p>
-                            </div>
+                        {/* Analytics Cards */}
+                        <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">Total Kelas</CardTitle>
+                                    <CalendarPlus className="text-muted-foreground h-4 w-4" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">{guidanceClassStats.total ?? 0}</div>
+                                </CardContent>
+                            </Card>
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">Akan Datang</CardTitle>
+                                    <CalendarClock className="text-muted-foreground h-4 w-4" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">{guidanceClassStats.upcoming ?? 0}</div>
+                                </CardContent>
+                            </Card>
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">Sedang Berlangsung</CardTitle>
+                                    <CalendarCheck className="text-muted-foreground h-4 w-4" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">{guidanceClassStats.ongoing ?? 0}</div>
+                                </CardContent>
+                            </Card>
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-sm font-medium">Selesai</CardTitle>
+                                    <CalendarOff className="text-muted-foreground h-4 w-4" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">{guidanceClassStats.finished ?? 0}</div>
+                                </CardContent>
+                            </Card>
                         </div>
 
-                        <StatusFilter value={selectedStatus} onChange={handleStatusChange} />
-
-                        <div className="mt-4 flex justify-end">
+                        {/* Filters and Create Button */}
+                        <div className="mb-4 flex items-center justify-between">
+                            <StatusFilter value={selectedStatus} onChange={handleStatusChange} />
                             {isDosen && (
                                 <Button asChild>
                                     <Link href={route('front.internships.guidance-classes.create')}>

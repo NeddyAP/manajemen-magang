@@ -41,6 +41,9 @@ class LogbookController extends Controller
             $query->latest();
         }
 
+        // Get total count before pagination/filtering for analytics
+        $totalLogbookCount = $internship->logbooks()->count();
+
         // Paginate the results
         $perPage = $request->per_page ?? 10;
         $logbooks = $query->paginate($perPage)->withQueryString();
@@ -48,6 +51,7 @@ class LogbookController extends Controller
         return Inertia::render('front/internships/logbooks/index', [
             'internship' => $internship,
             'logbooks' => $logbooks->items(),
+            'totalLogbookCount' => $totalLogbookCount, // Pass total count
             'meta' => [
                 'total' => $logbooks->total(),
                 'per_page' => $logbooks->perPage(),
