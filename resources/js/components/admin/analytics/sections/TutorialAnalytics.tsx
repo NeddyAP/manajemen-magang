@@ -24,7 +24,7 @@ const TutorialAnalytics: React.FC = () => {
                 setStats(response.data);
             } catch (err) {
                 console.error('Error fetching tutorial stats:', err);
-                setError('Failed to load tutorial statistics.');
+                setError('Gagal memuat statistik tutorial.');
             } finally {
                 setLoading(false);
             }
@@ -36,7 +36,7 @@ const TutorialAnalytics: React.FC = () => {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Tutorial Summary</CardTitle>
+                <CardTitle>Ringkasan Tutorial</CardTitle>
             </CardHeader>
             <CardContent>
                 {loading && (
@@ -50,17 +50,17 @@ const TutorialAnalytics: React.FC = () => {
                     <div className="grid gap-2">
                         <div>
                             <p className="text-2xl font-bold">{stats.total_tutorials}</p>
-                            <p className="text-muted-foreground text-xs">Total Tutorials</p>
+                            <p className="text-muted-foreground text-xs">Total Tutorial</p>
                         </div>
                         <div>
                             <p className="text-2xl font-bold">{stats.active_tutorials}</p>
-                            <p className="text-muted-foreground text-xs">Active Tutorials</p>
+                            <p className="text-muted-foreground text-xs">Tutorial Aktif</p>
                         </div>
                         {/* Render more stats here */}
                         {/* TODO: Add charts or more detailed breakdowns (e.g., view counts if implemented) */}
                     </div>
                 )}
-                {!loading && !error && !stats && !error && <p className="text-muted-foreground text-sm">No data available.</p>}
+                {!loading && !error && !stats && !error && <p className="text-muted-foreground text-sm">Tidak ada data yang tersedia.</p>}
             </CardContent>
         </Card>
     );

@@ -24,7 +24,7 @@ const FaqAnalytics: React.FC = () => {
                 setStats(response.data);
             } catch (err) {
                 console.error('Error fetching FAQ stats:', err);
-                setError('Failed to load FAQ statistics.');
+                setError('Gagal memuat statistik FAQ.');
             } finally {
                 setLoading(false);
             }
@@ -36,7 +36,7 @@ const FaqAnalytics: React.FC = () => {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>FAQ Summary</CardTitle>
+                <CardTitle>Ringkasan FAQ</CardTitle>
             </CardHeader>
             <CardContent>
                 {loading && (
@@ -50,17 +50,17 @@ const FaqAnalytics: React.FC = () => {
                     <div className="grid gap-2">
                         <div>
                             <p className="text-2xl font-bold">{stats.total_faqs}</p>
-                            <p className="text-muted-foreground text-xs">Total FAQs</p>
+                            <p className="text-muted-foreground text-xs">Total FAQ</p>
                         </div>
                         <div>
                             <p className="text-2xl font-bold">{stats.active_faqs}</p>
-                            <p className="text-muted-foreground text-xs">Active FAQs</p>
+                            <p className="text-muted-foreground text-xs">FAQ Aktif</p>
                         </div>
                         {/* Render more stats here */}
                         {/* TODO: Add charts or more detailed breakdowns (e.g., view counts if implemented) */}
                     </div>
                 )}
-                {!loading && !error && !stats && !error && <p className="text-muted-foreground text-sm">No data available.</p>}
+                {!loading && !error && !stats && !error && <p className="text-muted-foreground text-sm">Tidak ada data yang tersedia.</p>}
             </CardContent>
         </Card>
     );

@@ -20,7 +20,7 @@ import SettingsLayout from '@/layouts/settings/layout';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Profile settings',
+        title: 'Pengaturan Profil',
         href: '/settings/profile',
     },
 ];
@@ -90,11 +90,11 @@ export default function Profile({ mustVerifyEmail, status, profile = {} }: Profi
 
     return (
         <FrontLayout breadcrumbs={breadcrumbs}>
-            <Head title="Profile settings" />
+            <Head title="Pengaturan Profil" />
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Profile information" description="Update your profile information" />
+                    <HeadingSmall title="Informasi Profil" description="Perbarui informasi profil Anda" />
 
                     <form onSubmit={submit} className="space-y-6">
                         <div className="grid gap-2">

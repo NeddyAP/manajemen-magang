@@ -36,7 +36,7 @@ const GuidanceAnalytics: React.FC = () => {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Guidance Class Summary</CardTitle>
+                <CardTitle>Rangkuman Kelas Bimbingan</CardTitle>
             </CardHeader>
             <CardContent>
                 {loading && (
@@ -49,12 +49,12 @@ const GuidanceAnalytics: React.FC = () => {
                 {!loading && !error && stats && (
                     <div>
                         <p className="text-2xl font-bold">{stats.total_classes}</p>
-                        <p className="text-muted-foreground text-xs">Total Guidance Classes Created</p>
+                        <p className="text-muted-foreground text-xs">Total Kelas Bimbingan Dibuat</p>
                         {/* Render more stats here */}
                         {/* TODO: Add charts or more detailed breakdowns (e.g., attendance) */}
                     </div>
                 )}
-                {!loading && !error && !stats && !error && <p className="text-muted-foreground text-sm">No data available.</p>}
+                {!loading && !error && !stats && !error && <p className="text-muted-foreground text-sm">Data tidak tersedia.</p>}
             </CardContent>
         </Card>
     );

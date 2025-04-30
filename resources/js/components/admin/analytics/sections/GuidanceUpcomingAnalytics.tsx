@@ -25,7 +25,7 @@ const GuidanceUpcomingAnalytics: React.FC = () => {
                 setStats(response.data);
             } catch (err) {
                 console.error('Error fetching guidance class stats:', err);
-                setError('Failed to load upcoming guidance class statistics.');
+                setError('Gagal memuat statistik kelas bimbingan yang akan datang.');
             } finally {
                 setLoading(false);
             }
@@ -37,7 +37,7 @@ const GuidanceUpcomingAnalytics: React.FC = () => {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Upcoming Classes</CardTitle>
+                <CardTitle>Kelas yang Akan Datang</CardTitle>
             </CardHeader>
             <CardContent>
                 {loading && (
@@ -49,10 +49,10 @@ const GuidanceUpcomingAnalytics: React.FC = () => {
                 {!loading && !error && stats && (
                     <div>
                         <p className="text-2xl font-bold">{stats.upcoming_classes}</p>
-                        <p className="text-muted-foreground text-xs">Classes Scheduled</p>
+                        <p className="text-muted-foreground text-xs">Kelas Terjadwal</p>
                     </div>
                 )}
-                {!loading && !error && !stats && <p className="text-muted-foreground text-sm">No upcoming data available.</p>}
+                {!loading && !error && !stats && <p className="text-muted-foreground text-sm">Tidak ada data mendatang yang tersedia.</p>}
             </CardContent>
         </Card>
     );

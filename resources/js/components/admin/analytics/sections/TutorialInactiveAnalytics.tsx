@@ -25,7 +25,7 @@ const TutorialInactiveAnalytics: React.FC = () => {
                 setStats(response.data);
             } catch (err) {
                 console.error('Error fetching tutorial stats:', err);
-                setError('Failed to load inactive tutorial statistics.');
+                setError('Gagal memuat statistik tutorial yang tidak aktif.');
             } finally {
                 setLoading(false);
             }
@@ -37,7 +37,7 @@ const TutorialInactiveAnalytics: React.FC = () => {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Inactive Tutorials</CardTitle>
+                <CardTitle>Tutorial Tidak Aktif</CardTitle>
             </CardHeader>
             <CardContent>
                 {loading && (
@@ -49,10 +49,10 @@ const TutorialInactiveAnalytics: React.FC = () => {
                 {!loading && !error && stats && (
                     <div>
                         <p className="text-2xl font-bold">{stats.inactive_tutorials}</p>
-                        <p className="text-muted-foreground text-xs">Currently Inactive</p>
+                        <p className="text-muted-foreground text-xs">Saat Ini Tidak Aktif</p>
                     </div>
                 )}
-                {!loading && !error && !stats && <p className="text-muted-foreground text-sm">No data available.</p>}
+                {!loading && !error && !stats && <p className="text-muted-foreground text-sm">Tidak ada data yang tersedia.</p>}
             </CardContent>
         </Card>
     );

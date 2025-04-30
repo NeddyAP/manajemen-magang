@@ -25,7 +25,7 @@ const FaqInactiveAnalytics: React.FC = () => {
                 setStats(response.data);
             } catch (err) {
                 console.error('Error fetching FAQ stats:', err);
-                setError('Failed to load inactive FAQ statistics.');
+                setError('Gagal memuat statistik FAQ yang tidak aktif.');
             } finally {
                 setLoading(false);
             }
@@ -37,7 +37,7 @@ const FaqInactiveAnalytics: React.FC = () => {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Inactive FAQs</CardTitle>
+                <CardTitle>FAQ Tidak Aktif</CardTitle>
             </CardHeader>
             <CardContent>
                 {loading && (
@@ -49,10 +49,10 @@ const FaqInactiveAnalytics: React.FC = () => {
                 {!loading && !error && stats && (
                     <div>
                         <p className="text-2xl font-bold">{stats.inactive_faqs}</p>
-                        <p className="text-muted-foreground text-xs">Currently Inactive</p>
+                        <p className="text-muted-foreground text-xs">Saat Ini Tidak Aktif</p>
                     </div>
                 )}
-                {!loading && !error && !stats && <p className="text-muted-foreground text-sm">No data available.</p>}
+                {!loading && !error && !stats && <p className="text-muted-foreground text-sm">Tidak ada data yang tersedia.</p>}
             </CardContent>
         </Card>
     );

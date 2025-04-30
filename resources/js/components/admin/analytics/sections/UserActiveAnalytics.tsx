@@ -30,7 +30,7 @@ const UserActiveAnalytics: React.FC = () => {
                 setStats(response.data);
             } catch (err) {
                 console.error('Error fetching user stats:', err);
-                setError('Failed to load active user statistics.');
+                setError('Gagal memuat statistik pengguna aktif.');
             } finally {
                 setLoading(false);
             }
@@ -42,7 +42,7 @@ const UserActiveAnalytics: React.FC = () => {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Active Users</CardTitle>
+                <CardTitle>User Aktif</CardTitle>
             </CardHeader>
             <CardContent>
                 {loading && (
@@ -54,10 +54,10 @@ const UserActiveAnalytics: React.FC = () => {
                 {!loading && !error && stats && (
                     <div>
                         <p className="text-2xl font-bold">{stats.active_users_30d}</p>
-                        <p className="text-muted-foreground text-xs">Logged In (Last 30 Days)</p>
+                        <p className="text-muted-foreground text-xs">Login (30 Hari Terakhir)</p>
                     </div>
                 )}
-                {!loading && !error && !stats && <p className="text-muted-foreground text-sm">No data available.</p>}
+                {!loading && !error && !stats && <p className="text-muted-foreground text-sm">Tidak ada data yang tersedia.</p>}
             </CardContent>
         </Card>
     );

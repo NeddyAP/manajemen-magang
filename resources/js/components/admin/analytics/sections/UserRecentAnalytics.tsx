@@ -30,7 +30,7 @@ const UserRecentAnalytics: React.FC = () => {
                 setStats(response.data);
             } catch (err) {
                 console.error('Error fetching user stats:', err);
-                setError('Failed to load recent user statistics.');
+                setError('Gagal memuat statistik pengguna terbaru.');
             } finally {
                 setLoading(false);
             }
@@ -42,7 +42,7 @@ const UserRecentAnalytics: React.FC = () => {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>New Registrations</CardTitle>
+                <CardTitle>Registrasi Baru</CardTitle>
             </CardHeader>
             <CardContent>
                 {loading && (
@@ -54,10 +54,10 @@ const UserRecentAnalytics: React.FC = () => {
                 {!loading && !error && stats && (
                     <div>
                         <p className="text-2xl font-bold">{stats.recent_registrations_7d}</p>
-                        <p className="text-muted-foreground text-xs">Registered (Last 7 Days)</p>
+                        <p className="text-muted-foreground text-xs">Terdaftar (7 Hari Terakhir)</p>
                     </div>
                 )}
-                {!loading && !error && !stats && <p className="text-muted-foreground text-sm">No recent data available.</p>}
+                {!loading && !error && !stats && <p className="text-muted-foreground text-sm">Tidak ada data terbaru yang tersedia.</p>}
             </CardContent>
         </Card>
     );

@@ -193,15 +193,29 @@ class AnalyticsController extends Controller
     public function getUserStats(Request $request): JsonResponse
     {
         $total = User::count();
-        $byRole = User::select('role', DB::raw('count(*) as total'))
-            ->groupBy('role')
-            ->get();
+
+        // Define the roles to count
+        $rolesToCount = ['superadmin', 'admin', 'dosen', 'mahasiswa'];
+        $usersByRole = [];
+
+        foreach ($rolesToCount as $roleName) {
+            // Count users with the specific role
+            // Ensure the role exists before querying to avoid errors if a role is removed
+            if (\Spatie\Permission\Models\Role::where('name', $roleName)->exists()) {
+                $count = User::role($roleName)->count();
+                $usersByRole[] = ['role' => $roleName, 'total' => $count];
+            } else {
+                // Optionally handle roles that might not exist in the DB
+                $usersByRole[] = ['role' => $roleName, 'total' => 0];
+            }
+        }
+
         $activeCount = User::where('last_login_at', '>=', now()->subDays(30))->count();
         $recentCount = User::where('created_at', '>=', now()->subDays(7))->count();
 
         $stats = [
             'total_users' => $total,
-            'users_by_role' => $byRole,
+            'users_by_role' => $usersByRole,
             'active_users_30d' => $activeCount,
             'recent_registrations_7d' => $recentCount,
         ];

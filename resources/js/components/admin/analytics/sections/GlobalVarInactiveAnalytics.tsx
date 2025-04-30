@@ -25,7 +25,7 @@ const GlobalVarInactiveAnalytics: React.FC = () => {
                 setStats(response.data);
             } catch (err) {
                 console.error('Error fetching global variable stats:', err);
-                setError('Failed to load inactive global variable statistics.');
+                setError('Gagal memuat statistik variabel global yang tidak aktif.');
             } finally {
                 setLoading(false);
             }
@@ -37,7 +37,7 @@ const GlobalVarInactiveAnalytics: React.FC = () => {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Inactive Variables</CardTitle>
+                <CardTitle>Variabel Tidak Aktif</CardTitle>
             </CardHeader>
             <CardContent>
                 {loading && (
@@ -49,10 +49,10 @@ const GlobalVarInactiveAnalytics: React.FC = () => {
                 {!loading && !error && stats && (
                     <div>
                         <p className="text-2xl font-bold">{stats.inactive_variables}</p>
-                        <p className="text-muted-foreground text-xs">Currently Inactive</p>
+                        <p className="text-muted-foreground text-xs">Saat Ini Tidak Aktif</p>
                     </div>
                 )}
-                {!loading && !error && !stats && <p className="text-muted-foreground text-sm">No data available.</p>}
+                {!loading && !error && !stats && <p className="text-muted-foreground text-sm">Tidak ada data yang tersedia.</p>}
             </CardContent>
         </Card>
     );

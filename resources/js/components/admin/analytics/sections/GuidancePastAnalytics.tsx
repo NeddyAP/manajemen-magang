@@ -25,7 +25,7 @@ const GuidancePastAnalytics: React.FC = () => {
                 setStats(response.data);
             } catch (err) {
                 console.error('Error fetching guidance class stats:', err);
-                setError('Failed to load past guidance class statistics.');
+                setError('Gagal memuat statistik kelas bimbingan yang lalu.');
             } finally {
                 setLoading(false);
             }
@@ -37,7 +37,7 @@ const GuidancePastAnalytics: React.FC = () => {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Past Classes</CardTitle>
+                <CardTitle>Kelas yang Lalu</CardTitle>
             </CardHeader>
             <CardContent>
                 {loading && (
@@ -49,10 +49,10 @@ const GuidancePastAnalytics: React.FC = () => {
                 {!loading && !error && stats && (
                     <div>
                         <p className="text-2xl font-bold">{stats.past_classes}</p>
-                        <p className="text-muted-foreground text-xs">Classes Completed</p>
+                        <p className="text-muted-foreground text-xs">Kelas Selesai</p>
                     </div>
                 )}
-                {!loading && !error && !stats && <p className="text-muted-foreground text-sm">No past data available.</p>}
+                {!loading && !error && !stats && <p className="text-muted-foreground text-sm">Tidak ada data masa lalu yang tersedia.</p>}
             </CardContent>
         </Card>
     );

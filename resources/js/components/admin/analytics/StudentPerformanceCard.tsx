@@ -24,7 +24,7 @@ export function StudentPerformanceCard() {
             })
             .catch((err) => {
                 console.error('Error fetching student performance:', err);
-                setError('Failed to load student performance data.');
+                setError('Gagal memuat data performa mahasiswa.'); // Translated error message
                 setPerformance(null);
             })
             .finally(() => {
@@ -38,7 +38,7 @@ export function StudentPerformanceCard() {
                 <CardTitle>Performa Mahasiswa (Rata-rata)</CardTitle> {/* Translated */}
             </CardHeader>
             <CardContent>
-                {loading && <p>Loading...</p>}
+                {loading && <p>Memuat...</p>} {/* Translated loading message */}
                 {error && <p className="text-red-500">{error}</p>}
                 {performance && !loading && !error && (
                     <div className="h-80">

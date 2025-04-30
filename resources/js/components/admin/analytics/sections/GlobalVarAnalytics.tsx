@@ -24,7 +24,7 @@ const GlobalVarAnalytics: React.FC = () => {
                 setStats(response.data);
             } catch (err) {
                 console.error('Error fetching global variable stats:', err);
-                setError('Failed to load global variable statistics.');
+                setError('Gagal memuat statistik variabel global.');
             } finally {
                 setLoading(false);
             }
@@ -36,7 +36,7 @@ const GlobalVarAnalytics: React.FC = () => {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Global Variable Summary</CardTitle>
+                <CardTitle>Ringkasan Variabel Global</CardTitle>
             </CardHeader>
             <CardContent>
                 {loading && (
@@ -50,16 +50,16 @@ const GlobalVarAnalytics: React.FC = () => {
                     <div className="grid gap-2">
                         <div>
                             <p className="text-2xl font-bold">{stats.total_variables}</p>
-                            <p className="text-muted-foreground text-xs">Total Variables</p>
+                            <p className="text-muted-foreground text-xs">Total Variabel</p>
                         </div>
                         <div>
                             <p className="text-2xl font-bold">{stats.active_variables}</p>
-                            <p className="text-muted-foreground text-xs">Active Variables</p>
+                            <p className="text-muted-foreground text-xs">Variabel Aktif</p>
                         </div>
                         {/* Render more stats here */}
                     </div>
                 )}
-                {!loading && !error && !stats && !error && <p className="text-muted-foreground text-sm">No data available.</p>}
+                {!loading && !error && !stats && !error && <p className="text-muted-foreground text-sm">Tidak ada data yang tersedia.</p>}
             </CardContent>
         </Card>
     );

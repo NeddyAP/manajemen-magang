@@ -25,7 +25,7 @@ const FaqRecentAnalytics: React.FC = () => {
                 setStats(response.data);
             } catch (err) {
                 console.error('Error fetching FAQ stats:', err);
-                setError('Failed to load recent FAQ statistics.');
+                setError('Gagal memuat statistik FAQ terbaru.');
             } finally {
                 setLoading(false);
             }
@@ -37,7 +37,7 @@ const FaqRecentAnalytics: React.FC = () => {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
+                <CardTitle>Aktivitas Terbaru</CardTitle>
             </CardHeader>
             <CardContent>
                 {loading && (
@@ -49,10 +49,10 @@ const FaqRecentAnalytics: React.FC = () => {
                 {!loading && !error && stats && (
                     <div>
                         <p className="text-2xl font-bold">{stats.recent_count_30d}</p>
-                        <p className="text-muted-foreground text-xs">FAQs Created (Last 30 Days)</p>
+                        <p className="text-muted-foreground text-xs">FAQ Dibuat (30 Hari Terakhir)</p>
                     </div>
                 )}
-                {!loading && !error && !stats && <p className="text-muted-foreground text-sm">No recent data available.</p>}
+                {!loading && !error && !stats && <p className="text-muted-foreground text-sm">Tidak ada data terbaru yang tersedia.</p>}
             </CardContent>
         </Card>
     );

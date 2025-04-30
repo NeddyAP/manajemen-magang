@@ -53,7 +53,7 @@ export function InternshipStatsCard() {
             })
             .catch((err) => {
                 console.error('Error fetching internship stats:', err);
-                setError('Failed to load internship statistics.');
+                setError('Gagal memuat statistik magang.');
                 setStats(null);
             })
             .finally(() => {
@@ -86,7 +86,7 @@ export function InternshipStatsCard() {
                 <CardTitle>Statistik Magang</CardTitle> {/* Translated */}
             </CardHeader>
             <CardContent>
-                {loading && <p>Loading...</p>}
+                {loading && <p>Memuat...</p>}
                 {error && <p className="text-red-500">{error}</p>}
                 {stats && !loading && !error && (
                     // Stack charts vertically

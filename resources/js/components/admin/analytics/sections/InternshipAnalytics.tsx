@@ -35,7 +35,7 @@ const InternshipAnalytics: React.FC = () => {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Internship Summary</CardTitle>
+                <CardTitle>Rangkuman Magang</CardTitle>
             </CardHeader>
             <CardContent>
                 {loading && (
@@ -47,10 +47,10 @@ const InternshipAnalytics: React.FC = () => {
                 {!loading && !error && stats && (
                     <div>
                         <p className="text-2xl font-bold">{stats.total_internships}</p>
-                        <p className="text-muted-foreground text-xs">Total Internship Applications</p>
+                        <p className="text-muted-foreground text-xs">Total Pengajuan Magang</p>
                     </div>
                 )}
-                {!loading && !error && !stats && <p className="text-muted-foreground text-sm">No data available.</p>}
+                {!loading && !error && !stats && <p className="text-muted-foreground text-sm">Data tidak tersedia.</p>}
             </CardContent>
         </Card>
     );

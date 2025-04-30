@@ -29,7 +29,7 @@ const UserAnalytics: React.FC = () => {
                 setStats(response.data);
             } catch (err) {
                 console.error('Error fetching user stats:', err);
-                setError('Failed to load user statistics.');
+                setError('Gagal memuat statistik pengguna.');
             } finally {
                 setLoading(false);
             }
@@ -41,7 +41,7 @@ const UserAnalytics: React.FC = () => {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>User Summary</CardTitle>
+                <CardTitle>Ringkasan Pengguna</CardTitle>
             </CardHeader>
             <CardContent>
                 {loading && (
@@ -56,10 +56,10 @@ const UserAnalytics: React.FC = () => {
                     <div className="grid gap-4">
                         <div>
                             <p className="text-2xl font-bold">{stats.total_users}</p>
-                            <p className="text-muted-foreground text-xs">Total Registered Users</p>
+                            <p className="text-muted-foreground text-xs">Total User Terdaftar</p>
                         </div>
                         <div>
-                            <h4 className="mb-1 text-sm font-medium">Users by Role:</h4>
+                            <h4 className="mb-1 text-sm font-medium">User Berdasarkan Role:</h4>
                             {stats.users_by_role.length > 0 ? (
                                 <ul className="text-muted-foreground list-disc pl-5 text-sm">
                                     {stats.users_by_role.map((roleStat) => (
@@ -69,14 +69,14 @@ const UserAnalytics: React.FC = () => {
                                     ))}
                                 </ul>
                             ) : (
-                                <p className="text-muted-foreground text-sm">No role data available.</p>
+                                <p className="text-muted-foreground text-sm">Tidak ada data role yang tersedia.</p>
                             )}
                         </div>
                         {/* Render more stats here */}
                         {/* TODO: Add charts or more detailed breakdowns (e.g., activity) */}
                     </div>
                 )}
-                {!loading && !error && !stats && !error && <p className="text-muted-foreground text-sm">No data available.</p>}
+                {!loading && !error && !stats && !error && <p className="text-muted-foreground text-sm">Tidak ada data yang tersedia.</p>}
             </CardContent>
         </Card>
     );
