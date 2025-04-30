@@ -41,8 +41,7 @@ class TutorialController extends Controller
         }
 
         // Get sorted results
-        $tutorials = $query->orderBy('order', 'asc')
-            ->orderBy('created_at', 'desc')
+        $tutorials = $query->orderBy('created_at', 'desc')
             ->get();
 
         return inertia('front/tutorials/index', compact('tutorials'));

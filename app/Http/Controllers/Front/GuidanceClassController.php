@@ -110,9 +110,10 @@ class GuidanceClassController extends Controller
             $query->latest();
         }
 
-        // Calculate analytics using the cloned query
+        // Calculate analytics using the cloned query, removing any previous ordering
         $now = now();
         $guidanceClassStats = $analyticsQuery
+            ->reorder() // Remove existing order by clauses
             ->select(
                 DB::raw('count(*) as total'),
                 DB::raw("sum(case when start_date > '{$now}' then 1 else 0 end) as upcoming"),

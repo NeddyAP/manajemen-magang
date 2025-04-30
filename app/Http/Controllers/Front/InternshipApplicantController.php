@@ -56,8 +56,9 @@ class InternshipApplicantController extends Controller
         $perPage = $request->per_page ?? 10;
         $internships = $query->paginate($perPage);
 
-        // Calculate analytics for the current user
+        // Calculate analytics for the current user, removing any previous ordering
         $stats = $analyticsQuery
+            ->reorder() // Remove existing order by clauses
             ->select(
                 DB::raw('count(*) as total'),
                 DB::raw("sum(case when status = 'waiting' then 1 else 0 end) as waiting"),
