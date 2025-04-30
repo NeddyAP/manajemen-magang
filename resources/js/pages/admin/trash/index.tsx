@@ -1,3 +1,4 @@
+import TrashAnalytics from '@/components/admin/analytics/sections/TrashAnalytics';
 import { DataTable } from '@/components/data-table/data-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -146,6 +147,11 @@ export default function Trash({ users, tutorials, internships, logbooks, reports
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Sampah" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+                {/* Analytics Section */}
+                <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <TrashAnalytics />
+                    {/* Add more analytics cards here if needed */}
+                </div>
                 <div className="flex flex-wrap gap-2">
                     {typeOptions.map((option) => (
                         <Button

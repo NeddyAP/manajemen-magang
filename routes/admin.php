@@ -61,3 +61,22 @@ Route::middleware(['auth', 'role:superadmin|admin'])->prefix('admin')->name('adm
 });
 
 require __DIR__.'/auth.php';
+
+use App\Http\Controllers\Admin\AnalyticsController;
+
+// Analytics Routes
+Route::middleware(['auth', 'role:superadmin|admin'])->prefix('analytics')->name('admin.analytics.')->group(function () {
+    Route::get('/internship-stats', [AnalyticsController::class, 'getInternshipStats'])->name('internship-stats');
+    Route::get('/student-performance', [AnalyticsController::class, 'getStudentPerformance'])->name('student-performance');
+    Route::get('/system-usage', [AnalyticsController::class, 'getSystemUsage'])->name('system-usage');
+
+    // New routes for specific sections
+    Route::get('/logbook-summary', [AnalyticsController::class, 'getLogbookSummary'])->name('logbook-summary');
+    Route::get('/report-summary', [AnalyticsController::class, 'getReportSummary'])->name('report-summary');
+    Route::get('/guidance-class-stats', [AnalyticsController::class, 'getGuidanceClassStats'])->name('guidance-class-stats');
+    Route::get('/tutorial-stats', [AnalyticsController::class, 'getTutorialStats'])->name('tutorial-stats');
+    Route::get('/user-stats', [AnalyticsController::class, 'getUserStats'])->name('user-stats');
+    Route::get('/faq-stats', [AnalyticsController::class, 'getFaqStats'])->name('faq-stats');
+    Route::get('/global-variable-stats', [AnalyticsController::class, 'getGlobalVariableStats'])->name('global-variable-stats');
+    Route::get('/trash-stats', [AnalyticsController::class, 'getTrashStats'])->name('trash-stats');
+});
