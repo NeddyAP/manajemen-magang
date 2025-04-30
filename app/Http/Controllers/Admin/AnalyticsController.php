@@ -102,20 +102,20 @@ class AnalyticsController extends Controller
     public function getLogbookSummary(Request $request): JsonResponse
     {
         $total = Logbook::count();
-        $byStatus = Logbook::select('status', DB::raw('count(*) as total'))
-            ->groupBy('status')
-            ->get()
-            ->keyBy('status'); // Key by status for easier frontend access
+        // $byStatus = Logbook::select('status', DB::raw('count(*) as total')) // Column 'status' does not exist
+        //     ->groupBy('status')
+        //     ->get()
+        //     ->keyBy('status');
 
         $recentCount = Logbook::where('created_at', '>=', now()->subDays(7))->count();
 
         $stats = [
             'total_logbooks' => $total,
-            'by_status' => [ // Ensure consistent structure even if a status has 0 count
-                'pending' => $byStatus->get('pending', (object) ['total' => 0])->total,
-                'approved' => $byStatus->get('approved', (object) ['total' => 0])->total,
-                'rejected' => $byStatus->get('rejected', (object) ['total' => 0])->total,
-            ],
+            // 'by_status' => [ // Column 'status' does not exist
+            //     'pending' => $byStatus->get('pending', (object) ['total' => 0])->total,
+            //     'approved' => $byStatus->get('approved', (object) ['total' => 0])->total,
+            //     'rejected' => $byStatus->get('rejected', (object) ['total' => 0])->total,
+            // ],
             'recent_count_7d' => $recentCount,
         ];
 
