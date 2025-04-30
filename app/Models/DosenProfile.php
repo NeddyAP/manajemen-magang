@@ -28,4 +28,12 @@ class DosenProfile extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Get the students advised by this lecturer.
+     */
+    public function advisees()
+    {
+        return $this->hasMany(MahasiswaProfile::class, 'advisor_id', 'user_id');
+    }
 }
