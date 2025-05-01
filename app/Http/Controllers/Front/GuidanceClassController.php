@@ -33,12 +33,11 @@ class GuidanceClassController extends Controller
             // Dosen melihat kelas yang mereka ampu
             $query = GuidanceClass::where('lecturer_id', $user->id)
                 ->with(['lecturer', 'students' => function ($query) {
-                    $query->select('users.id', 'name', 'student_number', 'study_program', 'semester')
-                        ->with('internships', function ($query) {
-                            $query->whereIn('status', ['pending', 'active', 'ongoing'])
-                                ->latest()
-                                ->first();
-                        });
+                    $query->with('internships', function ($query) {
+                        $query->whereIn('status', ['pending', 'active', 'ongoing'])
+                            ->latest()
+                            ->first();
+                    });
                 }]);
         } elseif ($userRole === 'mahasiswa') {
             // Mahasiswa melihat kelas dari dosen pembimbing mereka
@@ -46,7 +45,6 @@ class GuidanceClassController extends Controller
                 $query = GuidanceClass::where('lecturer_id', $user->mahasiswaProfile->advisor_id)
                     ->with(['lecturer', 'students' => function ($query) use ($user) {
                         $query->where('users.id', $user->id)
-                            ->select('users.id', 'name', 'student_number', 'study_program', 'semester')
                             ->with('internships', function ($query) {
                                 $query->whereIn('status', ['pending', 'active', 'ongoing'])
                                     ->latest()
