@@ -6,8 +6,8 @@ import { TableMeta, type BreadcrumbItem } from '@/types';
 import { Internship, InternshipStats } from '@/types/internship'; // Import InternshipStats
 import { Head, Link, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { columns, initialColumnVisibility } from './components/column';
+import { useEffect, useMemo, useState } from 'react'; // Import useMemo
+import { baseColumns, initialColumnVisibility } from './components/column'; // Import baseColumns
 import { StatusFilter, TypeFilter } from './components/filters';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -24,10 +24,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface InternshipsProps {
     internships: Internship[];
     stats: InternshipStats; // Add stats prop
+    isDosen: boolean; // Add isDosen prop
     meta: TableMeta;
 }
 
-export default function Applicants({ internships, stats, meta }: InternshipsProps) {
+export default function Applicants({ internships, stats, isDosen, meta }: InternshipsProps) {
     const [selectedStatus, setSelectedStatus] = useState<string>('');
     const [selectedType, setSelectedType] = useState<string>('');
 
@@ -44,6 +45,20 @@ export default function Applicants({ internships, stats, meta }: InternshipsProp
             setSelectedType(type);
         }
     }, []);
+
+    // REMOVED local mahasiswaColumn definition
+
+    // REMOVED useMemo for tableColumns
+
+    // Adjust initial visibility if Dosen
+    const columnVisibility = useMemo(() => {
+        if (isDosen) {
+            // Ensure the mahasiswa column is visible for Dosen
+            return { ...initialColumnVisibility, mahasiswa_name: true };
+        }
+        // Hide Mahasiswa column if not Dosen
+        return { ...initialColumnVisibility, mahasiswa_name: false };
+    }, [isDosen]);
 
     const handleStatusChange = (status: string) => {
         setSelectedStatus(status);
@@ -132,7 +147,7 @@ export default function Applicants({ internships, stats, meta }: InternshipsProp
                         </div>
                         <DataTable
                             className="inset-0 size-full"
-                            columns={columns}
+                            columns={baseColumns} // Pass baseColumns directly
                             data={internships}
                             filters={[
                                 { id: 'status', value: selectedStatus },
@@ -140,7 +155,7 @@ export default function Applicants({ internships, stats, meta }: InternshipsProp
                             ]}
                             meta={meta}
                             deleteRoute={route('front.internships.applicants.destroy.bulk')}
-                            initialColumnVisibility={initialColumnVisibility}
+                            initialColumnVisibility={columnVisibility} // Use the adjusted visibility
                         />
                     </div>
                 </div>

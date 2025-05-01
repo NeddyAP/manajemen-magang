@@ -19,7 +19,8 @@ import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { FileSpreadsheet, MoreHorizontal } from 'lucide-react';
 
-export const columns: ColumnDef<Internship>[] = [
+// Rename to baseColumns
+export const baseColumns: ColumnDef<Internship>[] = [
     {
         id: 'select',
         header: ({ table }) => (
@@ -47,6 +48,26 @@ export const columns: ColumnDef<Internship>[] = [
             if (!type || typeof type !== 'string') return '-';
 
             return <Badge variant={type === 'kkl' ? 'default' : 'secondary'}>{type.toUpperCase()}</Badge>;
+        },
+    },
+    {
+        accessorKey: 'mahasiswa_name',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Mahasiswa" />,
+        cell: ({ row }) => {
+            const studentName = row.getValue('mahasiswa_name');
+            const studentNim = row.original.mahasiswa_nim;
+            if (!studentName || typeof studentName !== 'string') return '-';
+
+            return (
+                <div className="flex flex-col">
+                    <span className="font-medium">{studentName.length > 40 ? `${studentName.slice(0, 40)}...` : studentName}</span>
+                    {studentNim && (
+                        <span className="text-muted-foreground text-sm">
+                            {typeof studentNim === 'string' && studentNim.length > 40 ? `${studentNim.slice(0, 40)}...` : studentNim}
+                        </span>
+                    )}
+                </div>
+            );
         },
     },
     {
@@ -226,6 +247,8 @@ export const columns: ColumnDef<Internship>[] = [
 ];
 
 export const initialColumnVisibility = {
+    id: false,
+    periode: false,
     created_at: false,
     updated_at: false,
 };

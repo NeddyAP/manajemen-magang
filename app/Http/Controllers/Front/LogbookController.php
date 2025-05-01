@@ -3,23 +3,36 @@
 namespace App\Http\Controllers\front;
 
 use App\Http\Controllers\Controller;
+use App\Models\DosenProfile; // Add DosenProfile
 use App\Models\Internship;
 use App\Models\Logbook;
+use App\Models\MahasiswaProfile; // Add MahasiswaProfile
+use App\Models\User; // Add User
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth; // Add Auth
 use Inertia\Inertia;
 
 class LogbookController extends Controller
 {
     public function index(Request $request, Internship $internship)
     {
-        // Check if the internship belongs to the authenticated user
-        if ($internship->user_id !== auth()->id()) {
-            abort(403);
+        $user = Auth::user();
+        $isOwner = $internship->user_id === $user->id;
+        $isAdvisor = false;
+
+        if ($user->hasRole('dosen')) {
+            $dosenProfile = DosenProfile::where('user_id', $user->id)->first();
+            if ($dosenProfile) {
+                $adviseeProfile = MahasiswaProfile::where('user_id', $internship->user_id)
+                    ->where('advisor_id', $dosenProfile->user_id)
+                    ->first();
+                $isAdvisor = (bool) $adviseeProfile;
+            }
         }
 
-        // Check if the internship is accepted
-        if ($internship->status !== 'accepted') {
-            abort(403, 'Anda hanya dapat mengakses logbook untuk magang yang telah disetujui.');
+        // Authorize: Must be owner or advisor, and internship must be accepted
+        if ((! $isOwner && ! $isAdvisor) || $internship->status !== 'accepted') {
+            abort(403, 'Unauthorized access or internship not accepted.');
         }
 
         $query = $internship->logbooks();
@@ -49,7 +62,7 @@ class LogbookController extends Controller
         $logbooks = $query->paginate($perPage)->withQueryString();
 
         return Inertia::render('front/internships/logbooks/index', [
-            'internship' => $internship,
+            'internship' => $internship->load('user:id,name'), // Load user for context
             'logbooks' => $logbooks->items(),
             'totalLogbookCount' => $totalLogbookCount, // Pass total count
             'meta' => [
@@ -63,6 +76,11 @@ class LogbookController extends Controller
 
     public function create(Internship $internship)
     {
+        // Only owner can create
+        if ($internship->user_id !== auth()->id() || $internship->status !== 'accepted') {
+            abort(403, 'Unauthorized action.');
+        }
+
         return Inertia::render('front/internships/logbooks/create', [
             'internship' => $internship,
         ]);
@@ -70,10 +88,18 @@ class LogbookController extends Controller
 
     public function store(Request $request, Internship $internship)
     {
+        // Only owner can store
+        if ($internship->user_id !== auth()->id() || $internship->status !== 'accepted') {
+            abort(403, 'Unauthorized action.');
+        }
+
         $validated = $request->validate([
             'date' => 'required|date',
             'activities' => 'required|string',
         ]);
+
+        // Associate logbook with the internship owner (student)
+        $validated['user_id'] = $internship->user_id;
 
         $logbook = $internship->logbooks()->create($validated);
 
@@ -83,6 +109,11 @@ class LogbookController extends Controller
 
     public function edit(Internship $internship, Logbook $logbook)
     {
+        // Only owner can edit
+        if ($internship->user_id !== auth()->id() || $logbook->internship_id !== $internship->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
         return Inertia::render('front/internships/logbooks/edit', [
             'internship' => $internship,
             'logbook' => $logbook,
@@ -91,6 +122,11 @@ class LogbookController extends Controller
 
     public function update(Request $request, Internship $internship, Logbook $logbook)
     {
+        // Only owner can update
+        if ($internship->user_id !== auth()->id() || $logbook->internship_id !== $internship->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $validated = $request->validate([
             'date' => 'required|date',
             'activities' => 'required|string',
@@ -104,21 +140,57 @@ class LogbookController extends Controller
 
     public function destroy(Internship $internship, Logbook $logbook)
     {
+        // Only owner can delete
+        if ($internship->user_id !== auth()->id() || $logbook->internship_id !== $internship->id) {
+            abort(403, 'Unauthorized action.');
+        }
         $logbook->delete();
 
         return redirect()->route('front.internships.logbooks.index', $internship)
             ->with('success', 'Logbook berhasil dihapus');
     }
 
-    public function internList()
+    public function internList(Request $request)
     {
-        $internships = Internship::where('user_id', auth()->id())
-            ->where('status', 'accepted')
-            ->withCount('logbooks')
+        $user = Auth::user();
+        $query = Internship::query()->where('status', 'accepted');
+        $search = $request->input('search'); // Get search term
+
+        if ($user->hasRole('dosen')) {
+            $dosenProfile = DosenProfile::where('user_id', $user->id)->first();
+            if ($dosenProfile) {
+                $adviseeUserIds = MahasiswaProfile::where('advisor_id', $dosenProfile->user_id)
+                    ->pluck('user_id')
+                    ->toArray();
+                $query->whereIn('user_id', $adviseeUserIds);
+
+                // Apply search if term exists
+                if ($search) {
+                    $query->whereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', "%{$search}%")
+                            ->orWhereHas('mahasiswaProfile', function ($profileQuery) use ($search) {
+                                $profileQuery->where('student_number', 'like', "%{$search}%");
+                            });
+                    });
+                }
+
+            } else {
+                $query->whereRaw('1 = 0'); // No advisees, show nothing
+            }
+        } elseif ($user->hasRole('mahasiswa')) {
+            $query->where('user_id', $user->id);
+        } else {
+            $query->whereRaw('1 = 0'); // Other roles see nothing here
+        }
+
+        // Eager load user details and count logbooks
+        $internships = $query->with(['user:id,name']) // Load user name
+            ->withCount('logbooks') // Count related logbooks
             ->get();
 
         return Inertia::render('front/internships/logbooks/intern-list', [
-            'internships' => $internships,
+            'internships' => $internships, // This will now include 'logbooks_count' attribute
+            'filters' => ['search' => $search], // Pass search term back to view
         ]);
     }
 }

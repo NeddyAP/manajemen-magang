@@ -1,6 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { router } from '@inertiajs/react';
@@ -8,7 +10,7 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { Check, QrCode, RefreshCcw, X } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 interface Student {
     id: number;
@@ -36,7 +38,28 @@ interface Props {
 
 export default function ManageAttendance({ classId, students, qrCode, isClassActive }: Props) {
     const [generatingQR, setGeneratingQR] = useState(false);
-    const [markingAttendance, setMarkingAttendance] = useState(false);
+    const [markingAttendance, setMarkingAttendance] = useState<number | null>(null);
+    const [resettingAttendance, setResettingAttendance] = useState<number | null>(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [attendanceStatusFilter, setAttendanceStatusFilter] = useState<'all' | 'present' | 'absent'>('all');
+
+    const filteredStudents = useMemo(() => {
+        return students.filter((student) => {
+            const searchMatch =
+                student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                student.student_number.toLowerCase().includes(searchTerm.toLowerCase());
+
+            const isPresent = student.attendance.attended_at !== null;
+            let statusMatch = true;
+            if (attendanceStatusFilter === 'present') {
+                statusMatch = isPresent;
+            } else if (attendanceStatusFilter === 'absent') {
+                statusMatch = !isPresent;
+            }
+
+            return searchMatch && statusMatch;
+        });
+    }, [students, searchTerm, attendanceStatusFilter]);
 
     const handleGenerateQR = async () => {
         setGeneratingQR(true);
@@ -55,39 +78,43 @@ export default function ManageAttendance({ classId, students, qrCode, isClassAct
         );
     };
 
-    const handleMarkAttendance = (studentId: number) => {
-        setMarkingAttendance(true);
+    const handleMarkAttendance = useCallback(
+        (studentId: number) => {
+            setMarkingAttendance(studentId);
+            router.post(
+                `/internships/guidance-classes/${classId}/attendance/${studentId}`,
+                {},
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        router.reload({ only: ['guidanceClass'] });
+                    },
+                    onFinish: () => setMarkingAttendance(null),
+                    onError: (errors) => {
+                        console.error('Error marking attendance:', errors);
+                    },
+                },
+            );
+        },
+        [classId],
+    );
 
-        router.post(
-            route('front.internships.guidance-classes.mark-attendance', [classId, studentId]),
-            {
-                notes: 'Ditandai manual oleh dosen',
-            },
-            {
+    const handleResetAttendance = useCallback(
+        (studentId: number) => {
+            setResettingAttendance(studentId);
+            router.delete(`/internships/guidance-classes/${classId}/attendance/${studentId}`, {
+                preserveScroll: true,
                 onSuccess: () => {
-                    setMarkingAttendance(false);
+                    router.reload({ only: ['guidanceClass'] });
                 },
-                onError: () => {
-                    setMarkingAttendance(false);
+                onFinish: () => setResettingAttendance(null),
+                onError: (errors) => {
+                    console.error('Error resetting attendance:', errors);
                 },
-            },
-        );
-    };
-
-    const handleResetAttendance = (studentId: number) => {
-        if (!confirm('Anda yakin ingin menghapus catatan kehadiran ini?')) return;
-
-        setMarkingAttendance(true);
-
-        router.delete(route('front.internships.guidance-classes.reset-attendance', [classId, studentId]), {
-            onSuccess: () => {
-                setMarkingAttendance(false);
-            },
-            onError: () => {
-                setMarkingAttendance(false);
-            },
-        });
-    };
+            });
+        },
+        [classId],
+    );
 
     return (
         <div className="space-y-6">
@@ -170,9 +197,30 @@ export default function ManageAttendance({ classId, students, qrCode, isClassAct
             <Card>
                 <CardHeader>
                     <CardTitle>Kehadiran Mahasiswa</CardTitle>
-                    <CardDescription>Kelola kehadiran mahasiswa dalam kelas ini</CardDescription>
+                    <CardDescription>Kelola kehadiran mahasiswa dalam kelas ini. Total terdaftar: {students.length}</CardDescription>
                 </CardHeader>
                 <CardContent>
+                    <div className="mb-4 flex flex-col gap-4 sm:flex-row">
+                        <Input
+                            placeholder="Cari Nama / NIM..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="max-w-sm"
+                        />
+                        <Select
+                            value={attendanceStatusFilter}
+                            onValueChange={(value) => setAttendanceStatusFilter(value as 'all' | 'present' | 'absent')}
+                        >
+                            <SelectTrigger className="w-full sm:w-[180px]">
+                                <SelectValue placeholder="Filter Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Semua Status</SelectItem>
+                                <SelectItem value="present">Hadir</SelectItem>
+                                <SelectItem value="absent">Belum Hadir</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                     <div className="rounded-md border">
                         <Table>
                             <TableHeader>
@@ -186,29 +234,25 @@ export default function ManageAttendance({ classId, students, qrCode, isClassAct
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {students.length === 0 ? (
+                                {filteredStudents.length === 0 ? (
                                     <TableRow>
                                         <TableCell colSpan={6} className="h-24 text-center">
-                                            Belum ada mahasiswa yang terdaftar.
+                                            {students.length === 0
+                                                ? 'Belum ada mahasiswa yang terdaftar.'
+                                                : 'Tidak ada mahasiswa yang cocok dengan filter.'}
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    students.map((student) => (
+                                    filteredStudents.map((student) => (
                                         <TableRow key={student.id}>
                                             <TableCell>{student.student_number}</TableCell>
                                             <TableCell>{student.name}</TableCell>
                                             <TableCell>{student.study_program}</TableCell>
                                             <TableCell>
                                                 {student.attendance.attended_at ? (
-                                                    <div className="flex items-center">
-                                                        <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-500"></div>
-                                                        <span className="text-green-600">Hadir</span>
-                                                    </div>
+                                                    <span className="text-green-600">Hadir</span>
                                                 ) : (
-                                                    <div className="flex items-center">
-                                                        <div className="mr-2 h-2.5 w-2.5 rounded-full bg-red-500"></div>
-                                                        <span className="text-red-600">Belum Hadir</span>
-                                                    </div>
+                                                    <span className="text-gray-500">Belum Hadir</span>
                                                 )}
                                             </TableCell>
                                             <TableCell>
@@ -235,28 +279,47 @@ export default function ManageAttendance({ classId, students, qrCode, isClassAct
                                                 )}
                                             </TableCell>
                                             <TableCell>
-                                                {isClassActive &&
-                                                    (student.attendance.attended_at ? (
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => handleResetAttendance(student.id)}
-                                                            disabled={markingAttendance}
-                                                        >
-                                                            <X className="h-4 w-4 text-red-500" />
-                                                            <span className="sr-only">Reset Kehadiran</span>
-                                                        </Button>
-                                                    ) : (
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => handleMarkAttendance(student.id)}
-                                                            disabled={markingAttendance}
-                                                        >
-                                                            <Check className="h-4 w-4 text-green-500" />
-                                                            <span className="sr-only">Tandai Hadir</span>
-                                                        </Button>
-                                                    ))}
+                                                <TooltipProvider>
+                                                    <div className="flex items-center space-x-2">
+                                                        {student.attendance.attended_at ? (
+                                                            <Tooltip>
+                                                                <TooltipTrigger asChild>
+                                                                    <Button
+                                                                        variant="destructive"
+                                                                        size="icon"
+                                                                        onClick={() => handleResetAttendance(student.id)}
+                                                                        disabled={resettingAttendance === student.id}
+                                                                        className="h-8 w-8"
+                                                                    >
+                                                                        <X className="h-4 w-4 text-red-500" />
+                                                                        <span className="sr-only">Reset Kehadiran</span>
+                                                                    </Button>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent>
+                                                                    <p>Reset Kehadiran</p>
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        ) : (
+                                                            <Tooltip>
+                                                                <TooltipTrigger asChild>
+                                                                    <Button
+                                                                        variant="outline"
+                                                                        size="icon"
+                                                                        onClick={() => handleMarkAttendance(student.id)}
+                                                                        disabled={markingAttendance === student.id}
+                                                                        className="h-8 w-8"
+                                                                    >
+                                                                        <Check className="h-4 w-4" />
+                                                                        <span className="sr-only">Tandai Hadir</span>
+                                                                    </Button>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent>
+                                                                    <p>Tandai Hadir (Manual)</p>
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        )}
+                                                    </div>
+                                                </TooltipProvider>
                                             </TableCell>
                                         </TableRow>
                                     ))

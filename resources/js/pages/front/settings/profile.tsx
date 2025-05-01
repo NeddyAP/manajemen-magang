@@ -55,8 +55,8 @@ const years = Array.from({ length: currentYear - 1970 + 1 }, (_, i) => (currentY
 
 export default function Profile({ mustVerifyEmail, status, profile = {} }: ProfileProps) {
     const { auth } = usePage<SharedData>().props;
-    const isDosen = auth.user.roles?.some((role) => role.name === 'dosen');
-    const isMahasiswa = auth.user.roles?.some((role) => role.name === 'mahasiswa');
+    const isDosen = auth.role === 'dosen';
+    const isMahasiswa = auth.role === 'mahasiswa';
     const [openTeachingYearCombobox, setOpenTeachingYearCombobox] = React.useState(false);
     const [openClassYearCombobox, setOpenClassYearCombobox] = React.useState(false);
 

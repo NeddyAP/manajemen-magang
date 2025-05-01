@@ -62,7 +62,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     // Compute dashboard link based on role if user exists
     const computedRightNavItems: NavItem[] = [];
     if (auth?.role) {
-        const roleName = auth.user?.roles?.[0]?.name;
+        const roleName = auth.role;
         if (roleName && ['admin', 'superadmin'].includes(roleName)) {
             computedRightNavItems.push({ title: 'Dashboard', href: '/admin', icon: LayoutDashboard });
         } else if (roleName && ['mahasiswa', 'dosen'].includes(roleName)) {

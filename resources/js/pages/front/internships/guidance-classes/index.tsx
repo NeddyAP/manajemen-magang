@@ -55,7 +55,7 @@ export default function GuidanceClassIndex({ classes, guidanceClassStats, meta }
         });
     };
 
-    const isDosen = auth.user?.roles?.[0]?.name === 'dosen';
+    const isDosen = auth.role === 'dosen';
     return (
         <FrontLayout breadcrumbs={breadcrumbs}>
             <Head title="Kelas Bimbingan" />

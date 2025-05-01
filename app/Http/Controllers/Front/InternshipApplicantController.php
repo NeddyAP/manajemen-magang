@@ -5,8 +5,12 @@ namespace App\Http\Controllers\Front;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreInternshipRequest;
 use App\Http\Requests\UpdateInternshipRequest;
+use App\Models\DosenProfile; // Add DosenProfile model
 use App\Models\Internship;
+use App\Models\MahasiswaProfile; // Add MahasiswaProfile model
+use App\Models\User; // Add User model
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth; // Add Auth facade
 use Illuminate\Support\Facades\DB; // Add DB facade
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -18,7 +22,33 @@ class InternshipApplicantController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Internship::query()->where('user_id', auth()->id());
+        $user = Auth::user();
+        $query = Internship::query();
+
+        if ($user->hasRole('dosen')) {
+            // Dosen sees internships of their advisees
+            $dosenProfile = DosenProfile::where('user_id', $user->id)->first();
+            if ($dosenProfile) {
+                // Get user_ids of advisees
+                $adviseeUserIds = MahasiswaProfile::where('advisor_id', $dosenProfile->user_id)
+                    ->pluck('user_id')
+                    ->toArray();
+                $query->whereIn('user_id', $adviseeUserIds);
+            } else {
+                // Dosen has no profile, show nothing (or handle as needed)
+                $query->whereRaw('1 = 0'); // No results
+            }
+        } elseif ($user->hasRole('mahasiswa')) {
+            // Mahasiswa sees their own internships
+            $query->where('user_id', $user->id);
+        } else {
+            // Other roles (e.g., admin might see all, or handle differently)
+            // For now, let's assume they see nothing in this specific controller
+            $query->whereRaw('1 = 0'); // No results for other roles in this context
+        }
+
+        // Clone the query for analytics *after* initial role-based filtering
+        $analyticsQuery = clone $query;
 
         // Handle search
         if ($request->has('search') && ! empty($request->search)) {
@@ -49,12 +79,22 @@ class InternshipApplicantController extends Controller
             $query->latest();
         }
 
-        // Clone the query for analytics before pagination
-        $analyticsQuery = clone $query;
+        // Eager load user and their profile relationship before pagination
+        $query->with(['user:id,name', 'user.mahasiswaProfile:user_id,student_number']);
 
         // Paginate the results
         $perPage = $request->per_page ?? 10;
-        $internships = $query->paginate($perPage);
+        $internshipsPagination = $query->paginate($perPage);
+
+        // Transform data to include mahasiswa_name and mahasiswa_nim
+        $internships = $internshipsPagination->through(function ($internship) {
+            $internship->mahasiswa_name = $internship->user?->name;
+            $internship->mahasiswa_nim = $internship->user?->mahasiswaProfile?->student_number;
+
+            // Optionally unset the loaded relationships if not needed directly in frontend JS
+            // unset($internship->user);
+            return $internship;
+        });
 
         // Calculate analytics for the current user, removing any previous ordering
         $stats = $analyticsQuery
@@ -68,13 +108,14 @@ class InternshipApplicantController extends Controller
             ->first();
 
         return Inertia::render('front/internships/applicants/index', [
-            'internships' => $internships->items(),
+            'internships' => $internships->items(), // Use transformed items
             'stats' => $stats, // Pass stats to the view
+            'isDosen' => $user->hasRole('dosen'), // Pass isDosen flag
             'meta' => [
-                'total' => $internships->total(),
-                'per_page' => $internships->perPage(),
-                'current_page' => $internships->currentPage(),
-                'last_page' => $internships->lastPage(),
+                'total' => $internshipsPagination->total(), // Use original pagination meta
+                'per_page' => $internshipsPagination->perPage(),
+                'current_page' => $internshipsPagination->currentPage(),
+                'last_page' => $internshipsPagination->lastPage(),
             ],
         ]);
     }
@@ -117,11 +158,24 @@ class InternshipApplicantController extends Controller
     {
         // Check if the internship belongs to the authenticated user
         if ($internship->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
+            // Allow Dosen to view advisee's internship
+            $isAdvisee = false;
+            if (auth()->user()->hasRole('dosen')) {
+                $dosenProfile = DosenProfile::where('user_id', auth()->id())->first();
+                if ($dosenProfile) {
+                    $adviseeProfile = MahasiswaProfile::where('user_id', $internship->user_id)
+                        ->where('advisor_id', $dosenProfile->user_id)
+                        ->first();
+                    $isAdvisee = (bool) $adviseeProfile;
+                }
+            }
+            if (! $isAdvisee) {
+                abort(403, 'Unauthorized action.');
+            }
         }
 
         return Inertia::render('front/internships/applicants/show', [
-            'internship' => $internship,
+            'internship' => $internship->load('user.mahasiswaProfile'), // Eager load user and profile
         ]);
     }
 
@@ -132,6 +186,7 @@ class InternshipApplicantController extends Controller
     {
         // Check if the internship belongs to the authenticated user
         if ($internship->user_id !== auth()->id()) {
+            // Dosen cannot edit student applications directly through this interface
             abort(403, 'Unauthorized action.');
         }
 
@@ -147,10 +202,11 @@ class InternshipApplicantController extends Controller
     {
         // Check if the internship belongs to the authenticated user
         if ($internship->user_id !== auth()->id()) {
+            // Dosen cannot update student applications directly through this interface
             abort(403, 'Unauthorized action.');
         }
 
-        // Only prevent updates if status is accepted
+        // Only prevent updates if status is accepted (for mahasiswa)
         if ($internship->status === 'accepted') {
             return redirect()->back()->with('error', 'You cannot update an application that has already been accepted.');
         }
@@ -187,10 +243,11 @@ class InternshipApplicantController extends Controller
     {
         // Check if the internship belongs to the authenticated user
         if ($internship->user_id !== auth()->id()) {
+            // Dosen cannot delete student applications directly through this interface
             abort(403, 'Unauthorized action.');
         }
 
-        // Only allow deletion if status is waiting
+        // Only allow deletion if status is waiting (for mahasiswa)
         if ($internship->status !== 'waiting') {
             return redirect()->back()->with('error', 'You cannot delete an application that has already been processed.');
         }
@@ -216,13 +273,57 @@ class InternshipApplicantController extends Controller
             'ids.*' => 'integer',
         ]);
 
-        // Find the internships that belong to the user and have 'waiting' status
-        $internships = Internship::whereIn('id', $validated['ids'])
-            ->where('user_id', auth()->id())
-            ->where('status', 'waiting')
-            ->get();
+        $user = Auth::user();
 
-        foreach ($internships as $internship) {
+        // Mahasiswa can only bulk delete their own 'waiting' applications
+        if ($user->hasRole('mahasiswa')) {
+            $internships = Internship::whereIn('id', $validated['ids'])
+                ->where('user_id', $user->id)
+                ->where('status', 'waiting')
+                ->get();
+
+            foreach ($internships as $internship) {
+                // Delete application file
+                if ($internship->application_file) {
+                    Storage::disk('public')->delete($internship->application_file);
+                }
+                $internship->delete();
+            }
+
+            return back()->with('success', 'Selected internship applications deleted successfully!');
+        } else {
+            // Dosen or other roles cannot bulk delete via this method
+            return back()->with('error', 'Unauthorized action for bulk deletion.');
+        }
+
+    }
+
+    /**
+     * Download the application file.
+     */
+    public function downloadApplicationFile(Internship $internship)
+    {
+        $user = Auth::user();
+
+        // Check if user is authorized (owns the internship or is the advisor Dosen)
+        $isOwner = $internship->user_id === $user->id;
+        $isAdvisor = false;
+
+        if ($user->hasRole('dosen')) {
+            $dosenProfile = DosenProfile::where('user_id', $user->id)->first();
+            if ($dosenProfile) {
+                $adviseeProfile = MahasiswaProfile::where('user_id', $internship->user_id)
+                    ->where('advisor_id', $dosenProfile->user_id)
+                    ->first();
+                $isAdvisor = (bool) $adviseeProfile;
+            }
+        }
+
+        if (! $isOwner && ! $isAdvisor && ! $user->hasRole('admin')) { // Assuming admin can also download
+            abort(403, 'Unauthorized action.');
+        }
+
+        if (! $internship->application_file) {
             // Delete application file
             if ($internship->application_file) {
                 Storage::disk('public')->delete($internship->application_file);
@@ -232,22 +333,5 @@ class InternshipApplicantController extends Controller
         }
 
         return back()->with('success', 'Selected internship applications deleted successfully!');
-    }
-
-    /**
-     * Download the application file.
-     */
-    public function downloadApplicationFile(Internship $internship)
-    {
-        // Check if user is authorized (either owns the internship or is admin/lecturer)
-        if ($internship->user_id !== auth()->id() && ! auth()->user()->hasRole(['admin', 'dosen'])) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        if (! $internship->application_file) {
-            abort(404, 'File not found.');
-        }
-
-        return Storage::disk('public')->download($internship->application_file);
     }
 }

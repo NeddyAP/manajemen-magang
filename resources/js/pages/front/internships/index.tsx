@@ -19,6 +19,7 @@ interface User {
 interface PageProps {
     auth: {
         user: User;
+        [key: string]: unknown;
     };
     [key: string]: unknown;
 }
@@ -37,10 +38,9 @@ interface CardItem {
 
 export default function InternshipsIndex() {
     const { auth } = usePage<PageProps>().props;
-    const user = auth.user;
-    const isMahasiswa = user?.role === 'mahasiswa';
-    const isDosen = user?.role === 'dosen';
-
+    const role = auth.role;
+    const isMahasiswa = role === 'mahasiswa';
+    const isDosen = role === 'dosen';
     const cards: CardItem[] = [
         {
             id: 'apply',

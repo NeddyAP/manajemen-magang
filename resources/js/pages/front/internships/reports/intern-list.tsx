@@ -1,16 +1,19 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
+import { Input } from '@/components/ui/input'; // Import Input
+import { useDebounce } from '@/hooks/use-debounce'; // Import custom hook
 import FrontLayout from '@/layouts/front-layout';
-import { type BreadcrumbItem } from '@/types';
+import { SharedData, type BreadcrumbItem } from '@/types'; // Import SharedData
 import { type Internship } from '@/types/internship';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react'; // Import router and usePage
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { FileText, PlusCircle } from 'lucide-react';
+import { FileText, PlusCircle, SearchIcon } from 'lucide-react'; // Import SearchIcon
+import { useEffect, useState } from 'react'; // Import hooks (useCallback removed)
 
 interface PageProps {
     internships: Internship[];
+    filters: { search?: string }; // Add filters prop
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -24,7 +27,30 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function ReportInternshipList({ internships }: PageProps) {
+export default function ReportInternshipList({ internships, filters }: PageProps) {
+    const { auth } = usePage<SharedData>().props;
+    // Corrected role check based on typical structure
+    const isDosen = auth.role === 'dosen';
+    const [searchTerm, setSearchTerm] = useState(filters.search || '');
+    const debouncedSearchTerm = useDebounce(searchTerm, 300); // Use the hook
+
+    useEffect(() => {
+        const query: Record<string, string> = {};
+        if (debouncedSearchTerm) {
+            query.search = debouncedSearchTerm;
+        }
+        // Use the correct route name for reports list
+        router.get(route('front.internships.reports.intern-list'), query, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
+    }, [debouncedSearchTerm]); // Trigger effect when debounced value changes
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
+    };
+
     return (
         <FrontLayout breadcrumbs={breadcrumbs}>
             <Head title="Laporan Magang" /> {/* Update Head title */}
@@ -34,16 +60,37 @@ export default function ReportInternshipList({ internships }: PageProps) {
                         <div className="mb-6 flex items-center justify-between">
                             <div>
                                 <h1 className="text-2xl font-bold">Pilih Magang (Laporan)</h1> {/* Update H1 title */}
-                                <p className="text-muted-foreground">Pilih salah satu magang untuk melihat atau mengunggah laporan.</p>{' '}
-                                {/* Update description */}
+                                <p className="text-muted-foreground">
+                                    {isDosen
+                                        ? 'Pilih magang mahasiswa untuk melihat laporan.'
+                                        : 'Pilih magang Anda untuk melihat atau mengunggah laporan.'}
+                                </p>
                             </div>
                         </div>
+
+                        {/* Search Input for Dosen */}
+                        {isDosen && (
+                            <div className="mb-4 max-w-sm">
+                                <div className="relative">
+                                    <SearchIcon className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                                    <Input
+                                        placeholder="Cari Nama/NIM Mahasiswa..."
+                                        value={searchTerm}
+                                        onChange={handleSearchChange}
+                                        className="pl-9"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
                         {internships.length > 0 ? (
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                                 {internships.map((internship) => (
                                     <Card key={internship.id}>
                                         <CardHeader>
                                             <CardTitle className="text-lg">{internship.company_name}</CardTitle>
+                                            {/* Display student name for Dosen */}
+                                            {isDosen && <p className="text-muted-foreground text-sm">{internship.user?.name}</p>}
                                         </CardHeader>
                                         <CardContent>
                                             <div className="space-y-4">
@@ -80,16 +127,24 @@ export default function ReportInternshipList({ internships }: PageProps) {
                             </div>
                         ) : (
                             <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
-                                <h3 className="text-xl font-semibold tracking-tight">Anda belum memiliki magang aktif.</h3>
+                                <h3 className="text-xl font-semibold tracking-tight">
+                                    {isDosen && searchTerm ? 'Tidak ada mahasiswa ditemukan.' : 'Tidak ada magang aktif.'}
+                                </h3>
                                 <p className="text-muted-foreground mt-2 text-sm">
-                                    Anda hanya dapat mengelola laporan untuk magang yang berstatus diterima.
+                                    {isDosen && searchTerm
+                                        ? 'Coba kata kunci pencarian yang berbeda.'
+                                        : isDosen
+                                          ? 'Belum ada mahasiswa bimbingan Anda yang memiliki magang aktif.'
+                                          : 'Anda hanya dapat mengelola laporan untuk magang yang berstatus diterima.'}
                                 </p>
-                                <Button className="mt-6" asChild>
-                                    <Link href={route('front.internships.applicants.create')}>
-                                        <PlusCircle className="mr-2 h-4 w-4" />
-                                        Ajukan Magang Baru
-                                    </Link>
-                                </Button>
+                                {!isDosen && (
+                                    <Button className="mt-6" asChild>
+                                        <Link href={route('front.internships.applicants.create')}>
+                                            <PlusCircle className="mr-2 h-4 w-4" />
+                                            Ajukan Magang Baru
+                                        </Link>
+                                    </Button>
+                                )}
                             </div>
                         )}
                     </div>

@@ -81,6 +81,23 @@ This is a comprehensive internship management system built with Laravel, focusin
     - Shared layouts and components
     - TypeScript for type safety
 
+## Recent Changes
+
+- Modified `app/Http/Controllers/Front/InternshipApplicantController.php`:
+    - Updated `index` method to display internships based on user role ('mahasiswa' sees own, 'dosen' sees advisees').
+    - Adjusted analytics query to match the role-based data scope.
+    - Updated `show` and `downloadApplicationFile` methods to allow 'dosen' access for their advisees.
+    - Restricted `edit`, `update`, `destroy`, and `bulkDestroy` methods to prevent 'dosen' from modifying student applications via this controller.
+- Modified `app/Http/Controllers/Front/LogbookController.php`:
+    - Updated `index` and `internList` methods to allow 'dosen' to view logbooks/internship lists for their advisees.
+    - Added authorization checks to ensure only the owner ('mahasiswa') can perform `create`, `store`, `edit`, `update`, `destroy` actions.
+    - Corrected `internList` to use `withCount('logbooks')`.
+- Modified `app/Http/Controllers/Front/ReportController.php`:
+    - Updated `index` and `internList` methods to allow 'dosen' to view reports/internship lists for their advisees.
+    - Added `downloadReportFile` method with authorization for owner, advisor ('dosen'), and admin.
+    - Added authorization checks to ensure only the owner ('mahasiswa') can perform `create`, `store`, `edit`, `update`, `destroy` actions.
+    - Corrected `internList` to use `withCount('reports')`.
+
 ## Current Focus Areas
 
 1. Implementing and maintaining core features

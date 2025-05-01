@@ -8,7 +8,7 @@ use App\Models\GuidanceClassAttendance;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB; // Add DB facade
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -22,12 +22,14 @@ class GuidanceClassController extends Controller
      */
     public function index(Request $request)
     {
-        $user = Auth::user();
+        // Load user with roles to avoid duplicate role queries
+        $user = Auth::user()->load('roles');
+        $userRole = $user->roles->first()->name ?? null;
 
         // Base query
         $query = null;
 
-        if ($user->hasRole('dosen')) {
+        if ($userRole === 'dosen') {
             // Dosen melihat kelas yang mereka ampu
             $query = GuidanceClass::where('lecturer_id', $user->id)
                 ->with(['lecturer', 'students' => function ($query) {
@@ -38,7 +40,7 @@ class GuidanceClassController extends Controller
                                 ->first();
                         });
                 }]);
-        } elseif ($user->hasRole('mahasiswa')) {
+        } elseif ($userRole === 'mahasiswa') {
             // Mahasiswa melihat kelas dari dosen pembimbing mereka
             if ($user->mahasiswaProfile && $user->mahasiswaProfile->advisor_id) {
                 $query = GuidanceClass::where('lecturer_id', $user->mahasiswaProfile->advisor_id)
@@ -148,9 +150,10 @@ class GuidanceClassController extends Controller
      */
     public function create()
     {
-        $user = Auth::user();
+        $user = Auth::user()->load('roles');
+        $userRole = $user->roles->first()->name ?? null;
 
-        if (! $user->hasRole('dosen')) {
+        if ($userRole !== 'dosen') {
             return redirect()->route('front.internships.guidance-classes.index')
                 ->with('error', 'Hanya dosen yang dapat membuat kelas bimbingan.');
         }
@@ -165,9 +168,10 @@ class GuidanceClassController extends Controller
      */
     public function store(Request $request)
     {
-        $user = Auth::user();
+        $user = Auth::user()->load('roles');
+        $userRole = $user->roles->first()->name ?? null;
 
-        if (! $user->hasRole('dosen')) {
+        if ($userRole !== 'dosen') {
             return redirect()->route('front.internships.guidance-classes.index')
                 ->with('error', 'Hanya dosen yang dapat membuat kelas bimbingan.');
         }
@@ -205,8 +209,8 @@ class GuidanceClassController extends Controller
      */
     public function show($id)
     {
-        $user = Auth::user();
-        $userRole = $user->hasRole('dosen') ? 'dosen' : 'mahasiswa';
+        $user = Auth::user()->load('roles');
+        $userRole = $user->roles->first()->name === 'dosen' ? 'dosen' : 'mahasiswa';
 
         $guidanceClass = GuidanceClass::with([
             'lecturer' => function ($query) {
@@ -232,43 +236,38 @@ class GuidanceClassController extends Controller
                 $query->where('advisor_id', $guidanceClass->lecturer_id)
                     ->where('academic_status', 'Aktif');
             })
-            ->whereHas('internships', function ($query) {
-                $query->where('status', 'accepted');
-            })
             ->with([
                 'mahasiswaProfile',
                 'internships' => function ($query) {
                     $query->where('status', 'accepted')
                         ->latest();
                 },
-                'guidanceClassAttendance' => function ($query) use ($id) {
-                    $query->where('guidance_class_id', $id);
-                },
             ]);
 
-        $students = $query->paginate(10)
-            ->through(function ($student) {
-                // Access relationships directly from User model
-                $attendance = $student->guidanceClassAttendance->first();
-                $internship = $student->internships->first();
+        $students = $query->get()->map(function ($student) use ($id) {
+            // Access relationships directly from User model
+            $attendance = GuidanceClassAttendance::where('guidance_class_id', $id)
+                ->where('user_id', $student->id)
+                ->first();
+            $internship = $student->internships->first();
 
-                return [
-                    'id' => $student->id,
-                    'name' => $student->name,
-                    'student_number' => $student->mahasiswaProfile?->student_number,
-                    'study_program' => $student->mahasiswaProfile?->study_program,
-                    'semester' => $student->mahasiswaProfile?->semester,
-                    'internship' => [
-                        'company_name' => $internship?->company_name,
-                        'status' => $internship?->status,
-                    ],
-                    'attendance' => [
-                        'attended_at' => $attendance?->attended_at,
-                        'attendance_method' => $attendance?->attendance_method,
-                        'notes' => $attendance?->notes,
-                    ],
-                ];
-            });
+            return [
+                'id' => $student->id,
+                'name' => $student->name,
+                'student_number' => $student->mahasiswaProfile?->student_number,
+                'study_program' => $student->mahasiswaProfile?->study_program,
+                'semester' => $student->mahasiswaProfile?->semester,
+                'internship' => [
+                    'company_name' => $internship?->company_name,
+                    'status' => $internship?->status,
+                ],
+                'attendance' => [
+                    'attended_at' => $attendance?->attended_at,
+                    'attendance_method' => $attendance?->attendance_method,
+                    'notes' => $attendance?->notes,
+                ],
+            ];
+        });
 
         // Check if student has attended
         $isAttended = false;
@@ -296,19 +295,13 @@ class GuidanceClassController extends Controller
                 'expertise' => $guidanceClass->lecturer->dosenProfile->expertise ?? null,
                 'academic_position' => $guidanceClass->lecturer->dosenProfile->academic_position ?? null,
             ],
-            'students' => $students->items(),
+            'students' => $students, // Pass the full collection
         ];
 
         return Inertia::render('front/internships/guidance-classes/show', [
             'class' => $classData,
             'userRole' => $userRole,
             'isAttended' => $isAttended,
-            'meta' => [
-                'total' => $students->total(),
-                'per_page' => $students->perPage(),
-                'current_page' => $students->currentPage(),
-                'last_page' => $students->lastPage(),
-            ],
         ]);
     }
 
@@ -320,9 +313,10 @@ class GuidanceClassController extends Controller
      */
     public function edit($id)
     {
-        $user = Auth::user();
+        $user = Auth::user()->load('roles');
+        $userRole = $user->roles->first()->name ?? null;
 
-        if (! $user->hasRole('dosen')) {
+        if ($userRole !== 'dosen') {
             return redirect()->route('front.internships.guidance-classes.index')
                 ->with('error', 'Hanya dosen yang dapat mengedit kelas bimbingan.');
         }
@@ -347,9 +341,10 @@ class GuidanceClassController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = Auth::user();
+        $user = Auth::user()->load('roles');
+        $userRole = $user->roles->first()->name ?? null;
 
-        if (! $user->hasRole('dosen')) {
+        if ($userRole !== 'dosen') {
             return redirect()->route('front.internships.guidance-classes.index')
                 ->with('error', 'Hanya dosen yang dapat mengedit kelas bimbingan.');
         }
@@ -392,9 +387,10 @@ class GuidanceClassController extends Controller
      */
     public function generateQrCode($id)
     {
-        $user = Auth::user();
+        $user = Auth::user()->load('roles');
+        $userRole = $user->roles->first()->name ?? null;
 
-        if (! $user->hasRole('dosen')) {
+        if ($userRole !== 'dosen') {
             return redirect()->route('front.internships.guidance-classes.index')
                 ->with('error', 'Hanya dosen yang dapat membuat QR Code kehadiran.');
         }
@@ -426,9 +422,10 @@ class GuidanceClassController extends Controller
      */
     public function markAttendance(Request $request, $classId, $studentId)
     {
-        $user = Auth::user();
+        $user = Auth::user()->load('roles');
+        $userRole = $user->roles->first()->name ?? null;
 
-        if (! $user->hasRole('dosen')) {
+        if ($userRole !== 'dosen') {
             return back()->with('error', 'Hanya dosen yang dapat menandai kehadiran secara manual.');
         }
 
@@ -462,8 +459,9 @@ class GuidanceClassController extends Controller
             $attendance->notes = $notes;
             $attendance->save();
 
-            return back()->with('success', 'Kehadiran mahasiswa berhasil dicatat.');
+            return back()->with('success', 'Kehadiran mahasiswa berhasil dicatat.'); // Revert to redirect
         } catch (\Exception $e) {
+            // Still return back with error on exception
             return back()->with('error', 'Gagal mencatat kehadiran: '.$e->getMessage());
         }
     }
@@ -477,9 +475,10 @@ class GuidanceClassController extends Controller
      */
     public function resetAttendance($classId, $studentId)
     {
-        $user = Auth::user();
+        $user = Auth::user()->load('roles');
+        $userRole = $user->roles->first()->name ?? null;
 
-        if (! $user->hasRole('dosen')) {
+        if ($userRole !== 'dosen') {
             return back()->with('error', 'Hanya dosen yang dapat mereset kehadiran.');
         }
 
@@ -487,16 +486,13 @@ class GuidanceClassController extends Controller
             ->where('lecturer_id', $user->id)
             ->firstOrFail();
 
-        $attendance = GuidanceClassAttendance::where('guidance_class_id', $classId)
+        // Delete the record directly using query builder
+        $deleted = GuidanceClassAttendance::where('guidance_class_id', $classId)
             ->where('user_id', $studentId)
-            ->firstOrFail();
+            ->delete(); // Returns the number of affected rows
 
-        $attendance->attended_at = null;
-        $attendance->attendance_method = null;
-        $attendance->notes = null;
-        $attendance->save();
-
-        return back()->with('success', 'Kehadiran mahasiswa berhasil direset.');
+        // Even if $deleted is 0 (e.g., already deleted), the state is correct
+        return back()->with('success', 'Kehadiran mahasiswa berhasil dihapus.');
     }
 
     /**
@@ -507,9 +503,10 @@ class GuidanceClassController extends Controller
      */
     public function destroy($id)
     {
-        $user = Auth::user();
+        $user = Auth::user()->load('roles');
+        $userRole = $user->roles->first()->name ?? null;
 
-        if (! $user->hasRole('dosen')) {
+        if ($userRole !== 'dosen') {
             return redirect()->route('front.internships.guidance-classes.index')
                 ->with('error', 'Hanya dosen yang dapat menghapus kelas bimbingan.');
         }
