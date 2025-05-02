@@ -26,7 +26,7 @@ import { toast } from 'sonner';
 interface NotificationData {
     message: string;
     link: string | null; // Link can be null
-    [key: string]: any; // Allow other properties (Address linter warning later if needed)
+    [key: string]: unknown; // Allow other properties, use unknown instead of any
 }
 
 interface Notification {

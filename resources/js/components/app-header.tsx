@@ -23,7 +23,7 @@ import { DropdownMenuItem, DropdownMenuSeparator } from './ui/dropdown-menu'; //
 interface NotificationData {
     message: string;
     link: string;
-    [key: string]: any; // Allow other properties
+    [key: string]: unknown; // Allow other properties, use unknown instead of any
 }
 
 interface Notification {
