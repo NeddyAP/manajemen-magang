@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\GuidanceClass;
 use App\Models\GuidanceClassAttendance;
 use App\Models\User;
+use App\Notifications\GuidanceClass\ClassScheduled;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -194,6 +197,17 @@ class GuidanceClassController extends Controller
         $guidanceClass->room = $request->room;
         $guidanceClass->description = $request->description;
         $guidanceClass->save();
+
+        // Notify eligible students
+        try {
+            $eligibleStudents = $guidanceClass->getEligibleStudents();
+            if ($eligibleStudents->isNotEmpty()) {
+                Notification::send($eligibleStudents, new ClassScheduled($guidanceClass));
+            }
+        } catch (\Exception $e) {
+            // Log error if notification sending fails, but don't block the user
+            Log::error('Failed to send ClassScheduled notification', ['error' => $e->getMessage(), 'class_id' => $guidanceClass->id]);
+        }
 
         return redirect()->route('front.internships.guidance-classes.show', $guidanceClass->id)
             ->with('success', 'Kelas bimbingan berhasil dibuat.');

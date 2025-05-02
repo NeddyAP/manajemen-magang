@@ -2,7 +2,7 @@
 
 This document tracks the current status, progress, and evolution of the internship management system.
 
-## Current Status (As of April 29, 2025)
+## Current Status (As of May 2, 2025)
 
 ### Core Features Status
 
@@ -39,6 +39,12 @@ This document tracks the current status, progress, and evolution of the internsh
    ✅ Tutorial system
    ✅ File management
    ✅ User documentation
+
+- ✅ Navigation system
+- ✅ Error handling
+- ✅ TypeScript types
+- ✅ In-App Notification System (Header Dropdown)
+- ✅ Notification History Page (View, Mark Unread, Delete)
 
 ### Database Schema Status
 
@@ -94,6 +100,8 @@ This document tracks the current status, progress, and evolution of the internsh
 3. File handling optimizations
 4. Security enhancements
 5. Modified front-end controllers (`InternshipApplicantController`, `LogbookController`, `ReportController`, `GuidanceClassController`, `InternshipController`) to calculate and pass aggregate statistics (counts, status breakdowns) to their respective index views.
+6. **Notification System:** Added API endpoints and controller methods (`markAsUnread`, `destroy`) for managing notifications.
+7. **Notification Links:** Corrected link generation in `ApplicationStatusChanged` notification.
 
 ### Frontend Changes
 
@@ -102,6 +110,12 @@ This document tracks the current status, progress, and evolution of the internsh
 3. TypeScript type definitions
 4. Layout system implementation
 5. Added analytics cards/badges to front-end internship index pages (applicants, logbooks, reports, guidance classes, main hub) displaying summary statistics.
+6. **Notification System:**
+    - Fixed unread count badge display in header dropdown.
+    - Created notification history page (`front/notifications/index.tsx`) using `FrontLayout`.
+    - Implemented Mark as Unread and Delete actions (with confirmation) on history page.
+    - Refactored history page UI using `<Card>` components.
+    - Ensured clicks on notifications navigate to the link provided by the backend.
 
 ## Known Issues
 
@@ -117,18 +131,22 @@ This document tracks the current status, progress, and evolution of the internsh
 
 ### Low Priority
 
-1. Additional documentation needed
+1. Additional documentation needed (API for new notification endpoints)
 2. UI/UX improvements for mobile
-3. Extended testing coverage
+3. Extended testing coverage (especially for notification actions)
+4. TypeScript `any` type warnings in `app-header.tsx` and `notifications/index.tsx` related to `NotificationData`.
 
 ## Next Steps
 
 ### Immediate Tasks
 
-1. Optimize file upload handling
-2. Enhance mobile responsiveness
-3. Implement additional caching
-4. Add comprehensive testing
+1. **Testing:** Comprehensive tests for Notification System (backend, API, frontend actions)
+2. **Notification Links:** Review/Refine Logbook/Report notification links
+3. **TypeScript:** Address `any` type warnings
+4. Optimize file upload handling
+5. Enhance mobile responsiveness
+6. Implement additional caching
+7. Add comprehensive testing
 
 ### Short-term Goals
 
@@ -148,10 +166,10 @@ This document tracks the current status, progress, and evolution of the internsh
 
 ### Code Quality
 
-- Additional TypeScript types needed
+- Additional TypeScript types needed (`NotificationData`)
 - Controller refactoring opportunities
-- Test coverage expansion
-- Documentation updates
+- Test coverage expansion (Notifications)
+- Documentation updates (Notification API)
 
 ### Infrastructure
 
@@ -175,6 +193,9 @@ This document tracks the current status, progress, and evolution of the internsh
 2. Implemented role-based access
 3. Chose file storage strategy
 4. Selected caching approach
+5. Implemented Notification History page with Mark Unread/Delete actions
+6. Used `FrontLayout` for Notification History page
+7. Refactored Notification history UI using `<Card>` components
 
 ### Pending Decisions
 

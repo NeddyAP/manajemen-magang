@@ -7,7 +7,8 @@ use App\Http\Controllers\Front\LogbookController;
 use App\Http\Controllers\Front\ReportController; // Import ReportController
 use App\Http\Controllers\GuidanceClassAttendanceController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\TutorialController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\TutorialController; // Import NotificationController
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -74,6 +75,20 @@ Route::middleware(['auth', 'verified'])->prefix('internships')->name('front.inte
 Route::get('guidance-classes/attend/{token}', [GuidanceClassAttendanceController::class, 'attend'])
     ->middleware('auth')
     ->name('guidance-classes.attend');
+
+// API Routes for Notifications
+Route::middleware(['auth'])->prefix('api')->name('api.')->group(function () {
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/mark-as-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+    Route::post('/notifications/mark-all-as-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+    Route::post('/notifications/mark-as-unread', [\App\Http\Controllers\NotificationController::class, 'markAsUnread'])->name('notifications.markAsUnread');
+    Route::delete('/notifications/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
+});
+
+// Notification History Page (Web Route)
+Route::get('/notifications', [NotificationController::class, 'history'])
+    ->middleware(['auth', 'verified'])
+    ->name('notifications.index');
 
 require __DIR__.'/admin.php';
 require __DIR__.'/settings.php';

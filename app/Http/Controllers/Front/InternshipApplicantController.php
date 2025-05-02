@@ -7,11 +7,13 @@ use App\Http\Requests\StoreInternshipRequest;
 use App\Http\Requests\UpdateInternshipRequest;
 use App\Models\DosenProfile; // Add DosenProfile model
 use App\Models\Internship;
-use App\Models\MahasiswaProfile; // Add MahasiswaProfile model
-use App\Models\User; // Add User model
+use App\Models\MahasiswaProfile;
+use App\Models\User;
+use App\Notifications\Internship\ApplicationSubmitted; // Import Notification class
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // Add Auth facade
-use Illuminate\Support\Facades\DB; // Add DB facade
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification; // Import Notification facade
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -145,7 +147,13 @@ class InternshipApplicantController extends Controller
         $validated['status'] = 'waiting';
         $validated['progress'] = '0';
 
-        Internship::create($validated);
+        $internship = Internship::create($validated);
+
+        // Notify Admins
+        $admins = User::role('admin')->get();
+        if ($admins->isNotEmpty()) {
+            Notification::send($admins, new ApplicationSubmitted($internship));
+        }
 
         return redirect()->route('front.internships.applicants.index')
             ->with('success', 'Internship application submitted successfully!');

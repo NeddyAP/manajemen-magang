@@ -136,21 +136,32 @@ This document outlines the business logic, user roles, features, and workflows o
 - User management
 - Content management
 
-### 2. Notification System
+### 2. Notification System (Implemented - Phase 1: In-App)
 
 **Types:**
 
-1. Email notifications
-2. In-app notifications
-3. Status updates
-4. Reminders
+1. ~~Email notifications~~ (Future Phase)
+2. ✅ In-app notifications (Database-driven)
+3. ✅ Status updates (via In-App)
+4. ✅ Reminders (via In-App)
 
-**Triggers:**
+**Features:**
+- Header dropdown displaying recent unread notifications and count.
+- Dedicated history page (`/notifications`) showing all notifications (paginated).
+- Ability to mark notifications as read (individually via click, all via button).
+- Ability to mark read notifications as unread on history page.
+- Ability to delete notifications on history page (with confirmation).
+- Clicking a notification attempts to navigate to a relevant link.
 
-- Application status changes
-- Report submissions/reviews
-- Upcoming guidance sessions
-- System announcements
+**Implemented Triggers:**
+
+- Internship Application Submitted (Admin/Dosen)
+- Internship Application Status Changed (Student)
+- Logbook Entry Submitted (Dosen)
+- Report Submitted (Dosen)
+- Report Status Changed (Student)
+- Guidance Class Scheduled/Updated (Student)
+- ~~System announcements~~ (Future Phase)
 
 ### 3. Document Management
 

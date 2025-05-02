@@ -106,6 +106,7 @@ Configuration in `config/filesystems.php`:
     - Inertia.js props
     - React hooks
     - Form handling with validation
+    - Notification display in header (`app-header.tsx`)
 
 ## Development Workflow
 
@@ -131,6 +132,7 @@ npm run build  # Build frontend assets
 - ESLint (JavaScript/TypeScript)
 - TypeScript compiler
 - Laravel Debugbar
+- Axios (for frontend API calls)
 
 ## Testing Strategy
 

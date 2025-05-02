@@ -26,8 +26,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function ReportCreate({ internship }: PageProps) {
-    const startDate = parseISO('internship.start_date');
-    const endDate = parseISO('internship.end_date');
+    const startDate = parseISO(internship.start_date);
+    const endDate = parseISO(internship.end_date);
 
     const dynamicBreadcrumbs = breadcrumbs.map((item) => {
         if (item.title === 'Laporan') {

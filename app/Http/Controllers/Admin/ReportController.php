@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Report;
+use App\Notifications\Reports\ReportStatusChanged; // Import Notification
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -84,6 +85,9 @@ class ReportController extends Controller
         ]);
 
         $report->update($validated);
+
+        // Notify the student
+        $report->user->notify(new ReportStatusChanged($report));
 
         return redirect()->back()->with('success', 'Status laporan berhasil diperbarui!');
     }

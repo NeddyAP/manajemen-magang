@@ -7,7 +7,9 @@ use App\Http\Requests\StoreGuidanceClassRequest;
 use App\Http\Requests\UpdateGuidanceClassRequest;
 use App\Models\GuidanceClass;
 use App\Models\User;
+use App\Notifications\GuidanceClass\ClassScheduled; // Import Notification
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification; // Import Notification facade
 use Illuminate\Support\Str;
 
 class GuidanceClassController extends Controller
@@ -100,6 +102,12 @@ class GuidanceClassController extends Controller
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
+            }
+
+            // Notify students after attaching them
+            $studentsToNotify = $guidanceClass->students()->get();
+            if ($studentsToNotify->isNotEmpty()) {
+                Notification::send($studentsToNotify, new ClassScheduled($guidanceClass));
             }
 
             return redirect()
@@ -288,6 +296,12 @@ class GuidanceClassController extends Controller
     public function update(UpdateGuidanceClassRequest $request, GuidanceClass $guidanceClass)
     {
         $guidanceClass->update($request->validated());
+
+        // Notify students associated with this class
+        $studentsToNotify = $guidanceClass->students()->get();
+        if ($studentsToNotify->isNotEmpty()) {
+            Notification::send($studentsToNotify, new ClassScheduled($guidanceClass));
+        }
 
         return redirect()
             ->route('admin.guidance-classes.index')

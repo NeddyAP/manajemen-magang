@@ -10,10 +10,29 @@ import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
-import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, GraduationCap, LayoutDashboard, LayoutGrid, Menu, Search } from 'lucide-react';
+import { Link, router, usePage } from '@inertiajs/react'; // Import router
+import axios from 'axios'; // Import axios
+import { Bell, BookOpen, GraduationCap, LayoutDashboard, LayoutGrid, Menu, Search } from 'lucide-react'; // Import Bell
+import { useEffect, useState } from 'react'; // Import useState, useEffect
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
+import { Badge } from './ui/badge'; // Import Badge
+import { DropdownMenuItem, DropdownMenuSeparator } from './ui/dropdown-menu'; // Import DropdownMenuItem, DropdownMenuSeparator
+
+// Define Notification type (adjust based on actual data structure)
+interface NotificationData {
+    message: string;
+    link: string;
+    [key: string]: any; // Allow other properties
+}
+
+interface Notification {
+    id: string;
+    type: string;
+    data: NotificationData;
+    read_at: string | null;
+    created_at: string;
+}
 
 const mainNavItems: NavItem[] = [
     {
@@ -43,6 +62,70 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
     const getInitials = useInitials();
+
+    // Notification State
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [unreadCount, setUnreadCount] = useState<number>(0);
+    const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true); // Loading state
+
+    // Fetch notifications on mount
+    useEffect(() => {
+        if (auth.user) {
+            fetchNotifications();
+            // Optional: Set up polling or WebSocket listener here for real-time updates
+            // const interval = setInterval(fetchNotifications, 30000); // Poll every 30 seconds
+            // return () => clearInterval(interval); // Cleanup interval on unmount
+        } else {
+            setLoading(false);
+        }
+    }, [auth.user]); // Re-fetch if auth status changes
+
+    const fetchNotifications = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get<{ unread: Notification[]; unread_count: number }>(route('api.notifications.index'));
+            setNotifications(response.data.unread);
+            setUnreadCount(response.data.unread_count);
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+            // Handle error appropriately, e.g., show a toast message
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleMarkAsRead = async (notificationId: string) => {
+        try {
+            await axios.post(route('api.notifications.markAsRead'), { ids: [notificationId] });
+            // Optimistically update UI or re-fetch
+            setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
+            setUnreadCount((prev) => Math.max(0, prev - 1));
+        } catch (error) {
+            console.error('Error marking notification as read:', error);
+        }
+    };
+
+    const handleMarkAllAsRead = async () => {
+        try {
+            await axios.post(route('api.notifications.markAllAsRead'));
+            setNotifications([]);
+            setUnreadCount(0);
+            setIsDropdownOpen(false); // Close dropdown after marking all
+        } catch (error) {
+            console.error('Error marking all notifications as read:', error);
+        }
+    };
+
+    const handleNotificationClick = (notification: Notification) => {
+        // Mark as read first
+        handleMarkAsRead(notification.id);
+        // Then navigate
+        if (notification.data.link) {
+            router.visit(notification.data.link);
+        }
+        setIsDropdownOpen(false); // Close dropdown after click
+    };
 
     // Function to check if current URL starts with the item's href
     const isActive = (href: string) => {
@@ -159,26 +242,28 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                     </div>
 
                     <div className="ml-auto flex items-center space-x-2">
-                        <div className="relative flex items-center space-x-1">
-                            <Button variant="ghost" size="icon" className="group h-9 w-9 cursor-pointer">
-                                <Search className="!size-5 opacity-80 group-hover:opacity-100" />
-                            </Button>
-                            {auth.user ? (
+                        {/* Search Button - Always visible */}
+                        <Button variant="ghost" size="icon" className="group h-9 w-9 cursor-pointer">
+                            <Search className="!size-5 opacity-80 group-hover:opacity-100" />
+                        </Button>
+
+                        {/* Conditional rendering based on auth */}
+                        {auth.user ? (
+                            // Authenticated user view
+                            <div className="flex items-center space-x-1">
+                                {/* Links like Dashboard/Panduan - hidden on mobile */}
                                 <div className="hidden lg:flex">
-                                    {computedRightNavItems.map((item) => (
-                                        <TooltipProvider key={item.title} delayDuration={0}>
+                                    {computedRightNavItems.map((item, index) => (
+                                        <TooltipProvider key={index}>
                                             <Tooltip>
-                                                <TooltipTrigger>
-                                                    <a
-                                                        href={item.href}
-                                                        rel="noopener noreferrer"
-                                                        className="group text-accent-foreground ring-offset-background hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring ml-1 inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent p-0 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
-                                                    >
-                                                        <span className="sr-only">{item.title}</span>
-                                                        {item.icon && (
-                                                            <Icon iconNode={item.icon} className="size-5 opacity-80 group-hover:opacity-100" />
-                                                        )}
-                                                    </a>
+                                                <TooltipTrigger asChild>
+                                                    <Button variant="ghost" size="icon" asChild className="group h-9 w-9 cursor-pointer">
+                                                        <a href={item.href} rel="noopener noreferrer">
+                                                            {item.icon && (
+                                                                <Icon iconNode={item.icon} className="!size-5 opacity-80 group-hover:opacity-100" />
+                                                            )}
+                                                        </a>
+                                                    </Button>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
                                                     <p>{item.title}</p>
@@ -187,27 +272,94 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                         </TooltipProvider>
                                     ))}
                                 </div>
-                            ) : (
-                                <></>
-                            )}
-                        </div>
-                        {auth.user ? (
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" className="size-10 rounded-full p-1">
-                                        <Avatar className="size-8 overflow-hidden rounded-full">
-                                            <AvatarImage src={auth.user.avatar} alt={auth.user.name} />
-                                            <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
-                                                {getInitials(auth.user.name)}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-56" align="end">
-                                    <UserMenuContent user={auth.user} />
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+
+                                {/* Notification Bell - visible on all sizes when logged in */}
+                                <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="icon" className="relative h-9 w-9">
+                                            <Bell className="!size-5" />
+                                            {unreadCount > 0 && (
+                                                <Badge
+                                                    variant="destructive" // Or another variant that provides contrast
+                                                    className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full p-0 text-[10px] font-medium text-white" // Remove p-0.5, ensure text-white, add font-medium
+                                                >
+                                                    {unreadCount}
+                                                </Badge>
+                                            )}
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-80">
+                                        <div className="flex items-center justify-between px-2 py-1.5">
+                                            <span className="font-semibold">Notifications</span>
+                                            {notifications.length > 0 && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="text-xs"
+                                                    onClick={handleMarkAllAsRead}
+                                                    disabled={loading}
+                                                >
+                                                    Mark all as read
+                                                </Button>
+                                            )}
+                                        </div>
+                                        <DropdownMenuSeparator />
+                                        {loading ? (
+                                            <div className="text-muted-foreground p-4 text-center text-sm">Loading...</div>
+                                        ) : notifications.length === 0 ? (
+                                            <div className="text-muted-foreground p-4 text-center text-sm">No unread notifications</div>
+                                        ) : (
+                                            <div className="max-h-80 overflow-y-auto">
+                                                {notifications.map((notification) => (
+                                                    <DropdownMenuItem
+                                                        key={notification.id}
+                                                        className="cursor-pointer"
+                                                        onSelect={(e) => e.preventDefault()} // Prevent closing on select
+                                                        onClick={() => handleNotificationClick(notification)}
+                                                    >
+                                                        <div className="flex flex-col">
+                                                            <p className="text-sm">{notification.data.message}</p>
+                                                            <p className="text-muted-foreground text-xs">
+                                                                {new Date(notification.created_at).toLocaleString()}
+                                                            </p>
+                                                        </div>
+                                                    </DropdownMenuItem>
+                                                ))}
+                                            </div>
+                                        )}
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem
+                                            className="cursor-pointer justify-center text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                            onSelect={(e) => e.preventDefault()} // Prevent closing on select
+                                            onClick={() => {
+                                                router.visit(route('notifications.index')); // Use named route
+                                                setIsDropdownOpen(false);
+                                            }}
+                                        >
+                                            View All Notifications
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+
+                                {/* User Avatar Dropdown - visible on all sizes when logged in */}
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" className="size-10 rounded-full p-1">
+                                            <Avatar className="size-8 overflow-hidden rounded-full">
+                                                <AvatarImage src={auth.user.avatar} alt={auth.user.name} />
+                                                <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                                                    {getInitials(auth.user.name)}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className="w-56" align="end">
+                                        <UserMenuContent user={auth.user} />
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         ) : (
+                            // Guest view
                             <div className="flex items-center space-x-2">
                                 <Link href="/login">
                                     <Button variant="ghost" size="sm">

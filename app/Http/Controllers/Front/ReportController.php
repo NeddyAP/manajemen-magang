@@ -5,14 +5,15 @@ namespace App\Http\Controllers\Front; // Corrected namespace
 use App\Http\Controllers\Controller;
 use App\Models\DosenProfile; // Add DosenProfile
 use App\Models\Internship;
-use App\Models\MahasiswaProfile; // Add MahasiswaProfile
-use App\Models\Report; // Use Report model
-use App\Models\User; // Add User
+use App\Models\MahasiswaProfile;
+use App\Models\Report;
+use App\Models\User;
+use App\Notifications\Reports\ReportSubmitted; // Import Notification
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // Add Auth
-use Illuminate\Support\Facades\DB; // Add DB facade
-use Illuminate\Support\Facades\Storage; // For file handling
-use Inertia\Inertia; // Add Inertia
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class ReportController extends Controller
 {
@@ -161,13 +162,21 @@ class ReportController extends Controller
         $latestReport = $internship->reports()->latest('version')->first();
         $newVersion = $latestReport ? $latestReport->version + 1 : 1;
 
-        $internship->reports()->create([
+        // Create the report and assign it to $report variable
+        $report = $internship->reports()->create([
             'user_id' => auth()->id(), // Belongs to the student
             'title' => $validated['title'],
             'report_file' => $filePath,
             'version' => $newVersion,
             'status' => 'pending',
         ]);
+
+        // Notify the advisor (Dosen)
+        $student = $internship->user->load('mahasiswaProfile.advisor'); // Load profile and advisor
+        $advisor = $student->mahasiswaProfile?->advisor;
+        if ($advisor) {
+            $advisor->notify(new ReportSubmitted($report));
+        }
 
         return redirect()->route('front.internships.reports.index', $internship)
             ->with('success', 'Laporan berhasil ditambahkan.');
@@ -226,6 +235,15 @@ class ReportController extends Controller
         }
 
         $report->update($updateData);
+
+        // Notify the advisor (Dosen) if the file was updated (implies resubmission)
+        if (isset($updateData['report_file'])) {
+            $student = $internship->user->load('mahasiswaProfile.advisor'); // Load profile and advisor
+            $advisor = $student->mahasiswaProfile?->advisor;
+            if ($advisor) {
+                $advisor->notify(new ReportSubmitted($report));
+            }
+        }
 
         return redirect()->route('front.internships.reports.index', $internship)
             ->with('success', 'Laporan berhasil diperbarui.');

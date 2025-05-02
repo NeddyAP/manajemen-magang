@@ -6,7 +6,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { GuidanceClass } from '@/types/guidance-class';
 import { router, useForm } from '@inertiajs/react';
-import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { FormEventHandler } from 'react';
 
@@ -29,8 +28,8 @@ export default function GuidanceClassForm({ mode, guidanceClass }: Props) {
 
         const payload = {
             ...data,
-            start_date: data.start_date ? format(data.start_date, 'yyyy-MM-dd HH:mm:ss') : null,
-            end_date: data.end_date ? format(data.end_date, 'yyyy-MM-dd HH:mm:ss') : null,
+            start_date: data.start_date ? data.start_date.toISOString() : null,
+            end_date: data.end_date ? data.end_date.toISOString() : null,
         };
 
         const options = {

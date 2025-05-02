@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Internship;
+use App\Notifications\Internship\ApplicationStatusChanged; // Import Notification
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -96,6 +97,9 @@ class InternshipController extends Controller
 
         $internship->update($validated);
 
+        // Notify the student
+        $internship->user->notify(new ApplicationStatusChanged($internship));
+
         return redirect()->route('admin.internships.index')
             ->with('success', 'Magang berhasil diubah!');
     }
@@ -119,6 +123,9 @@ class InternshipController extends Controller
         }
 
         $internship->update($validated);
+
+        // Notify the student
+        $internship->user->notify(new ApplicationStatusChanged($internship));
 
         return redirect()->back()->with('success', 'Status magang berhasil diperbarui!');
     }

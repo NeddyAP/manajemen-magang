@@ -217,12 +217,21 @@ BaseLayout
 - Rich text editor
 - Date picker
 
-### 3. Notification System
+### 3. Notification System (In-App)
 
-- Toast notifications
-- Status updates
-- Error messages
-- Success confirmations
+- **Backend:** Laravel Notifications (Database channel)
+- **API:**
+    - `/api/notifications` (GET - Fetch unread for dropdown)
+    - `/api/notifications/mark-as-read` (POST)
+    - `/api/notifications/mark-all-as-read` (POST)
+    - `/api/notifications/mark-as-unread` (POST)
+    - `/api/notifications/{id}` (DELETE)
+- **Frontend:**
+    - Header component (`app-header.tsx`): Displays Bell icon with unread count, dropdown for recent unread, link to history page.
+    - History Page (`front/notifications/index.tsx`): Displays all notifications (paginated), uses `<Card>` structure, provides "Mark as Unread" and "Delete" (with confirmation) actions.
+    - Clicking notification body marks as read (if unread) and navigates to linked resource.
+    - Actions use tooltips and toast notifications for feedback.
+- ~~Toast notifications~~ (Future Enhancement)
 
 ## Data Flow Patterns
 

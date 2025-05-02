@@ -6,10 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\DosenProfile; // Add DosenProfile
 use App\Models\Internship;
 use App\Models\Logbook;
-use App\Models\MahasiswaProfile; // Add MahasiswaProfile
-use App\Models\User; // Add User
+use App\Models\MahasiswaProfile;
+use App\Models\User;
+use App\Notifications\Logbook\EntrySubmitted; // Import Notification
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // Add Auth
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class LogbookController extends Controller
@@ -102,6 +103,14 @@ class LogbookController extends Controller
         $validated['user_id'] = $internship->user_id;
 
         $logbook = $internship->logbooks()->create($validated);
+
+        // Notify the advisor (Dosen)
+        $student = $internship->user->load('mahasiswaProfile.advisor'); // Load profile and advisor
+        $advisor = $student->mahasiswaProfile?->advisor;
+
+        if ($advisor) {
+            $advisor->notify(new EntrySubmitted($logbook));
+        }
 
         return redirect()->route('front.internships.logbooks.index', $internship)
             ->with('success', 'Logbook berhasil ditambahkan');
