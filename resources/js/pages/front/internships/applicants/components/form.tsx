@@ -101,7 +101,7 @@ export default function InternshipForm({ internship, mode, disabled = false }: P
                     </div>
 
                     <div className="space-y-4">
-                        <Label htmlFor="application_file">File tutorial{mode === 'create' ? '*' : ''}</Label>
+                        <Label htmlFor="application_file">Berkas Lamaran{mode === 'create' ? '*' : ''}</Label>
                         <Input id="application_file" type="file" accept=".pdf" disabled={disabled} onChange={handleFileChange} />
                         {currentFile && (
                             <p className="text-sm text-gray-500">
@@ -113,7 +113,7 @@ export default function InternshipForm({ internship, mode, disabled = false }: P
                                         target="_blank"
                                         rel="noopener noreferrer"
                                     >
-                                        (Download)
+                                        (Unduh)
                                     </a>
                                 )}
                             </p>

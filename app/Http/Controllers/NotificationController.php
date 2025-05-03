@@ -51,7 +51,7 @@ class NotificationController extends Controller
             $notifications->markAsRead();
         }
 
-        return response()->json(['message' => 'Notifications marked as read.']);
+        return response()->json(['message' => 'Notifikasi ditandai sebagai terbaca.']);
     }
 
     /**
@@ -62,7 +62,7 @@ class NotificationController extends Controller
         $user = Auth::user();
         $user->unreadNotifications->markAsRead();
 
-        return response()->json(['message' => 'All notifications marked as read.']);
+        return response()->json(['message' => 'Semua notifikasi ditandai sebagai terbaca.']);
     }
 
     /**
@@ -99,7 +99,7 @@ class NotificationController extends Controller
             $user->notifications()->whereIn('id', $validated['ids'])->update(['read_at' => null]);
         }
 
-        return response()->json(['message' => 'Notifications marked as unread.']);
+        return response()->json(['message' => 'Notifikasi ditandai sebagai belum dibaca.']);
     }
 
     /**
@@ -113,9 +113,9 @@ class NotificationController extends Controller
         if ($notification) {
             $notification->delete();
 
-            return response()->json(['message' => 'Notification deleted.']);
+            return response()->json(['message' => 'Notifikasi dihapus.']);
         } else {
-            return response()->json(['message' => 'Notification not found or unauthorized.'], 404);
+            return response()->json(['message' => 'Notifikasi tidak ditemukan atau tidak sah.'], 404);
         }
     }
 }

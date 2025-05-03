@@ -27,7 +27,7 @@ const secondNavItems: NavItem[] = [
         icon: History,
     },
     {
-        title: 'Reports',
+        title: 'Laporan',
         href: '/admin/reports',
         icon: File,
     },
@@ -43,7 +43,7 @@ const thirdNavItems: NavItem[] = [
 
 const forthNavItems: NavItem[] = [
     {
-        title: 'Users',
+        title: 'Pengguna',
         href: '/admin/users',
         icon: Users,
     },
@@ -51,7 +51,7 @@ const forthNavItems: NavItem[] = [
 
 const fifthNavItems: NavItem[] = [
     {
-        title: 'Tutorials',
+        title: 'Tutorial',
         href: '/admin/tutorials',
         icon: Waypoints,
     },
@@ -64,7 +64,7 @@ const fifthNavItems: NavItem[] = [
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Global Variables',
+        title: 'Variabel Global',
         href: '/admin/global-variables',
         icon: Cog,
     },
@@ -74,7 +74,7 @@ const footerNavItems: NavItem[] = [
         icon: Trash,
     },
     {
-        title: 'Home',
+        title: 'Beranda',
         href: '/',
         icon: House,
     },

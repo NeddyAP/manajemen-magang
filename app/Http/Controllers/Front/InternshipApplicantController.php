@@ -156,7 +156,7 @@ class InternshipApplicantController extends Controller
         }
 
         return redirect()->route('front.internships.applicants.index')
-            ->with('success', 'Internship application submitted successfully!');
+            ->with('success', 'Aplikasi magang berhasil diajukan!');
     }
 
     /**
@@ -178,7 +178,7 @@ class InternshipApplicantController extends Controller
                 }
             }
             if (! $isAdvisee) {
-                abort(403, 'Unauthorized action.');
+                abort(403, 'Tindakan tidak sah.');
             }
         }
 
@@ -195,7 +195,7 @@ class InternshipApplicantController extends Controller
         // Check if the internship belongs to the authenticated user
         if ($internship->user_id !== auth()->id()) {
             // Dosen cannot edit student applications directly through this interface
-            abort(403, 'Unauthorized action.');
+            abort(403, 'Tindakan tidak sah.');
         }
 
         return Inertia::render('front/internships/applicants/edit', [
@@ -211,12 +211,12 @@ class InternshipApplicantController extends Controller
         // Check if the internship belongs to the authenticated user
         if ($internship->user_id !== auth()->id()) {
             // Dosen cannot update student applications directly through this interface
-            abort(403, 'Unauthorized action.');
+            abort(403, 'Tindakan tidak sah.');
         }
 
         // Only prevent updates if status is accepted (for mahasiswa)
         if ($internship->status === 'accepted') {
-            return redirect()->back()->with('error', 'You cannot update an application that has already been accepted.');
+            return redirect()->back()->with('error', 'Anda tidak dapat memperbarui aplikasi yang sudah diterima.');
         }
 
         $validated = $request->validated();
@@ -241,7 +241,7 @@ class InternshipApplicantController extends Controller
         $internship->update($validated);
 
         return redirect()->route('front.internships.applicants.index')
-            ->with('success', 'Internship application updated successfully!');
+            ->with('success', 'Aplikasi magang berhasil diperbarui!');
     }
 
     /**
@@ -252,15 +252,15 @@ class InternshipApplicantController extends Controller
         // Check if the internship belongs to the authenticated user
         if ($internship->user_id !== auth()->id()) {
             // Dosen cannot delete student applications directly through this interface
-            abort(403, 'Unauthorized action.');
+            abort(403, 'Tindakan tidak sah.');
         }
 
-        // Only allow deletion if status is waiting (for mahasiswa)
-        if ($internship->status !== 'waiting') {
-            return redirect()->back()->with('error', 'You cannot delete an application that has already been processed.');
+        // Prevent deletion if status is accepted
+        if ($internship->status === 'accepted') {
+            return redirect()->back()->with('error', 'Anda tidak dapat menghapus aplikasi yang sudah diterima.');
         }
 
-        // Delete application file
+        // Delete application file if exists
         if ($internship->application_file) {
             Storage::disk('public')->delete($internship->application_file);
         }
@@ -268,7 +268,7 @@ class InternshipApplicantController extends Controller
         $internship->delete();
 
         return redirect()->route('front.internships.applicants.index')
-            ->with('success', 'Internship application deleted successfully!');
+            ->with('success', 'Aplikasi magang berhasil dihapus!');
     }
 
     /**
@@ -298,10 +298,10 @@ class InternshipApplicantController extends Controller
                 $internship->delete();
             }
 
-            return back()->with('success', 'Selected internship applications deleted successfully!');
+            return back()->with('success', 'Aplikasi magang yang dipilih berhasil dihapus!');
         } else {
             // Dosen or other roles cannot bulk delete via this method
-            return back()->with('error', 'Unauthorized action for bulk deletion.');
+            return back()->with('error', 'Tindakan tidak sah untuk penghapusan massal.');
         }
 
     }
@@ -328,18 +328,13 @@ class InternshipApplicantController extends Controller
         }
 
         if (! $isOwner && ! $isAdvisor && ! $user->hasRole('admin')) { // Assuming admin can also download
-            abort(403, 'Unauthorized action.');
+            abort(403, 'Tindakan tidak sah.');
         }
 
-        if (! $internship->application_file) {
-            // Delete application file
-            if ($internship->application_file) {
-                Storage::disk('public')->delete($internship->application_file);
-            }
-
-            $internship->delete();
+        if (! $internship->application_file || ! Storage::disk('public')->exists($internship->application_file)) {
+            return back()->with('error', 'Berkas aplikasi tidak ditemukan.');
         }
 
-        return back()->with('success', 'Selected internship applications deleted successfully!');
+        return Storage::disk('public')->download($internship->application_file);
     }
 }

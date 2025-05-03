@@ -290,7 +290,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" className="w-80">
                                         <div className="flex items-center justify-between px-2 py-1.5">
-                                            <span className="font-semibold">Notifications</span>
+                                            <span className="font-semibold">Notifikasi</span>
                                             {notifications.length > 0 && (
                                                 <Button
                                                     variant="ghost"
@@ -299,15 +299,15 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                     onClick={handleMarkAllAsRead}
                                                     disabled={loading}
                                                 >
-                                                    Mark all as read
+                                                    Tandai semua terbaca
                                                 </Button>
                                             )}
                                         </div>
                                         <DropdownMenuSeparator />
                                         {loading ? (
-                                            <div className="text-muted-foreground p-4 text-center text-sm">Loading...</div>
+                                            <div className="text-muted-foreground p-4 text-center text-sm">Memuat...</div>
                                         ) : notifications.length === 0 ? (
-                                            <div className="text-muted-foreground p-4 text-center text-sm">No unread notifications</div>
+                                            <div className="text-muted-foreground p-4 text-center text-sm">Tidak ada notifikasi baru</div>
                                         ) : (
                                             <div className="max-h-80 overflow-y-auto">
                                                 {notifications.map((notification) => (
@@ -336,7 +336,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                 setIsDropdownOpen(false);
                                             }}
                                         >
-                                            View All Notifications
+                                            Lihat Semua Notifikasi
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
@@ -363,11 +363,11 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                             <div className="flex items-center space-x-2">
                                 <Link href="/login">
                                     <Button variant="ghost" size="sm">
-                                        Login
+                                        Masuk
                                     </Button>
                                 </Link>
                                 <Link href="/register">
-                                    <Button size="sm">Register</Button>
+                                    <Button size="sm">Daftar</Button>
                                 </Link>
                             </div>
                         )}

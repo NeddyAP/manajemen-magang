@@ -253,7 +253,7 @@ class ReportController extends Controller
     {
         // Authorization checks: Only owner can delete
         if ($internship->user_id !== auth()->id() || $report->internship_id !== $internship->id || $report->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
+            abort(403, 'Tindakan tidak sah.');
         }
 
         // Optionally, prevent deletion of approved reports
@@ -292,17 +292,17 @@ class ReportController extends Controller
 
         // Authorize: Must be owner or advisor
         if (! $isOwner && ! $isAdvisor && ! $user->hasRole('admin')) { // Assuming admin can also download
-            abort(403, 'Unauthorized action.');
+            abort(403, 'Tindakan tidak sah.');
         }
 
         // Check if report belongs to the internship
         if ($report->internship_id !== $internship->id) {
-            abort(404, 'Report not found for this internship.');
+            abort(404, 'Laporan tidak ditemukan untuk magang ini.');
         }
 
         // Check if file exists
         if (! $report->report_file || ! Storage::disk('public')->exists($report->report_file)) {
-            abort(404, 'File not found.');
+            abort(404, 'Berkas tidak ditemukan.');
         }
 
         return Storage::disk('public')->download($report->report_file);

@@ -24,11 +24,11 @@ class GuidanceClassAttendanceController extends Controller
                 return back()->with('error', 'Anda tidak terdaftar sebagai mahasiswa bimbingan dosen ini.');
             }
 
-            if ($user->mahasiswaProfile->academic_status !== 'active') {
+            if ($user->mahasiswaProfile->academic_status !== 'Aktif') {
                 return back()->with('error', 'Status akademik Anda tidak aktif.');
             }
 
-            return back()->with('error', 'Anda harus memiliki magang yang aktif atau pending untuk menghadiri kelas.');
+            return back()->with('error', 'Anda harus memiliki magang yang aktif atau sedang berjalan untuk menghadiri kelas.');
         }
 
         // Check if class is ongoing and has spots

@@ -103,7 +103,7 @@ class TutorialController extends Controller
                 'tutorial' => $tutorial,
             ]);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to load tutorial: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memuat tutorial: '.$e->getMessage());
         }
     }
 
