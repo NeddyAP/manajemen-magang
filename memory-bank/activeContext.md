@@ -135,3 +135,4 @@ This is a comprehensive internship management system built with Laravel, focusin
 3. Maintain comprehensive documentation
 4. Implement proper error handling
 5. Ensure secure file management
+6. Use Indonesian for UI text where appropriate; revert to English if the translation is awkward.

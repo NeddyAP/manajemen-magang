@@ -1,3 +1,4 @@
+import { PageProps as InertiaPageProps } from '@inertiajs/core'; // Import Inertia's PageProps
 import { GlobalVariable } from '@/pages/admin/global-variables';
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
@@ -51,3 +52,6 @@ interface TableMeta {
     current_page: number;
     last_page: number;
 }
+
+// Define the generic PageProps
+export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & SharedData;

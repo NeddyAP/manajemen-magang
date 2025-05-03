@@ -1,6 +1,17 @@
 'use client';
 
 import { DataTableColumnHeader } from '@/components/data-table/column-header';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'; // Import AlertDialog components
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -12,12 +23,17 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'; // Import Tooltip components
 import { type Report } from '@/types/internship';
-import { Link, router } from '@inertiajs/react';
+import { type PageProps } from '@/types'; // Use original import path for PageProps
+import { Link, router, usePage } from '@inertiajs/react'; // Import usePage
 import { type ColumnDef, type VisibilityState } from '@tanstack/react-table';
+import { useState } from 'react'; // Import useState
+import { Label } from '@/components/ui/label'; // Import Label
+import { Textarea } from '@/components/ui/textarea'; // Import Textarea
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { FileSpreadsheet, MoreHorizontal } from 'lucide-react';
+import { CheckCircle, FileSpreadsheet, MoreHorizontal, XCircle } from 'lucide-react'; // Import CheckCircle and XCircle
 
 export const initialColumnVisibility: VisibilityState = {
     id: false,
@@ -106,44 +122,175 @@ export const columns: ColumnDef<Report>[] = [
         header: 'Aksi',
         cell: ({ row }) => {
             const report = row.original;
-            const canEdit = report.status !== 'approved';
+            const { auth } = usePage<PageProps>().props; // Get user from page props
+            const user = auth.user;
 
+            // Determine user capabilities
+            const isOwner = user.id === report.user_id;
+            // Add type annotation for role and check if roles exist
+            const isAdvisorOrAdmin = user.roles?.some((role: { name: string }) => ['dosen', 'admin'].includes(role.name)) ?? false;
+
+            // Conditions for actions
+            const canEdit = isOwner && report.status !== 'approved';
+            const canDelete = isOwner; // Owner can always delete? Or only non-approved? Adjust if needed.
+            const canApproveReject = isAdvisorOrAdmin && report.status === 'pending';
+
+            // State for rejection note
+            const [rejectionNote, setRejectionNote] = useState('');
+
+            // Handlers
             const handleDelete = () => {
-                if (confirm('Apakah Anda yakin ingin menghapus laporan ini?')) {
-                    router.delete(route('front.internships.reports.destroy', { internship: report.internship_id, report: report.id }), {
-                        preserveScroll: true,
-                    });
-                }
+                router.delete(route('front.internships.reports.destroy', { internship: report.internship_id, report: report.id }), {
+                    preserveScroll: true,
+                    // Add onFinish or onSuccess/onError for feedback if desired
+                });
+            };
+
+            const handleApprove = () => {
+                router.post(route('front.internships.reports.approve', { internship: report.internship_id, report: report.id }), undefined, {
+                    preserveScroll: true,
+                });
+            };
+
+            const handleReject = () => {
+                router.post(route('front.internships.reports.reject', { internship: report.internship_id, report: report.id }), {
+                    rejection_note: rejectionNote // Send the note
+                }, {
+                    preserveScroll: true,
+                    onSuccess: () => setRejectionNote(''), // Reset note on success
+                    // Consider adding onError handling
+                });
             };
 
             return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Buka menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                        <DropdownMenuItem asChild>
-                            <a href={`/storage/${report.report_file}`} target="_blank" rel="noopener noreferrer">
-                                Unduh
-                            </a>
-                        </DropdownMenuItem>
-                        {canEdit && (
+                <div className="flex items-center justify-end space-x-2">
+                    {/* Advisor/Admin Actions */}
+                    {canApproveReject && (
+                        <TooltipProvider delayDuration={100}>
+                            {/* Approve Button */}
+                            <AlertDialog>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600 hover:text-green-700">
+                                                <CheckCircle className="h-4 w-4" />
+                                                <span className="sr-only">Setujui</span>
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                    </TooltipTrigger>
+                                    <TooltipContent>Setujui Laporan</TooltipContent>
+                                </Tooltip>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Setujui Laporan?</AlertDialogTitle>
+                                        <AlertDialogDescription>Apakah Anda yakin ingin menyetujui laporan ini?</AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                                        <AlertDialogAction onClick={handleApprove} className="bg-green-600 hover:bg-green-700">
+                                            Ya, Setujui
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+
+                            {/* Reject Button */}
+                            <AlertDialog onOpenChange={(open) => !open && setRejectionNote('')}> {/* Reset note on close */}
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600 hover:text-red-700">
+                                                <XCircle className="h-4 w-4" />
+                                                <span className="sr-only">Tolak</span>
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                    </TooltipTrigger>
+                                    <TooltipContent>Tolak Laporan</TooltipContent>
+                                </Tooltip>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Tolak Laporan?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            Apakah Anda yakin ingin menolak laporan ini? Silakan berikan alasan penolakan.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    {/* Rejection Note Input */}
+                                    <div className="grid gap-2 py-4">
+                                        <Label htmlFor="rejection-note">Catatan Penolakan</Label>
+                                        <Textarea
+                                            id="rejection-note"
+                                            placeholder="Masukkan alasan penolakan..."
+                                            value={rejectionNote}
+                                            onChange={(e) => setRejectionNote(e.target.value)}
+                                            className="min-h-[100px]"
+                                        />
+                                    </div>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                                        <AlertDialogAction onClick={handleReject} className="bg-destructive hover:bg-destructive/90">
+                                            Ya, Tolak
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </TooltipProvider>
+                    )}
+
+                    {/* Owner Actions Dropdown */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Buka menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                            {/* Download is always available for owner/advisor */}
                             <DropdownMenuItem asChild>
-                                <Link href={route('front.internships.reports.edit', { internship: report.internship_id, report: report.id })}>
-                                    Edit
-                                </Link>
+                                <a href={route('front.internships.reports.download', { internship: report.internship_id, report: report.id })} target="_blank" rel="noopener noreferrer">
+                                    Unduh
+                                </a>
                             </DropdownMenuItem>
-                        )}
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleDelete} className="text-destructive focus:text-destructive focus:bg-destructive/10">
-                            Hapus
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                            {canEdit && (
+                                <DropdownMenuItem asChild>
+                                    <Link href={route('front.internships.reports.edit', { internship: report.internship_id, report: report.id })}>
+                                        Edit
+                                    </Link>
+                                </DropdownMenuItem>
+                            )}
+                            {canDelete && (
+                                <>
+                                    <DropdownMenuSeparator />
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <DropdownMenuItem
+                                                onSelect={(e) => e.preventDefault()} // Prevent closing dropdown
+                                                className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                                            >
+                                                Hapus
+                                            </DropdownMenuItem>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Hapus Laporan?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    Apakah Anda yakin ingin menghapus laporan ini? Tindakan ini tidak dapat diurungkan.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Batal</AlertDialogCancel>
+                                                <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+                                                    Ya, Hapus
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                </>
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
             );
         },
         enableSorting: false,

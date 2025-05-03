@@ -54,6 +54,9 @@ Route::middleware(['auth', 'verified'])->prefix('internships')->name('front.inte
         Route::get('/reports/{internship}/{report}/edit', [ReportController::class, 'edit'])->name('reports.edit');
         Route::put('/reports/{internship}/{report}', [ReportController::class, 'update'])->name('reports.update'); // Use PUT for updates
         Route::delete('/reports/{internship}/{report}', [ReportController::class, 'destroy'])->name('reports.destroy');
+        Route::get('/reports/{internship}/{report}/download', [ReportController::class, 'downloadReportFile'])->name('reports.download'); // Add download route back if missing
+        Route::post('/reports/{internship}/{report}/approve', [ReportController::class, 'approve'])->name('reports.approve'); // Approve route
+        Route::post('/reports/{internship}/{report}/reject', [ReportController::class, 'reject'])->name('reports.reject'); // Reject route
     });
 
     // Guidance Classes routes

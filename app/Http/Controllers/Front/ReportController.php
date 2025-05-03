@@ -8,6 +8,7 @@ use App\Models\Internship;
 use App\Models\MahasiswaProfile;
 use App\Models\Report;
 use App\Models\User;
+use App\Notifications\Reports\ReportStatusChanged; // Import Status Changed Notification
 use App\Notifications\Reports\ReportSubmitted; // Import Notification
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -306,5 +307,104 @@ class ReportController extends Controller
         }
 
         return Storage::disk('public')->download($report->report_file);
+    }
+
+    // Method for Dosen/Admin to approve a report
+    public function approve(Internship $internship, Report $report)
+    {
+        $user = Auth::user();
+        $isAdvisor = false;
+
+        // Check if the report belongs to the internship
+        if ($report->internship_id !== $internship->id) {
+            abort(404, 'Laporan tidak ditemukan untuk magang ini.');
+        }
+
+        // Check if the user is the advisor
+        if ($user->hasRole('dosen')) {
+            $dosenProfile = DosenProfile::where('user_id', $user->id)->first();
+            if ($dosenProfile) {
+                $adviseeProfile = MahasiswaProfile::where('user_id', $internship->user_id)
+                    ->where('advisor_id', $dosenProfile->user_id)
+                    ->first();
+                $isAdvisor = (bool) $adviseeProfile;
+            }
+        }
+
+        // Authorize: Must be advisor or admin
+        if (! $isAdvisor && ! $user->hasRole('admin')) {
+            abort(403, 'Tindakan tidak sah.');
+        }
+
+        // Check if the report is pending
+        if ($report->status !== 'pending') {
+            return back()->with('error', 'Hanya laporan yang berstatus pending yang dapat disetujui.');
+        }
+
+        // Update status to approved
+        $report->update(['status' => 'approved']);
+
+        // Notify the student
+        $student = $report->user;
+        if ($student) {
+            $student->notify(new ReportStatusChanged($report, 'approved'));
+        }
+
+        return back()->with('success', 'Laporan berhasil disetujui.');
+    }
+
+    // Method for Dosen/Admin to reject a report
+    public function reject(Request $request, Internship $internship, Report $report)
+    {
+        $user = Auth::user();
+        $isAdvisor = false;
+
+        // Check if the report belongs to the internship
+        if ($report->internship_id !== $internship->id) {
+            abort(404, 'Laporan tidak ditemukan untuk magang ini.');
+        }
+
+        // Check if the user is the advisor
+        if ($user->hasRole('dosen')) {
+            $dosenProfile = DosenProfile::where('user_id', $user->id)->first();
+            if ($dosenProfile) {
+                $adviseeProfile = MahasiswaProfile::where('user_id', $internship->user_id)
+                    ->where('advisor_id', $dosenProfile->user_id)
+                    ->first();
+                $isAdvisor = (bool) $adviseeProfile;
+            }
+        }
+
+        // Authorize: Must be advisor or admin
+        if (! $isAdvisor && ! $user->hasRole('admin')) {
+            abort(403, 'Tindakan tidak sah.');
+        }
+
+        // Check if the report is pending
+        if ($report->status !== 'pending') {
+            return back()->with('error', 'Hanya laporan yang berstatus pending yang dapat ditolak.');
+        }
+
+        // Validate rejection reason
+        $validated = $request->validate([
+            'rejection_note' => 'nullable|string|max:1000', // Validate the note
+        ]);
+
+        // Update status to rejected and add the note
+        $updateData = [
+            'status' => 'rejected',
+            'reviewer_notes' => $validated['rejection_note'] ?? null, // Save note to reviewer_notes
+        ];
+        $report->update($updateData);
+
+        // Notify the student (pass the note if needed by the notification)
+        $student = $report->user;
+        if ($student) {
+            // You might need to modify the ReportStatusChanged notification
+            // to accept and display the rejection note.
+            $student->notify(new ReportStatusChanged($report, 'rejected', $updateData['reviewer_notes']));
+        }
+
+        return back()->with('success', 'Laporan berhasil ditolak dengan catatan.');
     }
 }
