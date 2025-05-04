@@ -1,275 +1,174 @@
 # Product Context
 
-This document outlines the business logic, user roles, features, and workflows of the internship management system.
+This document outlines the business logic, user roles, features, and workflows of the internship management system (Manajement Magang).
 
 ## User Roles & Responsibilities
 
 ### 1. Student (Mahasiswa)
 
-- Apply for internship programs (KKL/KKN)
-- Submit daily logbook entries
-- Upload and revise reports
-- Attend guidance classes
-- Access learning materials and tutorials
-
-#### Permissions
-
-- Create/edit own internship applications
-- Manage personal logbook entries
-- Submit and revise reports
-- View assigned guidance classes
-- Access role-appropriate tutorials
+*   **Responsibilities:** Apply for internship programs (KKL/KKN), submit daily logbook entries, upload and manage internship reports, attend scheduled guidance classes, manage personal profile and settings.
+*   **Permissions:**
+    *   Create/edit own internship applications.
+    *   Manage personal logbook entries (create, edit, delete).
+    *   Submit and manage own reports (create, edit, delete).
+    *   View assigned guidance classes and related details.
+    *   Access general tutorials and FAQs.
+    *   View own notifications.
+    *   Update own profile (name, email, etc.) and password.
+    *   Manage appearance settings.
 
 ### 2. Lecturer (Dosen)
 
-- Review student applications
-- Supervise assigned students
-- Review logbook entries
-- Evaluate reports
-- Conduct guidance classes
+*   **Responsibilities:** Supervise assigned students, review student internship applications, review logbook entries and provide feedback, evaluate student reports, schedule and conduct guidance classes, manage own profile and settings.
+*   **Permissions:**
+    *   View internship applications of assigned advisees.
+    *   View logbook entries of assigned advisees and add notes/feedback.
+    *   View reports submitted by assigned advisees.
+    *   Create, manage, and view attendance for own guidance classes.
+    *   Assign students to guidance classes.
+    *   Access general tutorials and FAQs.
+    *   View own notifications.
+    *   Update own profile (name, email, etc.) and password.
+    *   Manage appearance settings.
+    *   *(Note: Dosen generally do not directly approve/reject applications or reports in the current workflow; this is handled by Admins, but Dosen provide input/supervision).*
 
-#### Permissions
+### 3. Administrator (Admin)
 
-- Review assigned internship applications
-- Add notes to student logbooks
-- Approve/reject student reports
-- Create and manage guidance classes
-- Upload teaching materials
-
-### 3. Administrator
-
-- Manage user accounts
-- Review and process applications
-- Monitor system activity
-- Manage FAQs and tutorials
-- Generate reports and analytics
-
-#### Permissions
-
-- Full system access
-- Manage all user accounts
-- Process all applications
-- Access system analytics
-- Manage system content
+*   **Responsibilities:** Manage user accounts (all roles), oversee and process internship applications, monitor system activity, manage system content (FAQs, Tutorials, Global Variables), manage guidance classes, view all system data, manage system settings, handle trash recovery/deletion.
+*   **Permissions:**
+    *   Full system access (CRUD operations on most resources).
+    *   Manage all user accounts (create, edit, delete, assign roles).
+    *   Process all internship applications (review, approve, reject).
+    *   Review all logbooks and reports.
+    *   Manage all guidance classes.
+    *   Manage system content (FAQs, Tutorials, Global Variables).
+    *   Access system analytics/dashboards.
+    *   Manage soft-deleted items (restore, force delete).
+    *   Update own profile (name, email, etc.) and password.
+    *   Manage appearance settings.
 
 ## Business Processes
 
 ### 1. Internship Application
 
-**Status Flow:** Draft → Submitted → pending (Under Review) → approved/rejected
-
-**Requirements:**
-
-- Valid student enrollment
-- Complete application form
-- Required documents (PDF format)
-- Company/institution details
-- Proposed timeline
+*   **Flow:**
+    1.  Student creates and submits an application with required details and PDF document uploads.
+    2.  Application status becomes `Submitted`.
+    3.  Admin reviews the application.
+    4.  Admin changes status to `Approved` or `Rejected`.
+    5.  Student and relevant Admin/Dosen are notified of status changes via In-App Notifications.
+*   **Statuses:** `Draft` (Implicit), `Submitted`, `Approved`, `Rejected`.
+*   **Requirements:** Valid student profile, completed form fields, required PDF document uploads.
 
 ### 2. Logbook Management
 
-**Frequency:** Daily entries required
-**Components:**
-
-- Date of activity
-- Detailed description
-- Supporting documents (optional)
-- Supervisor notes
-- Attendance records
+*   **Flow:**
+    1.  Student creates daily logbook entries detailing activities.
+    2.  Entries are visible to the student and their assigned Dosen supervisor.
+    3.  Dosen can view entries and add feedback/notes (future enhancement).
+*   **Frequency:** Expected daily during the internship period.
+*   **Components:** Date, activity description, optional supporting documents (future).
 
 ### 3. Report Submission
 
-**Versions:**
-
-1. Initial Draft
-2. Revisions based on feedback
-3. Final submission
-
-**Requirements:**
-
-- Standard formatting
-- Required sections
-- Supporting documents
-- Version tracking
-- Review comments
+*   **Flow:**
+    1.  Student uploads their internship report (PDF, DOCX, etc.).
+    2.  Report is visible to the student, assigned Dosen, and Admins.
+    3.  Dosen/Admin review the report.
+    4.  Status can be updated by Admin (e.g., `Needs Revision`, `Approved`). (Specific status flow TBD/simplified currently).
+    5.  Student is notified of status changes.
+*   **Versioning:** Currently handled by allowing re-uploads/updates by the student. Formal version tracking is not implemented.
+*   **Requirements:** Standard report format (as defined by institution), file upload.
 
 ### 4. Guidance Classes
 
-**Types:**
-
-1. Regular sessions
-2. Special consultations
-3. Group discussions
-
-**Features:**
-
-- Attendance tracking via QR code
-- Session materials
-- Discussion notes
-- Schedule management
+*   **Flow:**
+    1.  Admin or Dosen creates a guidance class, setting the topic, schedule, and location.
+    2.  Admin/Dosen assigns relevant students to the class.
+    3.  Students are notified about scheduled classes.
+    4.  Attendance is tracked (currently manual check-in, QR code planned).
+    5.  Materials can be associated (via description or future upload feature).
+*   **Features:** Scheduling, student assignment, attendance list.
 
 ## Product Features
 
-### 1. Dashboard Views
+### 1. Dashboards
 
-#### Student Dashboard
+*   **Student Dashboard:** Overview of application status, recent logbook activity, upcoming guidance sessions, notifications.
+*   **Lecturer Dashboard:** List of supervised students, pending items requiring attention (e.g., recent logbooks - future), scheduled guidance sessions.
+*   **Admin Dashboard:** System statistics (user counts, application counts by status), links to management sections (Users, FAQs, Tutorials, Global Variables, Trash), recent activity overview.
 
-- Application status
-- Logbook completion rate
-- Upcoming guidance sessions
-- Recent notifications
-- Report status
+### 2. Notification System (In-App)
 
-#### Lecturer Dashboard
-
-- Students under supervision
-- Pending reviews
-- Scheduled guidance sessions
-- Recent activities
-- Performance metrics
-
-#### Admin Dashboard
-
-- System statistics
-- Recent applications
-- Active internships
-- User management
-- Content management
-
-### 2. Notification System (Implemented - Phase 1: In-App)
-
-**Types:**
-
-1. ~~Email notifications~~ (Future Phase)
-2. ✅ In-app notifications (Database-driven)
-3. ✅ Status updates (via In-App)
-4. ✅ Reminders (via In-App)
-
-**Features:**
-- Header dropdown displaying recent unread notifications and count.
-- Dedicated history page (`/notifications`) showing all notifications (paginated).
-- Ability to mark notifications as read (individually via click, all via button).
-- Ability to mark read notifications as unread on history page.
-- Ability to delete notifications on history page (with confirmation).
-- Clicking a notification attempts to navigate to a relevant link.
-
-**Implemented Triggers:**
-
-- Internship Application Submitted (Admin/Dosen)
-- Internship Application Status Changed (Student)
-- Logbook Entry Submitted (Dosen)
-- Report Submitted (Dosen)
-- Report Status Changed (Student)
-- Guidance Class Scheduled/Updated (Student)
-- ~~System announcements~~ (Future Phase)
+*   **Channel:** Database (`notifications` table).
+*   **UI:**
+    *   Header dropdown (Bell icon) showing unread count and list of recent unread notifications.
+    *   Dedicated history page (`/notifications`) displaying all notifications (paginated).
+*   **Functionality:**
+    *   Mark notifications as read (individually by clicking, all via button).
+    *   Mark read notifications as unread (on history page).
+    *   Delete notifications (individually on history page, with confirmation).
+    *   Clicking a notification navigates to a relevant link (if provided).
+*   **Implemented Triggers:**
+    *   Internship Application Submitted (Notifies Admin/Dosen)
+    *   Internship Application Status Changed (Notifies Student)
+    *   Logbook Entry Submitted (Notifies Dosen)
+    *   Report Submitted (Notifies Dosen)
+    *   Report Status Changed (Notifies Student)
+    *   Guidance Class Scheduled/Updated (Notifies assigned Students)
+*   **Out of Scope (Currently):** Email notifications, Real-time push notifications, System announcements via notifications.
 
 ### 3. Document Management
 
-**Supported Formats:**
+*   **Mechanism:** File uploads associated with specific records (Applications, Reports, Logbooks - future).
+*   **Storage:** Configured via Laravel Filesystem (`local`, `public` disks used).
+*   **Supported Formats:** Primarily PDF, DOC/DOCX. Other types might be configurable.
+*   **Features:** Secure storage, access control based on user roles/ownership, download functionality. Version control is implicit (re-upload).
 
-- PDF documents
-- Office documents (doc, docx, ppt, pptx)
-- Archive files (zip, rar)
+### 4. Content Management (Admin)
 
-**Features:**
+*   **FAQs:** Create, Read, Update, Delete Frequently Asked Questions.
+*   **Tutorials:** Create, Read, Update, Delete tutorial entries.
+*   **Global Variables:** Manage system-wide key-value pairs.
 
-- Version control
-- Access control
-- Preview capability
-- Secure storage
+### 5. User Settings
 
-### 4. Reporting & Analytics
+*   **Profile:** Update name, email, specific profile details (NIM, NIDN etc.).
+*   **Password:** Change account password.
+*   **Appearance:** Select Light/Dark mode, theme settings.
 
-**Available Reports:**
+### 6. Trash Management (Admin)
 
-1. Internship Statistics
+*   View soft-deleted records (Users, FAQs, etc.).
+*   Restore deleted records.
+*   Permanently delete records.
 
-    - Applications by status
-    - Success rates
-    - Duration metrics
+### 7. Testing
 
-2. Student Performance
-
-    - Logbook completion
-    - Attendance rates
-    - Report quality
-
-3. System Usage
-    - User activity
-    - Resource utilization
-    - Feature adoption
+*   **Framework:** Pest PHP.
+*   **Environment:** Uses an in-memory SQLite database (`:memory:`) for isolated testing.
+*   **Focus:** Feature tests covering core application logic, especially Authentication flows (Registration, Login, Password Reset, Email Verification).
 
 ## Quality Standards
 
-### 1. Application Processing
-
-- Response within 5 working days
-- Clear status communication
-- Documented decision process
-
-### 2. Document Management
-
-- Secure file storage
-- Version tracking
-- Backup procedures
-- Access logging
-
-### 3. User Experience
-
-- Intuitive navigation
-- Mobile responsiveness
-- Quick load times
-- Clear error messages
-
-### 4. Support System
-
-- FAQ management
-- Tutorial system
-- Help documentation
-- Technical support
+*   **Application Processing:** Admin review expected within a reasonable timeframe (e.g., 2-3 business days). Clear status updates via notifications.
+*   **Document Management:** Reliable uploads and downloads. Secure storage preventing unauthorized access.
+*   **User Experience:** Intuitive navigation within role-specific layouts. Responsive design. Fast page loads (<1s). Clear feedback via toasts and validation messages. Use of Indonesian language for UI text.
+*   **Code Quality:** Adherence to Laravel and React best practices. Maintainable and readable code. Good test coverage. Minimal technical debt.
 
 ## Success Metrics
 
-### 1. System Performance
+*   **System Performance:** Low page load times, high uptime, low error rates.
+*   **User Engagement:** High login frequency, regular use of core features (logbooks, reports), high task completion rates.
+*   **Program Efficiency:** Reduced time for application processing, timely feedback loops, high compliance with logbook/report submissions.
+*   **Technical Health:** High test coverage (>80%), successful CI/CD pipeline runs, low bug report rate.
 
-- Application processing time
-- Document upload success rate
-- System uptime
-- Response times
+## Future Enhancements (Potential)
 
-### 2. User Engagement
-
-- Daily active users
-- Feature usage rates
-- User satisfaction scores
-- Support ticket resolution
-
-### 3. Program Success
-
-- Application completion rate
-- Logbook compliance
-- Report approval rate
-- Guidance attendance
-
-## Future Enhancements
-
-### Phase 1
-
-- Mobile application
-- Real-time notifications
-- Enhanced reporting
-- API integration
-
-### Phase 2
-
-- Machine learning for document processing
-- Automated progress tracking
-- Advanced analytics
-- Integration with academic systems
-
-### Phase 3
-
-- Blockchain for document verification
-- AI-powered insights
-- Extended API ecosystem
-- Cross-institution collaboration
+*   Real-time notifications (e.g., using WebSockets).
+*   Enhanced analytics and reporting module.
+*   Dosen feedback mechanism for logbooks/reports.
+*   QR code integration for guidance class attendance.
+*   Mobile responsiveness improvements.
+*   Integration with other university systems (SIS, LMS).
+*   Email notification channel.

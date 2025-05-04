@@ -1,185 +1,147 @@
 # Technical Context
 
-This document outlines the technical architecture, dependencies, and development setup for the internship management system.
+This document outlines the technical stack, dependencies, development setup, and testing strategy for the internship management system (Manajement Magang).
 
-## Development Environment
+## Core Technologies
 
-### Core Requirements
+*   **Backend Framework:** Laravel 12.x
+*   **Frontend Library/Framework:** React 18+ with TypeScript
+*   **Server-Client Integration:** Inertia.js
+*   **Database:** MySQL / MariaDB (Primary), SQLite (for Testing)
+*   **Styling:** Tailwind CSS
+*   **UI Component Library:** Shadcn UI
+*   **Build Tool:** Vite
+*   **Testing Framework:** Pest PHP
 
-- PHP 8.2+
-- Node.js (for frontend build)
-- Composer
-- NPM/Yarn
+## Development Environment Setup
 
-### Primary Dependencies
+### Requirements
 
-#### Backend (PHP)
+*   PHP 8.2+
+*   Node.js (Latest LTS recommended, check `package.json` engines if specified)
+*   Composer (PHP package manager)
+*   NPM or Yarn (Node.js package manager)
+*   A local web server environment (e.g., Laragon, Herd, Valet, Docker)
+*   Database Server (MySQL/MariaDB)
 
-```json
-{
-    "laravel/framework": "^12.0",
-    "inertiajs/inertia-laravel": "^2.0",
-    "spatie/laravel-permission": "^6.16",
-    "tightenco/ziggy": "^2.4"
-}
-```
+### Installation Steps
 
-#### Development Dependencies
+1.  Clone the repository.
+2.  Navigate to the project directory.
+3.  Install PHP dependencies: `composer install`
+4.  Install Node.js dependencies: `npm install` (or `yarn install`)
+5.  Copy `.env.example` to `.env`.
+6.  Generate application key: `php artisan key:generate`
+7.  Configure database connection details in `.env` (DB\_HOST, DB\_PORT, DB\_DATABASE, DB\_USERNAME, DB\_PASSWORD).
+8.  Run database migrations: `php artisan migrate`
+9.  (Optional) Seed the database: `php artisan db:seed`
+10. Build frontend assets: `npm run build` (for initial setup/production) or `npm run dev` (for development).
+11. Link storage: `php artisan storage:link`
 
-```json
-{
-    "barryvdh/laravel-debugbar": "^3.15",
-    "fakerphp/faker": "^1.23",
-    "laravel/pail": "^1.2.2",
-    "laravel/pint": "^1.18"
-}
-```
+## Key Dependencies
 
-## Architecture
+### Backend (composer.json)
 
-### Database Schema
+*   `laravel/framework`: ^12.0
+*   `inertiajs/inertia-laravel`: ^2.0
+*   `spatie/laravel-permission`: ^6.16 (Roles & Permissions)
+*   `tightenco/ziggy`: ^2.4 (Share Laravel routes with JS)
+*   `laravel/sanctum`: (API authentication - potentially used by Fortify)
+*   `laravel/fortify`: (Backend authentication logic - adapted for Inertia)
+*   **Dev:**
+    *   `pestphp/pest`: ^2.0 (Testing Framework)
+    *   `pestphp/pest-plugin-laravel`: ^2.0
+    *   `laravel/pint`: ^1.18 (Code Style)
+    *   `barryvdh/laravel-debugbar`: ^3.15 (Debugging)
+    *   `fakerphp/faker`: ^1.23 (Data seeding)
 
-1. **Core Tables**
+### Frontend (package.json)
 
-    - `users` - Base user information
-    - `admin_profiles` - Admin-specific details
-    - `dosen_profiles` - Lecturer profiles
-    - `mahasiswa_profiles` - Student profiles
+*   `react`: ^18.x
+*   `react-dom`: ^18.x
+*   `typescript`: ^5.x
+*   `@inertiajs/react`: ^1.x
+*   `tailwindcss`: ^3.x
+*   `@vitejs/plugin-react`: ^4.x
+*   `shadcn-ui`, `lucide-react`, `class-variance-authority`, `clsx`, `tailwind-merge`, etc. (Core Shadcn UI dependencies)
+*   `axios`: ^1.x (HTTP client, used by Inertia)
+*   `sonner`: (Toast notifications)
+*   **Dev:**
+    *   `vite`: ^5.x
+    *   `eslint`: ^8.x / ^9.x
+    *   `@typescript-eslint/parser`, `@typescript-eslint/eslint-plugin`
+    *   `postcss`, `autoprefixer`
 
-2. **Internship Management**
+## Architecture Overview
 
-    - `internships` - Internship applications and status
-    - `logbooks` - Daily activity records
-    - `reports` - Internship reports
-    - `guidance_classes` - Guidance session management
-
-3. **Support Tables**
-    - `tutorials` - Learning materials
-    - `faqs` - Frequently asked questions
-    - `cache` - System cache
-    - `jobs` - Queue management
-
-### File Storage
-
-Configuration in `config/filesystems.php`:
-
-- Default disk: 'local'
-- Public disk: For user-accessible files
-- Private disk: For sensitive documents
-- Supported upload types:
-    - PDF documents
-    - Office documents (doc, docx, ppt, pptx, xls, xlsx)
-    - Archive files (zip, rar)
-
-### Authentication & Authorization
-
-1. **Authentication**
-
-    - Laravel's built-in authentication
-    - Session-based auth with Inertia.js
-    - Email verification support
-
-2. **Authorization**
-    - Role-based access control (RBAC)
-    - Defined roles: superadmin, admin, dosen, mahasiswa
-    - Permission-based access to resources
-
-### Frontend Architecture
-
-1. **Core Technologies**
-
-    - React with TypeScript
-    - Inertia.js for backend communication
-    - Tailwind CSS for styling
-
-2. **Component Structure**
-
-    - Layouts
-        - AppLayout (Admin)
-        - FrontLayout (User)
-    - Shared Components
-        - DataTable
-        - Forms
-        - UI Elements
-
-3. **State Management**
-    - Inertia.js props
-    - React hooks
-    - Form handling with validation
-    - Notification display in header (`app-header.tsx`)
+*   **Database:** Schema defined via Laravel Migrations (`database/migrations/`). Eloquent ORM used for interaction.
+*   **File Storage:** Configured in `config/filesystems.php`. Uses `local` disk for general storage and `public` disk for web-accessible files (linked via `php artisan storage:link`). Uploads typically stored in `storage/app/`.
+*   **Authentication:** Laravel Fortify provides backend logic (registration, login, password reset), adapted for Inertia flows. Session-based authentication.
+*   **Authorization:** `spatie/laravel-permission` manages roles and permissions assigned to users. Middleware and Gates/Policies control access.
+*   **Frontend:** React components (`resources/js/`) rendered via Inertia. Vite bundles assets (`public/build/`). Tailwind CSS utility classes used for styling. Shadcn UI provides pre-built, customizable components.
 
 ## Development Workflow
 
-### Commands
+### Common Commands
 
 ```bash
-# Development
-npm run dev   # Start Vite development server
-php artisan serve  # Start Laravel development server
-php artisan queue:work  # Process background jobs
+# Start Vite dev server (hot module replacement)
+npm run dev
 
-# Database
-php artisan migrate  # Run migrations
-php artisan db:seed  # Seed database
+# Start Laravel development server
+php artisan serve
 
-# Asset Management
-npm run build  # Build frontend assets
+# Run database migrations
+php artisan migrate
+php artisan migrate:fresh # Drop all tables and re-run migrations
+php artisan migrate:fresh --seed # ...and run seeders
+
+# Run database seeders
+php artisan db:seed
+php artisan db:seed --class=SpecificSeeder
+
+# Run Pest tests
+php artisan test
+php artisan test --filter=AuthenticationTest # Run specific test file/method
+php artisan test --coverage # Run tests with code coverage (requires Xdebug/PCOV)
+
+# Run Laravel Pint code formatter
+./vendor/bin/pint
+
+# Run ESLint code linter
+npm run lint # (Assuming a script is defined in package.json)
+
+# Build frontend assets for production
+npm run build
 ```
 
-### Code Quality Tools
+### Code Quality
 
-- Laravel Pint (PHP CS)
-- ESLint (JavaScript/TypeScript)
-- TypeScript compiler
-- Laravel Debugbar
-- Axios (for frontend API calls)
+*   **PHP:** Laravel Pint (`pint.json` configuration) enforces PSR-12 style. Run `./vendor/bin/pint`.
+*   **TypeScript/JavaScript:** ESLint (`eslint.config.js` configuration) checks for code quality and potential errors. Run `npm run lint`.
 
 ## Testing Strategy
 
-1. **Backend Testing**
+*   **Framework:** Pest PHP (`phpunit.xml` configuration).
+*   **Environment:** Configured to use SQLite with the `:memory:` database for tests (`phpunit.xml`). This ensures tests run quickly and in isolation without affecting the development database.
+*   **Primary Type:** Feature Tests (`tests/Feature/`). These simulate user interactions via HTTP requests and assert responses, database state, and Inertia props.
+*   **Setup:** The `RefreshDatabase` trait is used in test classes to manage database state between tests. Factories (`database/factories/`) are used to create test data.
+*   **Coverage:** Aiming for high coverage of critical paths, especially Authentication, Authorization, and core CRUD operations. Run `php artisan test --coverage` to generate a report.
+*   **Frontend Testing:** Currently not implemented. Potential future addition using tools like Vitest or React Testing Library.
 
-    - Feature tests for controllers
-    - Unit tests for models
-    - Integration tests for file uploads
+## Security Considerations
 
-2. **Frontend Testing**
-    - Component testing with React
-    - E2E testing consideration
-
-## Security Measures
-
-1. **File Upload Security**
-
-    - File type validation
-    - Size restrictions
-    - Secure storage paths
-
-2. **Data Protection**
-
-    - CSRF protection
-    - XSS prevention
-    - SQL injection protection
-
-3. **Access Control**
-    - Route middleware
-    - Role-based access
-    - Resource authorization
+*   Standard Laravel security features are leveraged (CSRF protection, XSS filtering via Blade/React, SQL injection prevention via Eloquent).
+*   Input validation is strictly enforced using Laravel Form Requests.
+*   Authorization rules (Roles/Permissions) prevent unauthorized access to data and actions.
+*   File uploads are validated for type and size. Sensitive files should ideally be stored on the `local` disk, not `public`.
+*   Regularly update dependencies (Composer & NPM) to patch security vulnerabilities.
 
 ## Performance Considerations
 
-1. **Caching**
-
-    - Database query caching
-    - File caching
-    - Route caching in production
-
-2. **Queue Management**
-
-    - Background job processing
-    - Email sending
-    - File processing
-
-3. **Asset Optimization**
-    - Frontend asset bundling
-    - Image optimization
-    - Cache headers
+*   **Frontend:** Vite provides fast HMR during development and optimized builds (code splitting, tree shaking) for production.
+*   **Backend:**
+    *   Database query optimization (avoid N+1 problems using eager loading - `with()`).
+    *   Caching (Laravel's cache system - Redis/Memcached recommended for production) can be implemented for frequently accessed data or complex queries.
+    *   Queues (Laravel Queues) can be used for time-consuming tasks (e.g., sending emails, complex report generation) to improve web request response times.
+*   **Image Optimization:** Ensure images used in the frontend are appropriately sized and compressed.

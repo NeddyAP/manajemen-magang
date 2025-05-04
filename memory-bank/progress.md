@@ -1,274 +1,154 @@
 # Progress Tracking
 
-This document tracks the current status, progress, and evolution of the internship management system.
+This document tracks the current status, progress, and evolution of the internship management system (Manajement Magang).
 
-## Current Status (As of May 2, 2025)
+## Current Status (As of May 4, 2025)
 
 ### Core Features Status
 
-1. **User Management**
-   ✅ User authentication
-   ✅ Role-based access control
-   ✅ Profile management for different user types
-2. **Internship Management**
-   ✅ Application submission
-   ✅ Status tracking
-   ✅ Document handling
-   ✅ Progress monitoring
-
-3. **Logbook System**
-   ✅ Daily entry creation
-   ✅ Supervisor review process
-   ✅ Activity tracking
-   ✅ Notes and feedback
-
-4. **Report Management**
-   ✅ Report submission
-   ✅ Version control
-   ✅ Review process
-   ✅ File storage
-
-5. **Guidance System**
-   ✅ Class scheduling
-   ✅ QR code attendance
-   ✅ Student management
-   ✅ Session tracking
-
-6. **Support Features**
-   ✅ FAQ management
-   ✅ Tutorial system
-   ✅ File management
-   ✅ User documentation
-
-- ✅ Navigation system
-- ✅ Error handling
-- ✅ TypeScript types
-- ✅ In-App Notification System (Header Dropdown)
-- ✅ Notification History Page (View, Mark Unread, Delete)
+*   **User Management & Auth:** ✅ (Login, Register, PW Reset, Email Verify, Profiles, Roles/Permissions)
+*   **Internship Management:** ✅ (Application CRUD, Status Tracking, File Upload)
+*   **Logbook System:** ✅ (Student CRUD) - *Dosen feedback pending*
+*   **Report Management:** ✅ (Student CRUD, File Upload) - *Dosen feedback/formal review flow pending*
+*   **Guidance System:** ✅ (Class CRUD, Student Assignment) - *Attendance mechanism pending*
+*   **Support Features (Admin):** ✅ (FAQ CRUD, Tutorial CRUD, Global Variable CRUD)
+*   **Notification System:** ✅ (In-App DB-driven, Header Dropdown, History Page, Mark Read/Unread, Delete)
+*   **User Settings:** ✅ (Profile, Password, Appearance)
+*   **Admin Dashboard:** ✅ (Basic Stats, Navigation Links)
+*   **Trash Management (Admin):** ✅ (View, Restore, Force Delete)
+*   **Testing (Auth):** ✅ (Pest Feature Tests for Registration, Login, PW Reset, Email Verification)
 
 ### Database Schema Status
 
-1. **Core Tables**
-   ✅ users
-   ✅ admin_profiles
-   ✅ dosen_profiles
-   ✅ mahasiswa_profiles
-
-2. **Feature Tables**
-   ✅ internships
-   ✅ logbooks
-   ✅ reports
-   ✅ guidance_classes
-   ✅ guidance_class_attendance
-
-3. **Support Tables**
-   ✅ tutorials
-   ✅ faqs
-   ✅ global_variables
-   ✅ cache/jobs tables
+*   **Core Tables:** ✅ (`users`, `admin_profiles`, `dosen_profiles`, `mahasiswa_profiles`, `password_reset_tokens`, `sessions`)
+*   **Auth/Permissions:** ✅ (`roles`, `permissions`, `model_has_roles`, `model_has_permissions`, `role_has_permissions`)
+*   **Feature Tables:** ✅ (`internships`, `logbooks`, `reports`, `guidance_classes`, `guidance_class_attendance`)
+*   **Support Tables:** ✅ (`tutorials`, `faqs`, `global_variables`, `notifications`)
+*   **Framework Tables:** ✅ (`migrations`, `jobs`, `failed_jobs`, `cache`, `cache_locks`)
+*   **Soft Deletes:** ✅ Added to relevant models (Users, FAQs, Tutorials, etc.)
 
 ### Implementation Progress
 
-#### Backend (Laravel)
+#### Backend (Laravel 12.x)
 
-- ✅ Authentication system
-- ✅ Role & permission management
-- ✅ File upload handlers
-- ✅ Database migrations
-- ✅ Model relationships
-- ✅ Controller logic
-- ✅ Form validation
-- API endpoints
+*   ✅ Authentication & Authorization (Fortify/Sanctum adapted, Spatie Permissions)
+*   ✅ Core Model relationships defined
+*   ✅ Controller logic for CRUD operations
+*   ✅ Form Requests for validation
+*   ✅ Database migrations and seeders (basic)
+*   ✅ Inertia.js integration (`HandleInertiaRequests` middleware, data sharing)
+*   ✅ Notification system (Laravel Notifications, Database channel, API endpoints)
+*   ✅ File upload handling (Laravel Filesystem)
+*   ✅ Soft Deletes implementation
+*   ✅ Basic API endpoints for notifications
 
-#### Frontend (React + TypeScript)
+#### Frontend (React 18+ / TypeScript / Vite)
 
-- ✅ Component architecture
-- ✅ Page layouts
-- ✅ Form components
-- ✅ Data tables
-- ✅ File upload UI
-- ✅ Navigation system
-- ✅ Error handling
-- ✅ TypeScript types
+*   ✅ Component architecture (Shadcn UI base)
+*   ✅ Page layouts (`AuthLayout`, `FrontLayout`, `AdminLayout` via `AppShell`)
+*   ✅ Inertia form handling (`useForm`)
+*   ✅ Data tables (`react-table` usage within custom components)
+*   ✅ UI for core CRUD operations
+*   ✅ Navigation system (Sidebar, Header)
+*   ✅ Notification UI (Header dropdown, History page)
+*   ✅ User Settings UI
+*   ✅ Admin Dashboard UI
+*   ✅ Trash Management UI
+*   ✅ TypeScript types for core models and props (ongoing refinement)
 
-## Recent Changes
+#### Testing (Pest PHP / SQLite :memory:)
 
-### Backend Changes
+*   ✅ Setup for Pest testing environment
+*   ✅ `RefreshDatabase` trait usage
+*   ✅ Base `TestCase.php` configured
+*   ✅ Feature tests for Authentication flows (`tests/Feature/Auth/`)
 
-1. Database schema implementations
-2. Controller logic refinements
-3. File handling optimizations
-4. Security enhancements
-5. Modified front-end controllers (`InternshipApplicantController`, `LogbookController`, `ReportController`, `GuidanceClassController`, `InternshipController`) to calculate and pass aggregate statistics (counts, status breakdowns) to their respective index views.
-6. **Notification System:** Added API endpoints and controller methods (`markAsUnread`, `destroy`) for managing notifications.
-7. **Notification Links:** Corrected link generation in `ApplicationStatusChanged` notification.
+## Recent Changes (Summary - Pre-Documentation Update)
 
-### Frontend Changes
+*   **Features:** Implemented Notification System, User Settings, Admin Trash Management.
+*   **Backend:** Added Notification controllers/API, refined Dosen access logic, added soft deletes.
+*   **Frontend:** Built UI for Notifications, Settings, Trash. Added analytics cards.
+*   **Testing:** Added Pest Feature tests for Authentication.
+*   **Documentation:** **Currently updating Memory Bank files.**
 
-1. UI component development
-2. Form validation improvements
-3. TypeScript type definitions
-4. Layout system implementation
-5. Added analytics cards/badges to front-end internship index pages (applicants, logbooks, reports, guidance classes, main hub) displaying summary statistics.
-6. **Notification System:**
-    - Fixed unread count badge display in header dropdown.
-    - Created notification history page (`front/notifications/index.tsx`) using `FrontLayout`.
-    - Implemented Mark as Unread and Delete actions (with confirmation) on history page.
-    - Refactored history page UI using `<Card>` components.
-    - Ensured clicks on notifications navigate to the link provided by the backend.
-
-## Known Issues
+## Known Issues / Areas for Improvement
 
 ### High Priority
 
-1. None currently identified
+*   None currently identified.
 
 ### Medium Priority
 
-1. File upload size optimization needed
-2. Cache configuration refinement
-3. Performance optimization for large datasets
+*   **Guidance Class Attendance:** Implement a functional attendance mechanism (QR or manual check-in).
+*   **Dosen Feedback:** Add UI/backend logic for Dosen to add feedback to Logbooks/Reports.
+*   **Testing Coverage:** Expand Pest test coverage beyond Auth to other core modules (Internships, Logbooks, Reports, etc.).
 
 ### Low Priority
 
-1. Additional documentation needed (API for new notification endpoints)
-2. UI/UX improvements for mobile
-3. Extended testing coverage (especially for notification actions)
-4. TypeScript `any` type warnings in `app-header.tsx` and `notifications/index.tsx` related to `NotificationData`.
+*   **File Upload Enhancements:** Progress indicators, drag-and-drop support.
+*   **Advanced Search/Filtering:** Implement more complex filtering options on index pages.
+*   **Performance Optimization:** Review queries for potential N+1 issues, consider caching strategies.
+*   **UI/UX Refinements:** Minor layout adjustments, mobile responsiveness improvements.
+*   **TypeScript:** Address remaining `any` types, improve strictness.
+*   **API Documentation:** Formal documentation for any public-facing APIs (if planned).
 
 ## Next Steps
 
-### Immediate Tasks
+### Immediate Tasks (Post-Documentation)
 
-1. **Testing:** Comprehensive tests for Notification System (backend, API, frontend actions)
-2. **Notification Links:** Review/Refine Logbook/Report notification links
-3. **TypeScript:** Address `any` type warnings
-4. Optimize file upload handling
-5. Enhance mobile responsiveness
-6. Implement additional caching
-7. Add comprehensive testing
+1.  **Testing:** Write Pest tests for Internship CRUD operations.
+2.  **Testing:** Write Pest tests for Logbook CRUD operations (Student perspective).
+3.  **Testing:** Write Pest tests for Report CRUD operations (Student perspective).
 
 ### Short-term Goals
 
-1. Performance optimization
-2. Enhanced reporting features
-3. Extended API documentation
-4. User feedback integration
+1.  Implement Guidance Class attendance feature.
+2.  Implement Dosen feedback feature for Logbooks/Reports.
+3.  Continue expanding test coverage (Guidance, FAQs, Tutorials, Users, Settings).
+4.  Refine Admin dashboard with more useful statistics.
 
 ### Long-term Goals
 
-1. Mobile application development
-2. Machine learning integration
-3. Advanced analytics
-4. Cross-institution features
+1.  Explore real-time features (e.g., notifications via WebSockets).
+2.  Develop advanced analytics/reporting module.
+3.  Consider mobile application or PWA development.
+4.  Integrate with external systems if required.
 
 ## Technical Debt
 
-### Code Quality
-
-- Additional TypeScript types needed (`NotificationData`)
-- Controller refactoring opportunities
-- Test coverage expansion (Notifications)
-- Documentation updates (Notification API)
-
-### Infrastructure
-
-- Caching strategy optimization
-- Queue system enhancement
-- Backup system improvement
-- Monitoring implementation
-
-### Security
-
-- Regular security audits
-- Penetration testing
-- Compliance verification
-- Access control review
+*   **Code Quality:** Some controllers might benefit from refactoring into Services. Some frontend components could be further optimized or generalized.
+*   **Testing:** Significant portion of the application lacks automated tests.
+*   **Documentation:** API documentation (if needed) is missing. Inline code comments could be improved in complex sections.
+*   **Infrastructure:** Caching strategy not yet implemented. Queue worker setup might need refinement for production.
 
 ## Decisions Log
 
 ### Recent Decisions
 
-1. Adopted TypeScript for frontend
-2. Implemented role-based access
-3. Chose file storage strategy
-4. Selected caching approach
-5. Implemented Notification History page with Mark Unread/Delete actions
-6. Used `FrontLayout` for Notification History page
-7. Refactored Notification history UI using `<Card>` components
+*   Adopted Pest PHP for testing.
+*   Using SQLite `:memory:` for test database.
+*   Implemented In-App Notifications via Database channel.
+*   Standardized on Shadcn UI for frontend components.
+*   Implemented Soft Deletes for recoverable data.
+*   Used Indonesian language for UI text.
 
 ### Pending Decisions
 
-1. Mobile development strategy
-2. Analytics implementation
-3. API versioning approach
-4. Scaling strategy
+*   Specific mechanism for Guidance Class attendance (QR vs. Manual).
+*   Caching strategy (Redis vs. File vs. DB).
+*   Deployment strategy and infrastructure choices for production.
+*   Approach for handling potential real-time features.
 
-## Metrics & KPIs
+## Metrics & KPIs (Targets)
 
-### System Performance
-
-- Average response time: < 200ms
-- File upload success rate: 99.9%
-- System uptime: 99.9%
-- Error rate: < 0.1%
-
-### User Engagement
-
-- Daily active users: Growing
-- Feature adoption rate: High
-- User satisfaction: Positive
-- Support tickets: Minimal
-
-### Technical Quality
-
-- Code coverage: 80%+
-- Build success rate: 100%
-- Deploy success rate: 100%
-- Technical debt: Managed
+*   **Test Coverage:** > 80%
+*   **Page Load Time (Core Pages):** < 1 second
+*   **API Response Time:** < 200ms
+*   **System Uptime:** > 99.9%
+*   **Bug Rate:** < 5 critical bugs per month post-launch
 
 ## Roadmap Status
 
-### Phase 1 (Current)
-
-✅ Core features implementation
-✅ Basic user management
-✅ Document handling
-✅ Essential workflows
-
-### Phase 2 (Planned)
-
-⏳ Advanced analytics
-⏳ Mobile optimization
-⏳ Performance enhancement
-⏳ Extended features
-
-### Phase 3 (Future)
-
-📋 AI/ML integration
-📋 Cross-platform support
-📋 Advanced automation
-📋 Extended ecosystem
-
-## Resources
-
-### Documentation
-
-- System architecture
-- API documentation
-- User guides
-- Development guides
-
-### Tools & Technologies
-
-- Laravel 12
-- React + TypeScript
-- MariaDB/MySQL
-- Redis (planned)
-
-### Support
-
-- Development team
-- Technical documentation
-- User documentation
-- Training materials
+*   **Phase 1 (Core Features):** Mostly Complete ✅
+*   **Phase 2 (Refinement & Testing):** In Progress ⏳ (Notifications, Settings, Trash done. Testing started. Documentation update ongoing.)
+*   **Phase 3 (Advanced Features):** Planned 📋

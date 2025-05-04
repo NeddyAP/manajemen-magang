@@ -1,254 +1,147 @@
 # System Patterns
 
-This document outlines the key architectural patterns, workflows, and system interactions within the internship management system.
+This document outlines the key architectural patterns, workflows, and system interactions within the internship management system (Manajement Magang).
 
-## Core System Flows
+## Core System Flows (Simplified)
 
 ### 1. Internship Application Flow
 
 ```mermaid
 sequenceDiagram
-    participant Student
-    participant System
-    participant Lecturer
+    participant Mahasiswa
+    participant System (Laravel + Inertia + React)
     participant Admin
 
-    Student->>System: Submit application
-    System->>System: Validate documents
-    System->>Admin: Notify new application
-    Admin->>System: Review application
-    alt Application Approved
-        System->>Student: Send acceptance
-        System->>Lecturer: Assign supervisor
-    else Application Rejected
-        System->>Student: Send rejection with reason
-    end
+    Mahasiswa->>System: Accesses Application Form (React Page)
+    Mahasiswa->>System: Fills form & uploads PDF via Inertia `useForm`
+    System->>System: Validates request (Laravel Form Request)
+    System->>System: Stores application data & file (Eloquent Model, Filesystem)
+    System->>System: Creates Notification for Admin (Laravel Notification)
+    System->>Admin: Receives In-App Notification (React Header/Page)
+    Admin->>System: Accesses Application List/Details (React Page)
+    Admin->>System: Clicks Approve/Reject button
+    System->>System: Updates application status (Eloquent Model)
+    System->>System: Creates Notification for Mahasiswa (Laravel Notification)
+    System->>Mahasiswa: Receives In-App Notification (React Header/Page)
 ```
 
-### 2. Logbook Management Flow
+### 2. Logbook Management Flow (Student Entry)
 
 ```mermaid
 sequenceDiagram
-    participant Student
-    participant System
-    participant Supervisor
+    participant Mahasiswa
+    participant System (Laravel + Inertia + React)
+    participant Dosen
 
-    Student->>System: Create daily entry
-    System->>System: Validate entry
-    System->>Supervisor: Notify new entry
-    Supervisor->>System: Review & add notes
-    System->>Student: Update entry status
+    Mahasiswa->>System: Accesses Logbook Form (React Page)
+    Mahasiswa->>System: Fills daily entry via Inertia `useForm`
+    System->>System: Validates request (Laravel Form Request)
+    System->>System: Stores logbook entry (Eloquent Model)
+    System->>System: Creates Notification for Dosen (Laravel Notification)
+    System->>Dosen: Receives In-App Notification (React Header/Page)
+    Dosen->>System: Views Logbook Entry (React Page)
+    %% Dosen->>System: Adds Feedback (Future Enhancement)
 ```
 
-### 3. Report Submission Cycle
+### 3. Report Submission Flow (Student Submission)
 
 ```mermaid
 sequenceDiagram
-    participant Student
-    participant System
-    participant Reviewer
+    participant Mahasiswa
+    participant System (Laravel + Inertia + React)
+    participant Dosen / Admin
 
-    Student->>System: Submit report
-    System->>System: Version control
-    System->>Reviewer: Notify submission
-    Reviewer->>System: Review report
-    alt Report Approved
-        System->>Student: Mark as complete
-    else Report Needs Revision
-        System->>Student: Request changes
-    end
+    Mahasiswa->>System: Accesses Report Upload Form (React Page)
+    Mahasiswa->>System: Uploads report file via Inertia `useForm`
+    System->>System: Validates request (Laravel Form Request)
+    System->>System: Stores report record & file (Eloquent Model, Filesystem)
+    System->>System: Creates Notification for Dosen/Admin (Laravel Notification)
+    System->>Dosen / Admin: Receives In-App Notification (React Header/Page)
+    Dosen / Admin->>System: Views/Downloads Report (React Page / Direct Download)
+    %% Admin->>System: Updates Status (Future Enhancement)
 ```
 
-## Design Patterns
+## Architectural Patterns
 
-### 1. Repository Pattern
+1.  **Model-View-Controller (MVC) Variant (Laravel Backend):**
+    *   **Models:** Eloquent models (`app/Models/`) define data structure and relationships.
+    *   **Views:** Handled by React components rendered via Inertia. Blade templates (`resources/views/app.blade.php`) serve as the base entry point.
+    *   **Controllers:** (`app/Http/Controllers/`) Handle HTTP requests, interact with models, perform business logic, and return Inertia responses (`Inertia::render`).
+2.  **Single Page Application (SPA) via Inertia.js:**
+    *   Laravel backend provides data to React frontend via Inertia responses.
+    *   Frontend navigation handled by Inertia links (`<Link>`), avoiding full page reloads.
+    *   React components (`resources/js/pages/`) act as "pages".
+3.  **Component-Based UI (React):**
+    *   UI built using reusable React components (`resources/js/components/`).
+    *   Heavy reliance on Shadcn UI components (`resources/js/components/ui/`) for base elements (Buttons, Forms, Tables, Dialogs, etc.).
+    *   Layout components (`resources/js/layouts/`) define overall page structure.
 
-- Consistent data access layer
-- Separation of database logic
-- Reusable query patterns
+## Backend Patterns (Laravel)
 
-Example Implementation:
+1.  **Eloquent ORM:** Used for database interaction, defining relationships (HasMany, BelongsTo, etc.).
+2.  **Form Requests:** (`app/Http/Requests/`) Used for validation and authorization logic before controller actions.
+3.  **Middleware:** (`app/Http/Middleware/`) Used for handling cross-cutting concerns like authentication (`auth`), Inertia requests (`HandleInertiaRequests`), role/permission checks (`role`, `permission` from Spatie).
+4.  **Notifications:** Laravel's Notification system used, primarily with the `database` channel for In-App notifications.
+5.  **Filesystem Abstraction:** Used for handling file uploads and storage (`Storage` facade).
+6.  **Routing:** Defined in `routes/*.php` files. `Route::resource` used for standard CRUD routes. Ziggy package shares routes with the frontend.
+7.  **Soft Deletes:** Trait used on models to allow for recoverable deletion.
+8.  **Events/Listeners:** Used implicitly by some packages (e.g., Notifications), but custom application events are not heavily used yet.
 
-```php
-class InternshipRepository
-{
-    public function findByStatus(string $status)
-    public function findByUser(User $user)
-    public function updateProgress(Internship $internship, int $progress)
-}
-```
+## Frontend Patterns (React / TypeScript / Inertia)
 
-### 2. Service Layer Pattern
+1.  **Inertia `useForm` Hook:** Standard way to handle form submissions, validation errors, and loading states.
+2.  **Inertia `<Link>` Component:** Used for SPA navigation.
+3.  **Props Drilling / Context API:** Props passed down from page components. React Context API used for global state like appearance (`use-appearance.tsx`).
+4.  **Custom Hooks:** Used for abstracting reusable logic (e.g., `use-debounce`, `use-initials`, `use-mobile`).
+5.  **Conditional Rendering:** Used extensively to show/hide UI elements based on user roles, permissions, or data state.
+6.  **TypeScript:** Used for static typing of props, state, and function signatures. Interfaces/Types defined in `resources/js/types/`.
+7.  **Shadcn UI Component Usage:** Consistent use of components like `<Card>`, `<Button>`, `<Input>`, `<Table>`, `<Dialog>`, `<Tooltip>`, `<DropdownMenu>`, etc.
+8.  **Toast Notifications:** `sonner` library used for brief feedback messages after actions.
+9.  **Confirmation Dialogs:** `<AlertDialog>` used before destructive actions (e.g., delete).
 
-- Business logic encapsulation
-- Transaction management
-- Cross-cutting concerns
+## Testing Patterns (Pest PHP)
 
-Example Structure:
-
-```php
-class InternshipService
-{
-    public function processApplication(array $data)
-    public function updateStatus(Internship $internship, string $status)
-    public function calculateProgress(Internship $internship)
-}
-```
-
-### 3. Event-Driven Architecture
-
-- Application events
-- Webhooks (future implementation)
-- Real-time updates
-
-Common Events:
-
-- InternshipStatusChanged
-- LogbookEntryCreated
-- ReportSubmitted
-- GuidanceClassScheduled
-
-## Component Patterns
-
-### 1. Form Handling
-
-```typescript
-interface FormState {
-    data: Record<string, any>;
-    errors: Record<string, string>;
-    processing: boolean;
-}
-```
-
-### 2. Data Table Pattern
-
-```typescript
-interface DataTableProps<T> {
-    data: T[];
-    columns: ColumnDef<T>[];
-    meta: TableMeta;
-    filters?: ReactNode;
-}
-```
-
-### 3. File Upload Pattern
-
-```typescript
-interface FileUploadProps {
-    accept: string[];
-    maxSize: number;
-    onUpload: (file: File) => Promise<void>;
-}
-```
-
-## Security Patterns
-
-### 1. Authorization Gates
-
-```php
-Gate::define('update-internship', function (User $user, Internship $internship) {
-    return $user->id === $internship->user_id || $user->hasRole(['admin', 'supervisor']);
-});
-```
-
-### 2. Validation Chains
-
-```php
-class StoreInternshipRequest extends FormRequest
-{
-    public function rules(): array
-    {
-        return [
-            'type' => ['required', 'in:kkl,kkn'],
-            'application_file' => ['required', 'file', 'mimes:pdf', 'max:2048'],
-        ];
-    }
-}
-```
-
-## Integration Patterns
-
-### 1. API Response Structure
-
-```typescript
-interface ApiResponse<T> {
-    data: T;
-    meta?: Record<string, any>;
-    errors?: Record<string, string[]>;
-}
-```
-
-### 2. Error Handling Pattern
-
-```typescript
-try {
-    // Operation
-} catch (error) {
-    if (error instanceof ValidationError) {
-        // Handle validation errors
-    } else if (error instanceof AuthorizationError) {
-        // Handle authorization errors
-    } else {
-        // Handle unexpected errors
-    }
-}
-```
-
-## UI/UX Patterns
-
-### 1. Layout Structure
-
-```
-BaseLayout
-├── AdminLayout
-│   ├── Sidebar
-│   ├── Header
-│   └── Content
-└── FrontLayout
-    ├── Navbar
-    ├── Content
-    └── Footer
-```
-
-### 2. Form Components
-
-- Input with validation
-- File upload with preview
-- Rich text editor
-- Date picker
-
-### 3. Notification System (In-App)
-
-- **Backend:** Laravel Notifications (Database channel)
-- **API:**
-    - `/api/notifications` (GET - Fetch unread for dropdown)
-    - `/api/notifications/mark-as-read` (POST)
-    - `/api/notifications/mark-all-as-read` (POST)
-    - `/api/notifications/mark-as-unread` (POST)
-    - `/api/notifications/{id}` (DELETE)
-- **Frontend:**
-    - Header component (`app-header.tsx`): Displays Bell icon with unread count, dropdown for recent unread, link to history page.
-    - History Page (`front/notifications/index.tsx`): Displays all notifications (paginated), uses `<Card>` structure, provides "Mark as Unread" and "Delete" (with confirmation) actions.
-    - Clicking notification body marks as read (if unread) and navigates to linked resource.
-    - Actions use tooltips and toast notifications for feedback.
-- ~~Toast notifications~~ (Future Enhancement)
+1.  **Feature Tests:** Primary testing method, simulating HTTP requests to test application behavior from the outside in. Located in `tests/Feature/`.
+2.  **`RefreshDatabase` Trait:** Used in test classes to migrate the database before each test and wrap it in a transaction, ensuring a clean state. Uses SQLite `:memory:`.
+3.  **Factories:** Laravel factories used to generate model instances for testing (`database/factories/`).
+4.  **HTTP Assertions:** Pest/Laravel's built-in assertions used to verify responses (`assertStatus`, `assertInertia`, `assertRedirect`, `assertSee`, `assertDontSee`, etc.).
+5.  **Authentication Helpers:** `actingAs($user)` used to simulate logged-in users.
+6.  **Database Assertions:** `assertDatabaseHas`, `assertDatabaseMissing` used to verify database state changes.
+7.  **Inertia Assertions:** `assertInertia` used to check props passed to React components.
 
 ## Data Flow Patterns
 
-### 1. CRUD Operations
+1.  **Request Lifecycle (Typical Inertia Request):**
+    *   User interacts with React UI (e.g., clicks `<Link>`).
+    *   Inertia makes XHR request to Laravel backend.
+    *   Laravel routing directs request to a Controller method.
+    *   Middleware (Auth, Inertia, Roles) executes.
+    *   Controller fetches data (Eloquent), performs logic.
+    *   Controller returns `Inertia::render('PageName', ['prop' => $data])`.
+    *   `HandleInertiaRequests` middleware adds shared props.
+    *   Inertia receives JSON response.
+    *   React updates the relevant page component with new props.
+2.  **Form Submission:**
+    *   User fills form managed by `useForm`.
+    *   `useForm` POSTs data to Laravel endpoint.
+    *   Laravel Form Request validates data.
+    *   Controller processes valid data (saves to DB, etc.).
+    *   Controller typically redirects back or returns an Inertia response.
+    *   If validation fails, Laravel returns errors; `useForm` automatically populates its `errors` object.
+3.  **Notifications:**
+    *   Backend action triggers a Notification class (`User->notify(new NotificationClass())`).
+    *   Notification sent via `database` channel, stored in `notifications` table.
+    *   Frontend periodically fetches unread notifications (e.g., via shared Inertia props or dedicated API call) for header display.
+    *   Notification history page fetches all notifications via API.
 
-- Standard REST endpoints
-- Bulk operations support
-- Soft delete implementation
+## Security Patterns
 
-### 2. Search and Filter
-
-- Global search
-- Advanced filters
-- Sorting capabilities
-
-### 3. Pagination
-
-- Server-side pagination
-- Dynamic page size
-- Total count handling
+1.  **Authentication:** Handled by Laravel Fortify/Sanctum (adapted for Inertia sessions).
+2.  **Authorization:**
+    *   Route Middleware (`role:admin`, `permission:edit articles`).
+    *   Controller Authorization (`$this->authorize('update', $post)`).
+    *   Conditional rendering in Frontend based on user roles/permissions passed via props.
+3.  **Input Validation:** Laravel Form Requests on the backend.
+4.  **CSRF Protection:** Handled automatically by Laravel/Inertia.
+5.  **XSS Protection:** React inherently helps prevent XSS by escaping content. Backend validation/sanitization adds another layer.
+6.  **Mass Assignment Protection:** Eloquent's `$fillable`/`$guarded` properties used.
