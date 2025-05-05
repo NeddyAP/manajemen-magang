@@ -258,11 +258,11 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <Button variant="ghost" size="icon" asChild className="group h-9 w-9 cursor-pointer">
-                                                        <a href={item.href} rel="noopener noreferrer">
+                                                        <Link href={item.href} rel="noopener noreferrer">
                                                             {item.icon && (
                                                                 <Icon iconNode={item.icon} className="!size-5 opacity-80 group-hover:opacity-100" />
                                                             )}
-                                                        </a>
+                                                        </Link>
                                                     </Button>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
