@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input'; // Import Input
@@ -86,29 +87,52 @@ export default function ReportInternshipList({ internships, filters }: PageProps
                         {internships.length > 0 ? (
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                                 {internships.map((internship) => (
-                                    <Card key={internship.id}>
-                                        <CardHeader>
-                                            <CardTitle className="text-lg">{internship.company_name}</CardTitle>
-                                            {/* Display student name for Dosen */}
-                                            {isDosen && <p className="text-muted-foreground text-sm">{internship.user?.name}</p>}
+                                    <Card key={internship.id} className="overflow-hidden">
+                                        <CardHeader className="pb-2">
+                                            {isDosen && (
+                                                <CardTitle className="text-base">
+                                                    {internship.user?.name}
+                                                </CardTitle>
+                                            )}
+                                            <div className="flex justify-between items-center gap-2">
+                                                <p className="text-muted-foreground text-sm font-medium">
+                                                    {internship.company_name}
+                                                </p>
+                                                <Badge
+                                                    variant={
+                                                        internship.completion_status === 'Selesai'
+                                                            ? 'secondary'
+                                                            : internship.completion_status === 'Sedang Berlangsung'
+                                                                ? 'default'
+                                                                : 'destructive'
+                                                    }
+                                                    className={
+                                                        internship.completion_status === 'Selesai'
+                                                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                                                            : internship.completion_status === 'Sedang Berlangsung'
+                                                                ? ''
+                                                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                                                    }
+                                                >
+                                                    {internship.completion_status}
+                                                </Badge>
+                                            </div>
                                         </CardHeader>
-                                        <CardContent>
-                                            <div className="space-y-4">
-                                                <div>
-                                                    <p className="text-muted-foreground text-sm">Jenis Magang: {internship.type}</p>
-                                                </div>
-                                                <div>
-                                                    <p className="text-muted-foreground text-sm">
-                                                        Periode: {format(parseISO(internship.start_date ?? ''), 'dd MMMM yyyy', { locale: id })} -{' '}
-                                                        {format(parseISO(internship.end_date ?? ''), 'dd MMMM yyyy', { locale: id })}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="text-muted-foreground mb-1 text-sm">Jumlah Laporan:</p>
-                                                    <div className="flex items-center gap-2">
-                                                        <FileText className="text-muted-foreground h-4 w-4" />
-                                                        <span className="text-sm font-medium">{internship.reports_count ?? 0} Laporan</span>
-                                                    </div>
+                                        <CardContent className="space-y-2">
+                                            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                                                <p className="text-muted-foreground">
+                                                    <span className="font-medium">Jenis:</span> {internship.type}
+                                                </p>
+                                                <p className="text-muted-foreground">
+                                                    <span className="font-medium">Periode:</span>{' '}
+                                                    {format(parseISO(internship.start_date ?? ''), 'dd/MM/yy', { locale: id })} -{' '}
+                                                    {format(parseISO(internship.end_date ?? ''), 'dd/MM/yy', { locale: id })}
+                                                </p>
+                                            </div>
+                                            <div className="flex items-center justify-between pt-1">
+                                                <div className="flex items-center gap-1.5">
+                                                    <FileText className="text-muted-foreground h-3.5 w-3.5" />
+                                                    <span className="text-xs">{internship.reports_count ?? 0} Laporan</span>
                                                 </div>
                                                 {/* Remove Progress bar if not needed for reports */}
                                                 {/* <div>
@@ -116,9 +140,10 @@ export default function ReportInternshipList({ internships, filters }: PageProps
                                                     <Progress value={internship.progress} className="h-2" />
                                                     <p className="text-muted-foreground mt-1 text-xs">{internship.reports_count} Laporan</p>
                                                 </div> */}
-                                                <Button className="w-full" asChild>
-                                                    {/* Update link to report index route */}
-                                                    <Link href={route('front.internships.reports.index', internship.id)}>Lihat Laporan</Link>
+                                                <Button size="sm" className="h-8" asChild>
+                                                    <Link href={route('front.internships.reports.index', internship.id)}>
+                                                        Lihat Laporan
+                                                    </Link>
                                                 </Button>
                                             </div>
                                         </CardContent>
@@ -134,8 +159,8 @@ export default function ReportInternshipList({ internships, filters }: PageProps
                                     {isDosen && searchTerm
                                         ? 'Coba kata kunci pencarian yang berbeda.'
                                         : isDosen
-                                          ? 'Belum ada mahasiswa bimbingan Anda yang memiliki magang aktif.'
-                                          : 'Anda hanya dapat mengelola laporan untuk magang yang berstatus diterima.'}
+                                            ? 'Belum ada mahasiswa bimbingan Anda yang memiliki magang aktif.'
+                                            : 'Anda hanya dapat mengelola laporan untuk magang yang berstatus diterima.'}
                                 </p>
                                 {!isDosen && (
                                     <Button className="mt-6" asChild>

@@ -58,7 +58,6 @@ export default function InternshipList({ internships, filters }: PageProps) {
                 <div className="container mx-auto max-w-7xl">
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl p-6">
                         {' '}
-                        {/* Added padding */}
                         <div className="mb-6 flex items-center justify-between">
                             <div>
                                 <h1 className="text-2xl font-bold">Pilih Magang</h1>
@@ -86,39 +85,45 @@ export default function InternshipList({ internships, filters }: PageProps) {
                         {internships.length > 0 ? (
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                                 {internships.map((internship) => (
-                                    <Card key={internship.id}>
-                                        <CardHeader>
-                                            <CardTitle className="text-lg">{internship.company_name}</CardTitle>
-                                            {/* Display student name for Dosen */}
-                                            {isDosen && <p className="text-muted-foreground text-sm">{internship.user?.name}</p>}
+                                    <Card key={internship.id} className="overflow-hidden">
+                                        <CardHeader className="pb-2">
+                                            {isDosen && (
+                                                <CardTitle className="text-base">
+                                                    {internship.user?.name}
+                                                </CardTitle>
+                                            )}
+                                            <p className="text-muted-foreground text-sm font-medium">
+                                                {internship.company_name}
+                                            </p>
                                         </CardHeader>
-                                        <CardContent>
-                                            <div className="space-y-4">
-                                                {/* Restore the Internship Type display */}
-                                                <div>
-                                                    <p className="text-muted-foreground text-sm">Jenis Magang: {internship.type}</p>
-                                                </div>
-                                                <div>
-                                                    <p className="text-muted-foreground text-sm">
-                                                        Periode:{' '}
-                                                        {internship.start_date
-                                                            ? format(new Date(internship.start_date), 'dd MMMM yyyy', { locale: id })
-                                                            : 'Belum ditentukan'}{' '}
-                                                        -{' '}
-                                                        {internship.end_date
-                                                            ? format(new Date(internship.end_date), 'dd MMMM yyyy', { locale: id })
-                                                            : 'Belum ditentukan'}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <p className="text-muted-foreground mb-2 text-sm">Progress Logbook</p>
-                                                    <Progress value={internship.progress} className="h-2" />
-                                                    <p className="text-muted-foreground mt-1 text-xs">{internship.logbooks_count} dari 30 hari</p>
-                                                </div>
-                                                <Button className="w-full" asChild>
-                                                    <a href={route('front.internships.logbooks.index', internship.id)}>Lihat Logbook</a>
-                                                </Button>
+                                        <CardContent className="space-y-2">
+                                            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                                                <p className="text-muted-foreground">
+                                                    <span className="font-medium">Jenis:</span> {internship.type}
+                                                </p>
+                                                <p className="text-muted-foreground">
+                                                    <span className="font-medium">Periode:</span>{' '}
+                                                    {internship.start_date
+                                                        ? format(new Date(internship.start_date), 'dd/MM/yy', { locale: id })
+                                                        : '-'}{' '}
+                                                    -{' '}
+                                                    {internship.end_date
+                                                        ? format(new Date(internship.end_date), 'dd/MM/yy', { locale: id })
+                                                        : '-'}
+                                                </p>
                                             </div>
+                                            <div>
+                                                <Progress value={internship.progress} className="h-1.5" />
+                                                <div className="flex items-center justify-between mt-1">
+                                                    <p className="text-muted-foreground text-xs">Progress</p>
+                                                    <p className="text-muted-foreground text-xs">{internship.logbooks_count}/30</p>
+                                                </div>
+                                            </div>
+                                            <Button size="sm" className="h-8 w-full mt-1" asChild>
+                                                <Link href={route('front.internships.logbooks.index', internship.id)}>
+                                                    Lihat Logbook
+                                                </Link>
+                                            </Button>
                                         </CardContent>
                                     </Card>
                                 ))}
@@ -132,8 +137,8 @@ export default function InternshipList({ internships, filters }: PageProps) {
                                     {isDosen && searchTerm
                                         ? 'Coba kata kunci pencarian yang berbeda.'
                                         : isDosen
-                                          ? 'Belum ada mahasiswa bimbingan Anda yang memiliki magang aktif.'
-                                          : 'Silakan ajukan pendaftaran magang terlebih dahulu.'}
+                                            ? 'Belum ada mahasiswa bimbingan Anda yang memiliki magang aktif.'
+                                            : 'Silakan ajukan pendaftaran magang terlebih dahulu.'}
                                 </p>
                                 {!isDosen && (
                                     <Button className="mt-6" asChild>

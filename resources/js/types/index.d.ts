@@ -1,4 +1,3 @@
-import { PageProps as InertiaPageProps } from '@inertiajs/core'; // Import Inertia's PageProps
 import { GlobalVariable } from '@/pages/admin/global-variables';
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';

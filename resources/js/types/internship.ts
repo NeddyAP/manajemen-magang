@@ -18,6 +18,7 @@ export interface Internship {
     status_message?: string | null;
     logbooks_count?: number;
     reports_count?: number;
+    completion_status?: string;
     mahasiswa_name?: string | null; // Added for Dosen view in applicants table
     mahasiswa_nim?: string | null; // Added for Dosen view in applicants table
 }

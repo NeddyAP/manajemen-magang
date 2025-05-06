@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\InternshipCompletion;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -32,7 +33,13 @@ class Internship extends Model
 
     protected $appends = [
         'progress_percentage',
+        'completion_status'
     ];
+
+    public function getCompletionStatusAttribute()
+    {
+        return app(InternshipCompletion::class)->checkStatus($this);
+    }
 
     public function user()
     {
