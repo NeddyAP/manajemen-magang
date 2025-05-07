@@ -7,7 +7,7 @@ import { Internship } from '@/types/internship';
 import { Head, Link } from '@inertiajs/react'; // Import Link
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { PlusCircle } from 'lucide-react'; // Import an icon for the button
+import { ChevronLeft, PlusCircle } from 'lucide-react'; // Added ChevronLeft icon
 
 interface PageProps {
     internships: Internship[];
@@ -31,13 +31,25 @@ export default function InternshipList({ internships }: PageProps) {
             <div className="flex min-h-screen flex-1 flex-col gap-4 p-4">
                 <div className="container mx-auto max-w-7xl">
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl p-6">
-                        {' '}
-                        {/* Added padding */}
+                        {/* Back button */}
+                        <div className="mb-4">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="items-center text-muted-foreground hover:text-foreground"
+                                asChild
+                            >
+                                <Link href={route('front.internships.index')}>
+                                    <ChevronLeft className="mr-1 h-4 w-4" />
+                                    Kembali
+                                </Link>
+                            </Button>
+                        </div>
+
                         <div className="mb-6 flex items-center justify-between">
                             <div>
                                 <h1 className="text-2xl font-bold">Pilih Magang</h1>
-                                <p className="text-muted-foreground">Pilih salah satu magang untuk melihat atau mengisi logbook.</p>{' '}
-                                {/* Added description */}
+                                <p className="text-muted-foreground">Pilih salah satu magang untuk melihat atau mengisi logbook.</p>
                             </div>
                         </div>
                         {internships.length > 0 ? (

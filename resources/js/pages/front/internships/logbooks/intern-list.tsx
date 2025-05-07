@@ -9,7 +9,7 @@ import { Internship } from '@/types/internship';
 import { Head, Link, router, usePage } from '@inertiajs/react'; // Import router and usePage
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { PlusCircle, SearchIcon } from 'lucide-react'; // Import SearchIcon
+import { ChevronLeft, PlusCircle, SearchIcon } from 'lucide-react'; // Added ChevronLeft icon
 import { useEffect, useState } from 'react'; // Import hooks (useCallback removed)
 
 interface PageProps {
@@ -57,7 +57,21 @@ export default function InternshipList({ internships, filters }: PageProps) {
             <div className="flex min-h-screen flex-1 flex-col gap-4 p-4">
                 <div className="container mx-auto max-w-7xl">
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl p-6">
-                        {' '}
+                        {/* Back button */}
+                        <div className="mb-4">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="items-center text-muted-foreground hover:text-foreground"
+                                asChild
+                            >
+                                <Link href={route('front.internships.index')}>
+                                    <ChevronLeft className="mr-1 h-4 w-4" />
+                                    Kembali
+                                </Link>
+                            </Button>
+                        </div>
+
                         <div className="mb-6 flex items-center justify-between">
                             <div>
                                 <h1 className="text-2xl font-bold">Pilih Magang</h1>
@@ -126,8 +140,8 @@ export default function InternshipList({ internships, filters }: PageProps) {
                                     {isDosen && searchTerm
                                         ? 'Coba kata kunci pencarian yang berbeda.'
                                         : isDosen
-                                          ? 'Belum ada mahasiswa bimbingan Anda yang memiliki magang aktif.'
-                                          : 'Silakan ajukan pendaftaran magang terlebih dahulu.'}
+                                            ? 'Belum ada mahasiswa bimbingan Anda yang memiliki magang aktif.'
+                                            : 'Silakan ajukan pendaftaran magang terlebih dahulu.'}
                                 </p>
                                 {!isDosen && (
                                     <Button className="mt-6" asChild>

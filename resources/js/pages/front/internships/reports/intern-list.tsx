@@ -9,7 +9,7 @@ import { type Internship } from '@/types/internship';
 import { Head, Link, router, usePage } from '@inertiajs/react'; // Import router and usePage
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { FileText, PlusCircle, SearchIcon } from 'lucide-react'; // Import SearchIcon
+import { ChevronLeft, FileText, PlusCircle, SearchIcon } from 'lucide-react'; // Added ChevronLeft icon
 import { useEffect, useState } from 'react'; // Import hooks (useCallback removed)
 
 interface PageProps {
@@ -58,6 +58,21 @@ export default function ReportInternshipList({ internships, filters }: PageProps
             <div className="flex min-h-screen flex-1 flex-col gap-4 p-4">
                 <div className="container mx-auto max-w-7xl">
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl p-6">
+                        {/* Back button */}
+                        <div className="mb-4">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="items-center text-muted-foreground hover:text-foreground"
+                                asChild
+                            >
+                                <Link href={route('front.internships.index')}>
+                                    <ChevronLeft className="mr-1 h-4 w-4" />
+                                    Kembali
+                                </Link>
+                            </Button>
+                        </div>
+
                         <div className="mb-6 flex items-center justify-between">
                             <div>
                                 <h1 className="text-2xl font-bold">Pilih Magang (Laporan)</h1> {/* Update H1 title */}
@@ -97,15 +112,15 @@ export default function ReportInternshipList({ internships, filters }: PageProps
                                                         internship.completion_status === 'Selesai'
                                                             ? 'secondary'
                                                             : internship.completion_status === 'Sedang Berlangsung'
-                                                              ? 'default'
-                                                              : 'destructive'
+                                                                ? 'default'
+                                                                : 'destructive'
                                                     }
                                                     className={
                                                         internship.completion_status === 'Selesai'
                                                             ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                                                             : internship.completion_status === 'Sedang Berlangsung'
-                                                              ? ''
-                                                              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                                                                ? ''
+                                                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
                                                     }
                                                 >
                                                     {internship.completion_status}
@@ -151,8 +166,8 @@ export default function ReportInternshipList({ internships, filters }: PageProps
                                     {isDosen && searchTerm
                                         ? 'Coba kata kunci pencarian yang berbeda.'
                                         : isDosen
-                                          ? 'Belum ada mahasiswa bimbingan Anda yang memiliki magang aktif.'
-                                          : 'Anda hanya dapat mengelola laporan untuk magang yang berstatus diterima.'}
+                                            ? 'Belum ada mahasiswa bimbingan Anda yang memiliki magang aktif.'
+                                            : 'Anda hanya dapat mengelola laporan untuk magang yang berstatus diterima.'}
                                 </p>
                                 {!isDosen && (
                                     <Button className="mt-6" asChild>
