@@ -53,7 +53,7 @@ class ReportSeeder extends Seeder
                 Report::factory()->create([
                     'user_id' => $internship->user_id,
                     'internship_id' => $internship->id,
-                    'title' => 'Laporan Akhir Magang - Versi '.$i,
+                    'title' => 'Laporan Akhir Magang - Versi ' . $i,
                     'report_file' => $dummyStoragePath, // Use the dummy file path
                     'version' => $i,
                     'status' => $status,
@@ -61,7 +61,5 @@ class ReportSeeder extends Seeder
                 ]);
             }
         }
-
-        $this->command->info('ReportSeeder executed successfully.');
     }
 }
