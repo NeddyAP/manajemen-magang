@@ -57,11 +57,11 @@ export default function Home({ faqCategories = [], faqsByCategory = {} }: HomePr
                             </Button>
                         </div>
                         {/* Container for the image */}
-                        <div className="relative flex h-full items-center justify-center overflow-hidden rounded-lg">
+                        <div className="relative flex min-h-screen items-center justify-center overflow-hidden rounded-lg">
                             <img
                                 src="/assets/hero-image.webp"
                                 alt="Ilustrasi Manajemen Magang"
-                                className="h-auto max-h-full w-auto max-w-full object-contain"
+                                className="h-auto max-min-h-screen w-auto max-w-full object-contain"
                             />
                         </div>
                     </div>

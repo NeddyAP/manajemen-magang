@@ -146,7 +146,7 @@ export default function Trash({ users, tutorials, internships, logbooks, reports
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Sampah" />
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <div className="flex min-h-screen flex-1 flex-col gap-4 rounded-xl p-4">
                 {/* Analytics Section */}
                 <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3">
                     <TrashAnalytics />

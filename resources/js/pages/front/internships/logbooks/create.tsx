@@ -36,7 +36,7 @@ export default function LogbookCreate({ internship }: PageProps) {
     return (
         <FrontLayout breadcrumbs={dynamicBreadcrumbs}>
             <Head title="Tambah Logbook" />
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+            <div className="flex min-h-screen flex-1 flex-col gap-4 p-4">
                 <div className="container mx-auto max-w-7xl">
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl">
                         <div className="mb-6">
@@ -48,18 +48,18 @@ export default function LogbookCreate({ internship }: PageProps) {
                                 Periode:{' '}
                                 {internship.start_date
                                     ? new Date(internship.start_date).toLocaleDateString('id-ID', {
-                                          year: 'numeric',
-                                          month: 'long',
-                                          day: 'numeric',
-                                      })
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                    })
                                     : 'Belum ditentukan'}{' '}
                                 -{' '}
                                 {internship.end_date
                                     ? new Date(internship.end_date).toLocaleDateString('id-ID', {
-                                          year: 'numeric',
-                                          month: 'long',
-                                          day: 'numeric',
-                                      })
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                    })
                                     : 'Belum ditentukan'}
                             </p>
                         </div>

@@ -40,7 +40,7 @@ export default function ReportCreate({ internship }: PageProps) {
     return (
         <FrontLayout breadcrumbs={dynamicBreadcrumbs}>
             <Head title="Tambah Laporan" />
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+            <div className="flex min-h-screen flex-1 flex-col gap-4 p-4">
                 <div className="container mx-auto max-w-7xl">
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl">
                         <div className="mb-6">

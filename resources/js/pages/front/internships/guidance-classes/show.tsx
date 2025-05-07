@@ -47,7 +47,7 @@ export default function ShowGuidanceClass({ class: guidanceClass, meta, userRole
     return (
         <FrontLayout breadcrumbs={breadcrumbs}>
             <Head title={`Detail Kelas: ${guidanceClass.title}`} />
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+            <div className="flex min-h-screen flex-1 flex-col gap-4 p-4">
                 <div className="container mx-auto max-w-7xl">
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl p-4">
                         <div className="mb-6">

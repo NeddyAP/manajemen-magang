@@ -135,7 +135,7 @@ export default function NotificationsIndex() {
             }
         >
             <Head title="Notifikasi" />
-            <div className="flex h-full min-h-min flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+            <div className="flex min-h-screen flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
                 <div className="border-sidebar-border/70 dark:border-sidebar-border relative mx-auto w-full max-w-7xl flex-1 overflow-hidden">
                     <div className="mb-6">
                         <h1 className="text-2xl font-bold">Riwayat Notifikasi</h1>

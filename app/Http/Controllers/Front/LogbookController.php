@@ -118,8 +118,8 @@ class LogbookController extends Controller
 
     public function edit(Internship $internship, Logbook $logbook)
     {
-        // Only owner can edit
-        if ($internship->user_id !== auth()->id() || $logbook->internship_id !== $internship->id) {
+        // owner and advisor can edit
+        if ((!auth()->user()->hasRole('dosen') && $internship->user_id !== auth()->id()) || $logbook->internship_id !== $internship->id) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -131,14 +131,15 @@ class LogbookController extends Controller
 
     public function update(Request $request, Internship $internship, Logbook $logbook)
     {
-        // Only owner can update
-        if ($internship->user_id !== auth()->id() || $logbook->internship_id !== $internship->id) {
+        // owner and advisor can editupdate
+        if ((!auth()->user()->hasRole('dosen') && $internship->user_id !== auth()->id()) || $logbook->internship_id !== $internship->id) {
             abort(403, 'Unauthorized action.');
         }
 
         $validated = $request->validate([
             'date' => 'required|date',
             'activities' => 'required|string',
+            'supervisor_notes' => 'nullable|string',
         ]);
 
         $logbook->update($validated);
@@ -182,7 +183,6 @@ class LogbookController extends Controller
                             });
                     });
                 }
-
             } else {
                 $query->whereRaw('1 = 0'); // No advisees, show nothing
             }

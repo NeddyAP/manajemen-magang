@@ -93,7 +93,7 @@ export default function Applicants({ internships, stats, isDosen, meta }: Intern
     return (
         <FrontLayout breadcrumbs={breadcrumbs}>
             <Head title="Permohonan Magang" />
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+            <div className="flex min-h-screen flex-1 flex-col gap-4 p-4">
                 <div className="container mx-auto max-w-7xl">
                     {/* Analytics Cards */}
                     <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

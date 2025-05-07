@@ -23,7 +23,7 @@ export default function CreateGuidanceClass() {
     return (
         <FrontLayout breadcrumbs={breadcrumbs}>
             <Head title="Buat Kelas Bimbingan" />
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+            <div className="flex min-h-screen flex-1 flex-col gap-4 p-4">
                 <div className="container mx-auto max-w-4xl">
                     <Card>
                         <CardHeader>

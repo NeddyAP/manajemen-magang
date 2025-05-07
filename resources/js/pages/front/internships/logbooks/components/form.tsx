@@ -5,8 +5,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea'; // Import Textarea
+import { SharedData } from '@/types';
 import { Logbook } from '@/types/internship';
-import { router, useForm } from '@inertiajs/react';
+import { router, useForm, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
@@ -21,9 +22,12 @@ export default function LogbookForm({ logbook, mode, internshipId }: Props) {
     const { data, setData, post, put, errors, processing } = useForm({
         // internship_id is handled by the route parameter, no need here
         date: logbook?.date || new Date().toISOString().split('T')[0], // Default to today for create
-        activities: logbook?.activities || '', // Rename activity to activities
+        activities: logbook?.activities || '',
+        supervisor_notes: logbook?.supervisor_notes || '',
     });
 
+    const { role } = usePage<SharedData>().props.auth;
+    const isDosen = role === 'dosen';
     // Store parsed dates for the calendar UI
     const [startDate, setStartDate] = useState<Date | undefined>(data.date ? new Date(data.date) : undefined);
 
@@ -52,6 +56,7 @@ export default function LogbookForm({ logbook, mode, internshipId }: Props) {
                                 <Button
                                     variant="outline"
                                     className={`w-full justify-start text-left font-normal ${!startDate && 'text-muted-foreground'}`}
+                                    disabled={isDosen}
                                 >
                                     <CalendarIcon className="mr-2 h-4 w-4" />
                                     {startDate ? format(startDate, 'PPP') : <span>Pilih tanggal</span>}
@@ -80,9 +85,26 @@ export default function LogbookForm({ logbook, mode, internshipId }: Props) {
                             className={errors.activities ? 'border-destructive' : ''} // Check errors.activities
                             rows={5}
                             placeholder="Jelaskan aktivitas yang Anda lakukan hari ini..."
+                            disabled={isDosen}
                         />
                         <InputError message={errors.activities} /> {/* Check errors.activities */}
                     </div>
+                    {/* Show this field only if the user is a Dosen */}
+                    {isDosen && (
+                        <div className="space-y-4">
+                            <Label htmlFor="supervisor_notes">Catatan Dosen</Label> {/* Change htmlFor and id */}
+                            <Textarea // Use Textarea instead of Input
+                                id="supervisor_notes" // Change id to supervisor_notes
+                                value={data.supervisor_notes} // Change data field name
+                                onChange={(e) => setData('supervisor_notes', e.target.value)} // Change setData field name
+                                className={errors.supervisor_notes ? 'border-destructive' : ''} // Check errors.supervisor_notes
+                                rows={5}
+                                placeholder="Jelaskan catatan yang diberikan dosen..."
+                            />
+                            <InputError message={errors.supervisor_notes} /> {/* Check errors.supervisor_notes */}
+                        </div>
+                    )}
+                    {/* Show this field only if the user is a Dosen */}
                 </CardContent>
             </Card>
 
