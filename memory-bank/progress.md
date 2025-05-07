@@ -2,13 +2,13 @@
 
 This document tracks the current status, progress, and evolution of the internship management system (Manajement Magang).
 
-## Current Status (As of May 4, 2025)
+## Current Status (As of May 7, 2025)
 
 ### Core Features Status
 
 *   **User Management & Auth:** ✅ (Login, Register, PW Reset, Email Verify, Profiles, Roles/Permissions)
 *   **Internship Management:** ✅ (Application CRUD, Status Tracking, File Upload)
-*   **Logbook System:** ✅ (Student CRUD) - *Dosen feedback pending*
+*   **Logbook System:** ✅ (Student CRUD, Dosen Supervisor Notes via Modal) - *Full Dosen feedback on reports pending*
 *   **Report Management:** ✅ (Student CRUD, File Upload) - *Dosen feedback/formal review flow pending*
 *   **Guidance System:** ✅ (Class CRUD, Student Assignment) - *Attendance mechanism pending*
 *   **Support Features (Admin):** ✅ (FAQ CRUD, Tutorial CRUD, Global Variable CRUD)
@@ -55,6 +55,7 @@ This document tracks the current status, progress, and evolution of the internsh
 *   ✅ Admin Dashboard UI
 *   ✅ Trash Management UI
 *   ✅ TypeScript types for core models and props (ongoing refinement)
+*   ✅ Logbook page optimizations (back button, animations, modal for supervisor notes)
 
 #### Testing (Pest PHP / SQLite :memory:)
 
@@ -63,13 +64,17 @@ This document tracks the current status, progress, and evolution of the internsh
 *   ✅ Base `TestCase.php` configured
 *   ✅ Feature tests for Authentication flows (`tests/Feature/Auth/`)
 
-## Recent Changes (Summary - Pre-Documentation Update)
+## Recent Changes
 
+*   **Logbook Enhancements:**
+    *   Enabled 'dosen' users to add supervisor notes to logbooks via a modal.
+    *   Optimized logbook pages: added back button, incorporated Tailwind CSS animations for better UX.
+    *   Resolved backend authorization issues for 'dosen' access to logbooks, ensuring correct student data visibility.
 *   **Features:** Implemented Notification System, User Settings, Admin Trash Management.
-*   **Backend:** Added Notification controllers/API, refined Dosen access logic, added soft deletes.
+*   **Backend:** Added Notification controllers/API, refined Dosen access logic for other modules, added soft deletes.
 *   **Frontend:** Built UI for Notifications, Settings, Trash. Added analytics cards.
 *   **Testing:** Added Pest Feature tests for Authentication.
-*   **Documentation:** **Currently updating Memory Bank files.**
+*   **Documentation:** Completed Memory Bank update to reflect recent changes.
 
 ## Known Issues / Areas for Improvement
 
@@ -80,7 +85,7 @@ This document tracks the current status, progress, and evolution of the internsh
 ### Medium Priority
 
 *   **Guidance Class Attendance:** Implement a functional attendance mechanism (QR or manual check-in).
-*   **Dosen Feedback:** Add UI/backend logic for Dosen to add feedback to Logbooks/Reports.
+*   **Dosen Feedback (Reports):** Add UI/backend logic for Dosen to add feedback to Reports. (Logbook supervisor notes partially address this).
 *   **Testing Coverage:** Expand Pest test coverage beyond Auth to other core modules (Internships, Logbooks, Reports, etc.).
 
 ### Low Priority
@@ -131,6 +136,8 @@ This document tracks the current status, progress, and evolution of the internsh
 *   Standardized on Shadcn UI for frontend components.
 *   Implemented Soft Deletes for recoverable data.
 *   Used Indonesian language for UI text.
+*   Implemented supervisor notes for logbooks using a modal.
+*   Prioritized fixing 'dosen' authorization for logbooks by ensuring correct `internship_id` and `user_id` checks.
 
 ### Pending Decisions
 
@@ -150,5 +157,5 @@ This document tracks the current status, progress, and evolution of the internsh
 ## Roadmap Status
 
 *   **Phase 1 (Core Features):** Mostly Complete ✅
-*   **Phase 2 (Refinement & Testing):** In Progress ⏳ (Notifications, Settings, Trash done. Testing started. Documentation update ongoing.)
+*   **Phase 2 (Refinement & Testing):** In Progress ⏳ (Notifications, Settings, Trash, Logbook Dosen Notes & UI enhancements done. Testing started. Documentation updated.)
 *   **Phase 3 (Advanced Features):** Planned 📋

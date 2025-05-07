@@ -3,8 +3,8 @@
 _This file tracks the current work focus, recent changes, immediate next steps, active decisions, important patterns/preferences discovered, and project insights._
 
 **Status:** Active Development
-**Last Reviewed:** May 4, 2025
-**Current Task:** Update Memory Bank Documentation
+**Last Reviewed:** May 7, 2025
+**Current Task:** Finalizing Memory Bank Update post-logbook enhancements.
 
 ## Project Overview
 
@@ -23,6 +23,7 @@ This is a comprehensive internship management system (Manajement Magang) built w
 3.  **Activity Tracking (Logbooks):**
     *   Daily logbook entries (`logbooks` table) by students.
     *   Visibility for students and assigned Dosen.
+    *   Dosen supervisor notes can be added via a modal.
 4.  **Report Management:**
     *   Report submission (`reports` table) with file uploads.
     *   Visibility for students, assigned Dosen, and Admins.
@@ -80,10 +81,11 @@ This is a comprehensive internship management system (Manajement Magang) built w
 7.  **Testing:** Pest PHP for Feature tests. Focus on testing behavior through HTTP requests. Use of `RefreshDatabase` trait with SQLite `:memory:`. Factory helpers for data setup.
 8.  **UI Text:** Use Indonesian language for user-facing labels, buttons, messages. Fallback to English if translation is awkward or unclear.
 
-## Recent Changes (Summary - Pre-Documentation Update)
+## Recent Changes
 
+*   **Logbook Enhancements:** Enabled 'dosen' users to add supervisor notes to logbooks via a modal. Optimized logbook pages for performance and user experience, including adding a back button and incorporating Tailwind CSS animations. Resolved backend authorization issues ensuring 'dosen' can correctly access and manage logbooks for their assigned students.
 *   Implementation of Notification system (backend logic, API endpoints, frontend UI/actions).
-*   Refinement of Dosen access controls for viewing advisee data (Internships, Logbooks, Reports).
+*   Refinement of Dosen access controls for viewing advisee data (Internships, Reports).
 *   Addition of analytics/summary cards to various index pages.
 *   Implementation of User Settings pages (Profile, Password, Appearance).
 *   Implementation of Admin Trash Management feature.
@@ -91,13 +93,13 @@ This is a comprehensive internship management system (Manajement Magang) built w
 
 ## Current Focus Area
 
-*   **Task:** Updating all Memory Bank documentation (`*.md` files in `memory-bank/`) to accurately reflect the current project state, including technology stack, features, patterns, and testing setup.
+*   **Task:** Completing the update of all Memory Bank documentation (`*.md` files in `memory-bank/`) to accurately reflect the current project state, including the recent logbook enhancements.
 
 ## Next Steps (After Documentation Update)
 
 1.  **Testing:** Continue adding Pest tests for other core features (CRUD operations for Internships, Logbooks, Reports, Guidance Classes, FAQs, Tutorials, etc.). Aim for higher test coverage.
 2.  **Guidance Class Attendance:** Implement QR code generation/scanning or a simpler check-in mechanism.
-3.  **Dosen Feedback:** Add functionality for Dosen to add notes/feedback to Logbooks and Reports.
+3.  **Dosen Feedback (Reports):** Add functionality for Dosen to add notes/feedback to Reports. (Logbook feedback partially implemented via supervisor notes).
 4.  **Refinement:** Address any remaining `TODO` comments in the code. Improve UI/UX based on feedback. Optimize queries or backend logic where necessary.
 5.  **TypeScript:** Continue improving type safety, potentially defining more specific types for shared data structures (e.g., `NotificationData`).
 
@@ -109,3 +111,9 @@ This is a comprehensive internship management system (Manajement Magang) built w
 4.  Write comprehensive tests using Pest.
 5.  Maintain accurate Memory Bank documentation.
 6.  Use Indonesian for UI text.
+
+## Insights & Learnings
+
+*   **Authorization Specificity:** Ensuring correct ID usage (e.g., `internship_id` for overall internship context vs. `logbook_id` for specific entries) in backend authorization queries is crucial for proper data access control. This was particularly relevant when fixing 'dosen' access to logbooks, where initial queries might have been too broad or used incorrect identifiers, leading to access issues.
+*   **Modal Interactivity:** When implementing modals for actions like adding supervisor notes, ensure smooth data flow and state management between the modal and the parent page to reflect changes immediately.
+*   **Component Reusability:** The back button and animation patterns can be abstracted into reusable components or hooks for consistency across different pages.
