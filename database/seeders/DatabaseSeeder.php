@@ -68,7 +68,7 @@ class DatabaseSeeder extends Seeder
                 'user_id' => $mahasiswaUser->id,
                 'advisor_id' => $dosen->random()->id,
                 'student_number' => fake()->unique()->numerify('I.22#####'),
-                'study_program' => fake()->randomElement(['Teknik Informatika', 'Sistem Informasi']),
+                'study_program' => fake()->randomElement(['Ilmu Komputer', 'Sistem Informasi']),
                 'class_year' => fake()->numberBetween(2020, 2023),
                 'academic_status' => 'Aktif',
                 'semester' => fake()->numberBetween(1, 8),

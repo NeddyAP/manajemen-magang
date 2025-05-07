@@ -59,12 +59,7 @@ export default function InternshipList({ internships, filters }: PageProps) {
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl p-6">
                         {/* Back button */}
                         <div className="mb-4">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className="items-center text-muted-foreground hover:text-foreground"
-                                asChild
-                            >
+                            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground items-center" asChild>
                                 <Link href={route('front.internships.index')}>
                                     <ChevronLeft className="mr-1 h-4 w-4" />
                                     Kembali
@@ -140,8 +135,8 @@ export default function InternshipList({ internships, filters }: PageProps) {
                                     {isDosen && searchTerm
                                         ? 'Coba kata kunci pencarian yang berbeda.'
                                         : isDosen
-                                            ? 'Belum ada mahasiswa bimbingan Anda yang memiliki magang aktif.'
-                                            : 'Silakan ajukan pendaftaran magang terlebih dahulu.'}
+                                          ? 'Belum ada mahasiswa bimbingan Anda yang memiliki magang aktif.'
+                                          : 'Silakan ajukan pendaftaran magang terlebih dahulu.'}
                                 </p>
                                 {!isDosen && (
                                     <Button className="mt-6" asChild>

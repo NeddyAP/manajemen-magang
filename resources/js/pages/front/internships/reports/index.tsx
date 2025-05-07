@@ -141,6 +141,6 @@ export default function ReportsIndex({ internship, reports, reportStats, meta }:
                     </div>
                 </div>
             </div>
-        </FrontLayout >
+        </FrontLayout>
     );
 }

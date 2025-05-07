@@ -7,7 +7,7 @@ import { Internship, Logbook } from '@/types/internship';
 import { Head, Link } from '@inertiajs/react';
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { Plus, ArrowLeft } from 'lucide-react'; // Import ArrowLeft
+import { ArrowLeft, Plus } from 'lucide-react'; // Import ArrowLeft
 import { columns, initialColumnVisibility } from './components/column';
 
 const breadcrumbs: BreadcrumbItem[] = [

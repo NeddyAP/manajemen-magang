@@ -33,12 +33,7 @@ export default function InternshipList({ internships }: PageProps) {
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl p-6">
                         {/* Back button */}
                         <div className="mb-4">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className="items-center text-muted-foreground hover:text-foreground"
-                                asChild
-                            >
+                            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground items-center" asChild>
                                 <Link href={route('front.internships.index')}>
                                     <ChevronLeft className="mr-1 h-4 w-4" />
                                     Kembali
