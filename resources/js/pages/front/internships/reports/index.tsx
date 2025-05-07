@@ -7,7 +7,7 @@ import { type Internship, type Report, type ReportStats } from '@/types/internsh
 import { Head, Link, router } from '@inertiajs/react'; // Correct inertia import
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { Plus } from 'lucide-react';
+import { ArrowLeft, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { columns, initialColumnVisibility } from './components/column';
 import { StatusFilter } from './components/filters';
@@ -75,12 +75,23 @@ export default function ReportsIndex({ internship, reports, reportStats, meta }:
                                     {format(parseISO(internship.end_date), 'dd MMMM yyyy', { locale: id })}
                                 </p>
                             </div>
-                            <Button asChild>
-                                <Link href={route('front.internships.reports.create', internship.id)}>
-                                    <Plus className="mr-2 h-4 w-4" />
-                                    Tambah Laporan
-                                </Link>
-                            </Button>
+
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => window.history.back()}
+                                    className="transition-colors duration-200 ease-in-out"
+                                >
+                                    <ArrowLeft className="mr-2 h-4 w-4" />
+                                    Kembali
+                                </Button>
+                                <Button asChild>
+                                    <Link href={route('front.internships.reports.create', internship.id)}>
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Tambah Laporan
+                                    </Link>
+                                </Button>
+                            </div>
                         </div>
 
                         {/* Analytics Cards */}
@@ -130,6 +141,6 @@ export default function ReportsIndex({ internship, reports, reportStats, meta }:
                     </div>
                 </div>
             </div>
-        </FrontLayout>
+        </FrontLayout >
     );
 }

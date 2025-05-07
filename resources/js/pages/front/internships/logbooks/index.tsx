@@ -7,7 +7,7 @@ import { Internship, Logbook } from '@/types/internship';
 import { Head, Link } from '@inertiajs/react';
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { Plus } from 'lucide-react';
+import { Plus, ArrowLeft } from 'lucide-react'; // Import ArrowLeft
 import { columns, initialColumnVisibility } from './components/column';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -54,17 +54,27 @@ export default function LogbooksIndex({ internship, logbooks, totalLogbookCount,
                                     {format(new Date(internship.end_date), 'dd MMMM yyyy', { locale: id })}
                                 </p>
                             </div>
-                            <Button asChild>
-                                <Link href={route('front.internships.logbooks.create', internship.id)}>
-                                    <Plus className="mr-2 h-4 w-4" />
-                                    Tambah Logbook
-                                </Link>
-                            </Button>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => window.history.back()}
+                                    className="transition-colors duration-200 ease-in-out"
+                                >
+                                    <ArrowLeft className="mr-2 h-4 w-4" />
+                                    Kembali
+                                </Button>
+                                <Button asChild className="transition-colors duration-200 ease-in-out">
+                                    <Link href={route('front.internships.logbooks.create', internship.id)}>
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Tambah Logbook
+                                    </Link>
+                                </Button>
+                            </div>
                         </div>
 
                         {/* Analytics Card */}
                         <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                            <Card>
+                            <Card className="transition-all duration-300 ease-in-out hover:shadow-lg">
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                     <CardTitle className="text-sm font-medium">Total Entri Logbook</CardTitle>
                                 </CardHeader>
@@ -75,7 +85,9 @@ export default function LogbooksIndex({ internship, logbooks, totalLogbookCount,
                             {/* Add more cards here if needed */}
                         </div>
 
-                        <DataTable meta={meta} columns={columns} data={logbooks} initialColumnVisibility={initialColumnVisibility} />
+                        <div className="transition-all duration-300 ease-in-out hover:shadow-md">
+                            <DataTable meta={meta} columns={columns} data={logbooks} initialColumnVisibility={initialColumnVisibility} />
+                        </div>
                     </div>
                 </div>
             </div>
