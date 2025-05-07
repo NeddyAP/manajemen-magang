@@ -33,7 +33,7 @@ class Internship extends Model
 
     protected $appends = [
         'progress_percentage',
-        'completion_status'
+        'completion_status',
     ];
 
     public function getCompletionStatusAttribute()

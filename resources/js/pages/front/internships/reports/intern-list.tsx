@@ -89,29 +89,23 @@ export default function ReportInternshipList({ internships, filters }: PageProps
                                 {internships.map((internship) => (
                                     <Card key={internship.id} className="overflow-hidden">
                                         <CardHeader className="pb-2">
-                                            {isDosen && (
-                                                <CardTitle className="text-base">
-                                                    {internship.user?.name}
-                                                </CardTitle>
-                                            )}
-                                            <div className="flex justify-between items-center gap-2">
-                                                <p className="text-muted-foreground text-sm font-medium">
-                                                    {internship.company_name}
-                                                </p>
+                                            {isDosen && <CardTitle className="text-base">{internship.user?.name}</CardTitle>}
+                                            <div className="flex items-center justify-between gap-2">
+                                                <p className="text-muted-foreground text-sm font-medium">{internship.company_name}</p>
                                                 <Badge
                                                     variant={
                                                         internship.completion_status === 'Selesai'
                                                             ? 'secondary'
                                                             : internship.completion_status === 'Sedang Berlangsung'
-                                                                ? 'default'
-                                                                : 'destructive'
+                                                              ? 'default'
+                                                              : 'destructive'
                                                     }
                                                     className={
                                                         internship.completion_status === 'Selesai'
                                                             ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                                                             : internship.completion_status === 'Sedang Berlangsung'
-                                                                ? ''
-                                                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                                                              ? ''
+                                                              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
                                                     }
                                                 >
                                                     {internship.completion_status}
@@ -141,9 +135,7 @@ export default function ReportInternshipList({ internships, filters }: PageProps
                                                     <p className="text-muted-foreground mt-1 text-xs">{internship.reports_count} Laporan</p>
                                                 </div> */}
                                                 <Button size="sm" className="h-8" asChild>
-                                                    <Link href={route('front.internships.reports.index', internship.id)}>
-                                                        Lihat Laporan
-                                                    </Link>
+                                                    <Link href={route('front.internships.reports.index', internship.id)}>Lihat Laporan</Link>
                                                 </Button>
                                             </div>
                                         </CardContent>
@@ -159,8 +151,8 @@ export default function ReportInternshipList({ internships, filters }: PageProps
                                     {isDosen && searchTerm
                                         ? 'Coba kata kunci pencarian yang berbeda.'
                                         : isDosen
-                                            ? 'Belum ada mahasiswa bimbingan Anda yang memiliki magang aktif.'
-                                            : 'Anda hanya dapat mengelola laporan untuk magang yang berstatus diterima.'}
+                                          ? 'Belum ada mahasiswa bimbingan Anda yang memiliki magang aktif.'
+                                          : 'Anda hanya dapat mengelola laporan untuk magang yang berstatus diterima.'}
                                 </p>
                                 {!isDosen && (
                                     <Button className="mt-6" asChild>

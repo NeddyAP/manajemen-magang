@@ -48,18 +48,18 @@ export default function LogbookCreate({ internship }: PageProps) {
                                 Periode:{' '}
                                 {internship.start_date
                                     ? new Date(internship.start_date).toLocaleDateString('id-ID', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                    })
+                                          year: 'numeric',
+                                          month: 'long',
+                                          day: 'numeric',
+                                      })
                                     : 'Belum ditentukan'}{' '}
                                 -{' '}
                                 {internship.end_date
                                     ? new Date(internship.end_date).toLocaleDateString('id-ID', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                    })
+                                          year: 'numeric',
+                                          month: 'long',
+                                          day: 'numeric',
+                                      })
                                     : 'Belum ditentukan'}
                             </p>
                         </div>

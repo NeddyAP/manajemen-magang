@@ -19,7 +19,7 @@ class InternshipCompletion
             ->where('status', 'approved')
             ->exists();
 
-        if (!$hasApprovedReport) {
+        if (! $hasApprovedReport) {
             return 'Menunggu Persetujuan Laporan';
         }
 
@@ -27,7 +27,7 @@ class InternshipCompletion
         $start = Carbon::parse($internship->start_date);
         $end = Carbon::parse($internship->end_date);
         $totalDays = $end->diffInDays($start) + 1;
-        
+
         $logbookCount = $internship->logbooks()
             ->whereBetween('date', [$start, $end])
             ->count();

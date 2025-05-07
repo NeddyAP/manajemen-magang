@@ -44,10 +44,8 @@ export default function LogbooksIndex({ internship, logbooks, totalLogbookCount,
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 overflow-hidden rounded-xl">
                         <div className="mb-6 flex items-center justify-between">
                             <div>
-                                <h1 className="text-xl font-bold mb-6">Logbook Magang</h1>
-                                <p>
-                                    Mahasiswa: {internship.user?.name}
-                                </p>
+                                <h1 className="mb-6 text-xl font-bold">Logbook Magang</h1>
+                                <p>Mahasiswa: {internship.user?.name}</p>
                                 <p className="text-muted-foreground">
                                     Nama Perusahaan: {internship.company_name} - {internship.type}
                                 </p>

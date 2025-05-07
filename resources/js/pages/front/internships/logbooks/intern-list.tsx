@@ -87,14 +87,8 @@ export default function InternshipList({ internships, filters }: PageProps) {
                                 {internships.map((internship) => (
                                     <Card key={internship.id} className="overflow-hidden">
                                         <CardHeader className="pb-2">
-                                            {isDosen && (
-                                                <CardTitle className="text-base">
-                                                    {internship.user?.name}
-                                                </CardTitle>
-                                            )}
-                                            <p className="text-muted-foreground text-sm font-medium">
-                                                {internship.company_name}
-                                            </p>
+                                            {isDosen && <CardTitle className="text-base">{internship.user?.name}</CardTitle>}
+                                            <p className="text-muted-foreground text-sm font-medium">{internship.company_name}</p>
                                         </CardHeader>
                                         <CardContent className="space-y-2">
                                             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
@@ -106,23 +100,18 @@ export default function InternshipList({ internships, filters }: PageProps) {
                                                     {internship.start_date
                                                         ? format(new Date(internship.start_date), 'dd/MM/yy', { locale: id })
                                                         : '-'}{' '}
-                                                    -{' '}
-                                                    {internship.end_date
-                                                        ? format(new Date(internship.end_date), 'dd/MM/yy', { locale: id })
-                                                        : '-'}
+                                                    - {internship.end_date ? format(new Date(internship.end_date), 'dd/MM/yy', { locale: id }) : '-'}
                                                 </p>
                                             </div>
                                             <div>
                                                 <Progress value={internship.progress} className="h-1.5" />
-                                                <div className="flex items-center justify-between mt-1">
+                                                <div className="mt-1 flex items-center justify-between">
                                                     <p className="text-muted-foreground text-xs">Progress</p>
                                                     <p className="text-muted-foreground text-xs">{internship.logbooks_count}/30</p>
                                                 </div>
                                             </div>
-                                            <Button size="sm" className="h-8 w-full mt-1" asChild>
-                                                <Link href={route('front.internships.logbooks.index', internship.id)}>
-                                                    Lihat Logbook
-                                                </Link>
+                                            <Button size="sm" className="mt-1 h-8 w-full" asChild>
+                                                <Link href={route('front.internships.logbooks.index', internship.id)}>Lihat Logbook</Link>
                                             </Button>
                                         </CardContent>
                                     </Card>
@@ -137,8 +126,8 @@ export default function InternshipList({ internships, filters }: PageProps) {
                                     {isDosen && searchTerm
                                         ? 'Coba kata kunci pencarian yang berbeda.'
                                         : isDosen
-                                            ? 'Belum ada mahasiswa bimbingan Anda yang memiliki magang aktif.'
-                                            : 'Silakan ajukan pendaftaran magang terlebih dahulu.'}
+                                          ? 'Belum ada mahasiswa bimbingan Anda yang memiliki magang aktif.'
+                                          : 'Silakan ajukan pendaftaran magang terlebih dahulu.'}
                                 </p>
                                 {!isDosen && (
                                     <Button className="mt-6" asChild>

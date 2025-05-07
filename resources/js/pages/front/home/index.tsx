@@ -61,7 +61,7 @@ export default function Home({ faqCategories = [], faqsByCategory = {} }: HomePr
                             <img
                                 src="/assets/hero-image.webp"
                                 alt="Ilustrasi Manajemen Magang"
-                                className="h-auto max-min-h-screen w-auto max-w-full object-contain"
+                                className="max-min-h-screen h-auto w-auto max-w-full object-contain"
                             />
                         </div>
                     </div>

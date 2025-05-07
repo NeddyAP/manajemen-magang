@@ -119,7 +119,7 @@ class LogbookController extends Controller
     public function edit(Internship $internship, Logbook $logbook)
     {
         // owner and advisor can edit
-        if ((!auth()->user()->hasRole('dosen') && $internship->user_id !== auth()->id()) || $logbook->internship_id !== $internship->id) {
+        if ((! auth()->user()->hasRole('dosen') && $internship->user_id !== auth()->id()) || $logbook->internship_id !== $internship->id) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -132,7 +132,7 @@ class LogbookController extends Controller
     public function update(Request $request, Internship $internship, Logbook $logbook)
     {
         // owner and advisor can editupdate
-        if ((!auth()->user()->hasRole('dosen') && $internship->user_id !== auth()->id()) || $logbook->internship_id !== $internship->id) {
+        if ((! auth()->user()->hasRole('dosen') && $internship->user_id !== auth()->id()) || $logbook->internship_id !== $internship->id) {
             abort(403, 'Unauthorized action.');
         }
 

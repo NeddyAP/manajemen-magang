@@ -41,10 +41,23 @@ export default function InternshipsIndex() {
     const role = auth.role;
     const isMahasiswa = role === 'mahasiswa';
     const isDosen = role === 'dosen';
+    const isAdmin = role === 'admin' || role === 'superadmin';
+
     const cards: CardItem[] = [
         {
+            id: 'admin-dashboard',
+            title: 'Dashboard Admin',
+            description: 'Kelola program magang',
+            content: 'Kelola semua aplikasi magang, logbook, dan laporan akhir magang.',
+            icon: <UserIcon className="text-primary h-6 w-6" />,
+            route: route('admin.dashboard'),
+            buttonText: 'Lihat Dashboard',
+            buttonVariant: 'default',
+            showOnlyFor: ['admin'],
+        },
+        {
             id: 'apply',
-            title: 'Aplikasi Magang',
+            title: 'Ajukan Magang',
             description: 'Ajukan program magang',
             content: 'Kirim aplikasi magang Anda dengan dokumen dan informasi yang diperlukan',
             icon: <UserIcon className="text-primary h-6 w-6" />,
@@ -55,9 +68,9 @@ export default function InternshipsIndex() {
         },
         {
             id: 'my-applications',
-            title: 'Aplikasi Saya',
-            description: 'Lihat aplikasi magang Anda',
-            content: 'Periksa status aplikasi Anda dan kelola progres magang Anda',
+            title: 'Aplikasi Magang',
+            description: 'Lihat aplikasi magang',
+            content: 'Periksa status aplikasi dan kelola progres magang',
             icon: <UserIcon className="text-primary h-6 w-6" />,
             route: route('front.internships.applicants.index'),
             buttonText: 'Lihat Aplikasi',
@@ -100,6 +113,7 @@ export default function InternshipsIndex() {
         if (!card.showOnlyFor) return true;
         if (isMahasiswa && card.showOnlyFor.includes('mahasiswa')) return true;
         if (isDosen && card.showOnlyFor.includes('dosen')) return true;
+        if (isAdmin && card.showOnlyFor.includes('admin')) return true;
         return !card.showOnlyFor.length;
     });
 
