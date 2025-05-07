@@ -98,6 +98,8 @@ class DatabaseSeeder extends Seeder
         $this->call(TutorialSeeder::class);
         $this->call(GlobalVariableSeeder::class);
         $this->call(ReportSeeder::class);
+        $this->call(GuidanceClassSeeder::class);
+        $this->call(GuidanceClassAttendanceSeeder::class);
 
         // Test data
         User::factory()->create([
