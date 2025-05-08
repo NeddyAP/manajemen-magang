@@ -37,7 +37,7 @@ class GuidanceClassController extends Controller
             $query = GuidanceClass::where('lecturer_id', $user->id)
                 ->with(['lecturer', 'students' => function ($query) {
                     $query->with('internships', function ($query) {
-                        $query->whereIn('status', ['pending', 'active', 'ongoing'])
+                        $query->where('status', 'accepted')
                             ->latest()
                             ->first();
                     });
@@ -49,7 +49,7 @@ class GuidanceClassController extends Controller
                     ->with(['lecturer', 'students' => function ($query) use ($user) {
                         $query->where('users.id', $user->id)
                             ->with('internships', function ($query) {
-                                $query->whereIn('status', ['pending', 'active', 'ongoing'])
+                                $query->where('status', 'accepted')
                                     ->latest()
                                     ->first();
                             });

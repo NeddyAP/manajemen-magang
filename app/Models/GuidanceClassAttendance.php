@@ -89,9 +89,9 @@ class GuidanceClassAttendance extends Pivot
     {
         return $query->whereHas('user', function ($q) {
             $q->whereHas('mahasiswaProfile', function ($q) {
-                $q->where('academic_status', 'active');
+                $q->where('academic_status', 'Aktif');
             })->whereHas('internships', function ($q) {
-                $q->whereIn('status', ['pending', 'active', 'ongoing']);
+                $q->where('status', 'accepted');
             });
         });
     }

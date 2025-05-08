@@ -6,10 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreGuidanceClassRequest;
 use App\Http\Requests\UpdateGuidanceClassRequest;
 use App\Models\GuidanceClass;
+use App\Models\GuidanceClassAttendance;
 use App\Models\User;
-use App\Notifications\GuidanceClass\ClassScheduled; // Import Notification
+use App\Notifications\GuidanceClass\ClassScheduled;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Notification; // Import Notification facade
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
 class GuidanceClassController extends Controller
@@ -19,7 +20,7 @@ class GuidanceClassController extends Controller
      */
     public function index(Request $request)
     {
-        $query = GuidanceClass::with(['lecturer'])
+        $query = GuidanceClass::with(['lecturer.dosenProfile'])
             ->latest();
         // Add search functionality
         if ($search = $request->input('search')) {
@@ -31,12 +32,15 @@ class GuidanceClassController extends Controller
 
         $classes = $query->paginate(10)
             ->withQueryString()
-            ->through(fn ($class) => [
+            ->through(fn($class) => [
                 'id' => $class->id,
                 'title' => $class->title,
                 'lecturer' => [
                     'id' => $class->lecturer->id,
                     'name' => $class->lecturer->name,
+                    'employee_number' => $class->lecturer->dosenProfile->employee_number ?? null,
+                    'expertise' => $class->lecturer->dosenProfile->expertise ?? null,
+                    'academic_position' => $class->lecturer->dosenProfile->academic_position ?? null,
                 ],
                 'start_date' => $class->start_date,
                 'end_date' => $class->end_date,
@@ -44,7 +48,16 @@ class GuidanceClassController extends Controller
                 'participants_count' => $class->students()->count(),
             ]);
 
-        $lecturers = User::role('dosen')->get(['id', 'name']);
+        $lecturers = User::role('dosen')
+            ->with('dosenProfile')
+            ->get()
+            ->map(fn($lecturer) => [
+                'id' => $lecturer->id,
+                'name' => $lecturer->name,
+                'employee_number' => $lecturer->dosenProfile->employee_number ?? null,
+                'expertise' => $lecturer->dosenProfile->expertise ?? null,
+                'academic_position' => $lecturer->dosenProfile->academic_position ?? null,
+            ]);
 
         return inertia('admin/guidance-classes/index', [
             'classes' => $classes->items(),
@@ -134,21 +147,11 @@ class GuidanceClassController extends Controller
                 $query->where('advisor_id', $guidanceClass->lecturer_id)
                     ->where('academic_status', 'Aktif');
             })
-            // Add separate whereHas for internships directly on User
-            ->whereHas('internships', function ($query) {
-                $query->where('status', 'accepted');
-            })
             ->with([
-                // Load profile directly
                 'mahasiswaProfile',
-                // Load internships directly, constrained
                 'internships' => function ($query) {
                     $query->where('status', 'accepted')
-                        ->latest(); // Keep latest if multiple accepted exist
-                },
-                // Load attendance directly, constrained
-                'guidanceClassAttendance' => function ($query) use ($guidanceClass) {
-                    $query->where('guidance_class_id', $guidanceClass->id);
+                        ->latest();
                 },
             ]);
 
@@ -219,9 +222,11 @@ class GuidanceClassController extends Controller
         // Paginate the students
         $perPage = $request->input('per_page', 10);
         $students = $query->paginate($perPage)
-            ->through(function ($student) {
-                // Access relationships directly from User model
-                $attendance = $student->guidanceClassAttendance->first(); // Access directly
+            ->through(function ($student) use ($guidanceClass) {
+                // Access attendance record with specific guidance class ID
+                $attendance = GuidanceClassAttendance::where('guidance_class_id', $guidanceClass->id)
+                    ->where('user_id', $student->id)
+                    ->first();
                 $internship = $student->internships->first(); // Access directly
 
                 return [

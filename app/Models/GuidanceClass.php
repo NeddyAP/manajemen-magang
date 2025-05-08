@@ -54,13 +54,13 @@ class GuidanceClass extends Model
             ->whereHas('roles', fn ($query) => $query->where('name', 'mahasiswa'))
             ->whereHas('mahasiswaProfile', function ($query) {
                 $query->where('advisor_id', $this->lecturer_id)
-                    ->where('academic_status', 'active');
+                    ->where('academic_status', 'Aktif');
             })
             ->whereHas('internships', function ($query) {
-                $query->whereIn('status', ['pending', 'active', 'ongoing']);
+                $query->where('status', 'accepted');
             })
             ->with(['mahasiswaProfile', 'internships' => function ($query) {
-                $query->whereIn('status', ['pending', 'active', 'ongoing'])
+                $query->where('status', 'accepted')
                     ->latest();
             }])
             ->withPivot(['attended_at', 'attendance_method', 'notes'])
@@ -75,10 +75,10 @@ class GuidanceClass extends Model
         return User::role('mahasiswa')
             ->whereHas('mahasiswaProfile', function ($query) {
                 $query->where('advisor_id', $this->lecturer_id)
-                    ->where('academic_status', 'active');
+                    ->where('academic_status', 'Aktif');
             })
             ->whereHas('internships', function ($query) {
-                $query->whereIn('status', ['pending', 'active', 'ongoing']);
+                $query->where('status', 'accepted');
             })
             ->get();
     }
@@ -112,9 +112,9 @@ class GuidanceClass extends Model
         return $student->hasRole('mahasiswa')
             && $student->mahasiswaProfile
             && $student->mahasiswaProfile->advisor_id === $this->lecturer_id
-            && $student->mahasiswaProfile->academic_status === 'active'
+            && $student->mahasiswaProfile->academic_status === 'Aktif'
             && $student->internships()
-                ->whereIn('status', ['pending', 'active', 'ongoing'])
+                ->where('status', 'accepted')
                 ->exists();
     }
 

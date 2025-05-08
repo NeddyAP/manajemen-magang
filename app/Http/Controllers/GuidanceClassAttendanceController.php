@@ -42,7 +42,7 @@ class GuidanceClassAttendanceController extends Controller
 
         // Get latest internship for notes
         $internship = $user->internships()
-            ->whereIn('status', ['pending', 'active', 'ongoing'])
+            ->where('status', 'accepted')
             ->latest()
             ->first();
 
