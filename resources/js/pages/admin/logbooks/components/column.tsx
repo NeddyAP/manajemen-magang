@@ -43,15 +43,12 @@ export const columns: ColumnDef<Logbook>[] = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="Nama Mahasiswa" />,
         cell: ({ row }) => {
             const user = row.original.internship?.user;
-            return user?.name || '-';
-        },
-    },
-    {
-        accessorKey: 'internship.user.mahasiswaProfile.advisor.name',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Pembimbing" />,
-        cell: ({ row }) => {
-            const advisor = row.original.internship?.user?.mahasiswaProfile?.advisor;
-            return advisor?.name || '-';
+            return (
+                <div className="flex flex-col">
+                    <span className="font-medium">{user?.name}</span>
+                    <span className="text-muted-foreground text-sm">{user?.email}</span>
+                </div>
+            );
         },
     },
     {
@@ -139,4 +136,5 @@ export const columns: ColumnDef<Logbook>[] = [
 export const initialColumnVisibility = {
     created_at: false,
     updated_at: false,
+    'internship.user.email': false,
 };

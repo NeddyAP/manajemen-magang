@@ -60,10 +60,10 @@ export const columns: ColumnDef<Internship>[] = [
         cell: ({ row }) => {
             const advisor = row.original?.user?.mahasiswa_profile?.advisor as
                 | {
-                      name: string;
-                      email: string;
-                      dosen_profile?: { expertise: string };
-                  }
+                    name: string;
+                    email: string;
+                    dosen_profile?: { expertise: string };
+                }
                 | undefined;
             if (!advisor) return <span className="text-muted-foreground text-sm">Belum ditentukan</span>;
 

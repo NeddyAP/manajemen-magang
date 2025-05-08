@@ -14,27 +14,16 @@ class LogbookController extends Controller
     public function index(Request $request)
     {
         $query = Logbook::with([
-            'internship.user.mahasiswaProfile.advisor.dosenProfile',
+            'internship.user',
             'internship.user.mahasiswaProfile',
         ]);
 
-        // Handle search
         if ($request->has('search')) {
             $searchTerm = $request->search;
-            $query->where(function ($q) use ($searchTerm) {
-                $q->where('activities', 'like', "%{$searchTerm}%")
-                    ->orWhere('supervisor_notes', 'like', "%{$searchTerm}%")
-                    ->orWhereHas('internship.user', function ($query) use ($searchTerm) {
-                        $query->where('name', 'like', "%{$searchTerm}%");
-                    });
+            $query->whereHas('internship.user', function ($q) use ($searchTerm) {
+                $q->where('name', 'like', "{$searchTerm}%")
+                    ->orWhere('email', 'like', "{$searchTerm}%");
             });
-        }
-
-        // Handle filters
-        if ($request->has('filter')) {
-            foreach ($request->filter as $column => $value) {
-                $query->where($column, 'like', "%{$value}%");
-            }
         }
 
         // Handle sorting
@@ -49,8 +38,15 @@ class LogbookController extends Controller
         $perPage = $request->input('per_page', 10);
         $logbooks = $query->paginate($perPage)->withQueryString();
 
+        // Get unique mahasiswas for the filter
+        $mahasiswas = \App\Models\User::whereHas('internships.logbooks')
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
         return inertia('admin/logbooks/index', [
             'logbooks' => $logbooks->items(),
+            'mahasiswas' => $mahasiswas,
             'meta' => [
                 'total' => $logbooks->total(),
                 'per_page' => $logbooks->perPage(),
@@ -66,8 +62,9 @@ class LogbookController extends Controller
     public function show(Logbook $logbook)
     {
         $logbook->load([
-            'internship.user.mahasiswaProfile.advisor.dosenProfile',
+            'internship.user',
             'internship.user.mahasiswaProfile',
+            'internship.user.mahasiswaProfile.advisor',
         ]);
 
         return inertia('admin/logbooks/show', compact('logbook'));
@@ -83,7 +80,7 @@ class LogbookController extends Controller
 
             return redirect()->route('admin.logbooks.index')->with('success', 'Logbook berhasil dihapus.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menghapus logbook: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus logbook: ' . $e->getMessage());
         }
     }
 
@@ -98,7 +95,7 @@ class LogbookController extends Controller
 
             return redirect()->route('admin.logbooks.index')->with('success', 'Logbook berhasil dihapus.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menghapus logbook: '.$e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus logbook: ' . $e->getMessage());
         }
     }
 }
