@@ -3,12 +3,13 @@ import UserAnalytics from '@/components/admin/analytics/sections/UserAnalytics';
 import UserRecentAnalytics from '@/components/admin/analytics/sections/UserRecentAnalytics';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { User, type BreadcrumbItem } from '@/types';
+import { Role } from '@/types/user';
 import { Head, Link, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { DataTable } from '../../../components/data-table/data-table';
-import { columns, initialColumnVisibility, Role, User } from './components/column';
+import { columns, initialColumnVisibility } from './components/column';
 import { RoleFilter } from './components/filters';
 
 const breadcrumbs: BreadcrumbItem[] = [

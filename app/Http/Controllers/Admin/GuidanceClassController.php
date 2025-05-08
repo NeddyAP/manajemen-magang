@@ -32,7 +32,7 @@ class GuidanceClassController extends Controller
 
         $classes = $query->paginate(10)
             ->withQueryString()
-            ->through(fn($class) => [
+            ->through(fn ($class) => [
                 'id' => $class->id,
                 'title' => $class->title,
                 'lecturer' => [
@@ -51,7 +51,7 @@ class GuidanceClassController extends Controller
         $lecturers = User::role('dosen')
             ->with('dosenProfile')
             ->get()
-            ->map(fn($lecturer) => [
+            ->map(fn ($lecturer) => [
                 'id' => $lecturer->id,
                 'name' => $lecturer->name,
                 'employee_number' => $lecturer->dosenProfile->employee_number ?? null,

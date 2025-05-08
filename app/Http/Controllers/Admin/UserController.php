@@ -145,6 +145,15 @@ class UserController extends Controller
         }
     }
 
+    public function show(User $user)
+    {
+        $user->load(['roles', 'adminProfile', 'dosenProfile', 'mahasiswaProfile.advisor.dosenProfile']);
+
+        return inertia('admin/users/show', [
+            'user' => $user,
+        ]);
+    }
+
     public function edit(User $user)
     {
         $user->load(['roles', 'adminProfile', 'dosenProfile', 'mahasiswaProfile']);

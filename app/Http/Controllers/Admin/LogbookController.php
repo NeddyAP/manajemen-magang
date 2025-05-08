@@ -80,7 +80,7 @@ class LogbookController extends Controller
 
             return redirect()->route('admin.logbooks.index')->with('success', 'Logbook berhasil dihapus.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menghapus logbook: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus logbook: '.$e->getMessage());
         }
     }
 
@@ -95,7 +95,7 @@ class LogbookController extends Controller
 
             return redirect()->route('admin.logbooks.index')->with('success', 'Logbook berhasil dihapus.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menghapus logbook: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus logbook: '.$e->getMessage());
         }
     }
 }

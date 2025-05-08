@@ -9,7 +9,10 @@ export interface Auth {
 
 export interface BreadcrumbItem {
     title: string;
-    href: string;
+    href?: string;
+    isCurrent?: boolean;
+    isActive?: boolean;
+    icon?: React.ReactNode;
 }
 
 export interface NavGroup {

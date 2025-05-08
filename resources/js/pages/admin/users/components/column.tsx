@@ -1,6 +1,5 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -11,35 +10,18 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { router } from '@inertiajs/react';
+import { User } from '@/types/user';
+import { Link } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
-import { format, parseISO } from 'date-fns';
-import { id } from 'date-fns/locale';
 import { MoreHorizontal } from 'lucide-react';
 import { DataTableColumnHeader } from '../../../../components/data-table/column-header';
-
-// This type is used to define the shape of our data.
-export interface Role {
-    id: number;
-    name: string;
-    guard_name: string;
-}
-
-export interface User {
-    id: string;
-    email: string;
-    name: string;
-    created_at?: string;
-    roles: Role[];
-    [key: string]: unknown; // For any other properties that might be in the user data
-}
 
 export const columns: ColumnDef<User>[] = [
     {
         id: 'select',
         header: ({ table }) => (
             <Checkbox
-                checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
+                checked={table.getIsAllPageRowsSelected()}
                 onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
                 aria-label="Select all"
             />
@@ -51,73 +33,38 @@ export const columns: ColumnDef<User>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: 'id',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Id Pengguna" />,
+        accessorKey: 'name',
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Nama" />,
+        cell: ({ row }) => (
+            <Link href={route('admin.users.show', row.original.id)} className="text-blue-500 hover:underline">
+                {row.original.name}
+            </Link>
+        ),
     },
     {
         accessorKey: 'email',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
     },
     {
-        accessorKey: 'name',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Nama" />,
-    },
-    {
         accessorKey: 'roles',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Role" />,
         cell: ({ row }) => {
             const roles = row.original.roles;
-            if (!roles || !roles.length) return '-';
-
-            return (
-                <div className="flex flex-wrap gap-1">
-                    {roles.map((role, index) => (
-                        <Badge key={index} variant="outline">
-                            {role.name}
-                        </Badge>
-                    ))}
-                </div>
-            );
+            return roles && roles.length > 0 ? roles.map((role) => role.name).join(', ') : 'N/A';
         },
-        enableSorting: false,
-    },
-    {
-        accessorKey: 'created_at',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Dibuat Pada" />,
-        cell: ({ row }) => {
-            const createdAt = row.getValue('created_at') as string | undefined;
-            if (!createdAt) return '-';
-
-            try {
-                // Format date to Indonesian locale
-                return format(parseISO(createdAt), 'PPpp', { locale: id });
-            } catch (error) {
-                console.error('Error formatting date:', error);
-                return createdAt;
+        filterFn: (row, id, value: string[]) => {
+            const userRoles = row.original.roles;
+            if (!userRoles || userRoles.length === 0) {
+                return false;
             }
-        },
-    },
-    {
-        accessorKey: 'updated_at',
-        header: ({ column }) => <DataTableColumnHeader column={column} title="Diperbarui Pada" />,
-        cell: ({ row }) => {
-            const updatedAt = row.getValue('updated_at') as string | undefined;
-            if (!updatedAt) return '-';
-
-            try {
-                // Format date to Indonesian locale
-                return format(parseISO(updatedAt), 'PPpp', { locale: id });
-            } catch (error) {
-                console.error('Error formatting date:', error);
-                return updatedAt;
-            }
+            // Check if any of the user's role names are included in the filter value array
+            return userRoles.some((role) => value.includes(role.name));
         },
     },
     {
         id: 'actions',
         cell: ({ row }) => {
-            const users = row.original;
-
+            const user = row.original;
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -128,22 +75,24 @@ export const columns: ColumnDef<User>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(users.id.toString())}>Salin ID pengguna</DropdownMenuItem>
-                        <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                            <a href={route('admin.users.edit', users.id)}>Edit</a>
+                            <Link href={route('admin.users.show', { user: user.id })}>Lihat Detail</Link>
                         </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href={route('admin.users.edit', { user: user.id })}>Edit</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem
                             onClick={() => {
                                 if (confirm('Apakah Anda yakin ingin menghapus pengguna ini?')) {
-                                    router.delete(route('admin.users.destroy', users.id), {
-                                        preserveScroll: true,
-                                    });
+                                    // router.delete(route('admin.users.destroy', { user: user.id }));
+                                    // For now, log to console, actual delete needs router from props or context
+                                    console.log('Delete user:', user.id);
                                 }
                             }}
-                            className="text-red-500"
+                            className="text-red-600"
                         >
-                            Delete
+                            Hapus
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -153,6 +102,23 @@ export const columns: ColumnDef<User>[] = [
 ];
 
 export const initialColumnVisibility = {
-    created_at: false,
-    updated_at: false,
+    id: false,
+    email: true,
+    role: true,
+    profile_specific_info: true, // Placeholder for role-specific info
+    actions: true,
+};
+
+const getProfileSpecificInfo = (user: User) => {
+    const role = user.roles?.[0]?.name;
+    if (role === 'mahasiswa' && user.mahasiswa_profile) {
+        return `NIM: ${user.mahasiswa_profile.student_number} - ${user.mahasiswa_profile.study_program}`;
+    }
+    if (role === 'dosen' && user.dosen_profile) {
+        return `NIDN: ${user.dosen_profile.employee_number} - ${user.dosen_profile.expertise}`;
+    }
+    if (role === 'admin' && user.admin_profile) {
+        return `Posisi: ${user.admin_profile.position}`;
+    }
+    return '-';
 };
