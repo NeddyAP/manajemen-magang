@@ -108,17 +108,3 @@ export const initialColumnVisibility = {
     profile_specific_info: true, // Placeholder for role-specific info
     actions: true,
 };
-
-const getProfileSpecificInfo = (user: User) => {
-    const role = user.roles?.[0]?.name;
-    if (role === 'mahasiswa' && user.mahasiswa_profile) {
-        return `NIM: ${user.mahasiswa_profile.student_number} - ${user.mahasiswa_profile.study_program}`;
-    }
-    if (role === 'dosen' && user.dosen_profile) {
-        return `NIDN: ${user.dosen_profile.employee_number} - ${user.dosen_profile.expertise}`;
-    }
-    if (role === 'admin' && user.admin_profile) {
-        return `Posisi: ${user.admin_profile.position}`;
-    }
-    return '-';
-};
