@@ -10,7 +10,7 @@ This document tracks the current status, progress, and evolution of the internsh
 *   **Internship Management:** ✅ (Application CRUD, Status Tracking, File Upload)
 *   **Logbook System:** ✅ (Student CRUD, Dosen Supervisor Notes via Modal) - *Full Dosen feedback on reports pending*
 *   **Report Management:** ✅ (Student CRUD, File Upload) - *Dosen feedback/formal review flow pending*
-*   **Guidance System:** ✅ (Class CRUD, Student Assignment) - *Attendance mechanism pending*
+*   **Guidance System:** ✅ (Class CRUD, Student Assignment, QR Code & Manual Attendance Tracking)
 *   **Support Features (Admin):** ✅ (FAQ CRUD, Tutorial CRUD, Global Variable CRUD)
 *   **Notification System:** ✅ (In-App DB-driven, Header Dropdown, History Page, Mark Read/Unread, Delete)
 *   **User Settings:** ✅ (Profile, Password, Appearance)
@@ -75,6 +75,8 @@ This document tracks the current status, progress, and evolution of the internsh
 *   **Frontend:** Built UI for Notifications, Settings, Trash. Added analytics cards.
 *   **Testing:** Added Pest Feature tests for Authentication.
 *   **Documentation:** Completed Memory Bank update to reflect recent changes.
+*   **[2025-05-08 18:54:33] - Clarified Dosen report feedback: Partially implemented via rejection notes; general feedback pending.**
+*   **[2025-05-08 19:02:06] - Confirmed substantial implementation of Guidance Class attendance feature (QR code via URL and manual check-in).**
 
 ## Known Issues / Areas for Improvement
 
@@ -84,8 +86,7 @@ This document tracks the current status, progress, and evolution of the internsh
 
 ### Medium Priority
 
-*   **Guidance Class Attendance:** Implement a functional attendance mechanism (QR or manual check-in).
-*   **Dosen Feedback (Reports):** Add UI/backend logic for Dosen to add feedback to Reports. (Logbook supervisor notes partially address this).
+*   **Dosen Feedback (Reports):** Partially implemented. Dosen can add `reviewer_notes` when rejecting a report. A general feedback mechanism is still pending. (Logbook supervisor notes also offer a form of feedback).
 *   **Testing Coverage:** Expand Pest test coverage beyond Auth to other core modules (Internships, Logbooks, Reports, etc.).
 
 ### Low Priority
@@ -107,8 +108,7 @@ This document tracks the current status, progress, and evolution of the internsh
 
 ### Short-term Goals
 
-1.  Implement Guidance Class attendance feature.
-2.  Implement Dosen feedback feature for Logbooks/Reports.
+1.  Implement general Dosen feedback feature for Reports (beyond rejection notes) and enhance Logbook feedback if needed.
 3.  Continue expanding test coverage (Guidance, FAQs, Tutorials, Users, Settings).
 4.  Refine Admin dashboard with more useful statistics.
 
@@ -141,7 +141,6 @@ This document tracks the current status, progress, and evolution of the internsh
 
 ### Pending Decisions
 
-*   Specific mechanism for Guidance Class attendance (QR vs. Manual).
 *   Caching strategy (Redis vs. File vs. DB).
 *   Deployment strategy and infrastructure choices for production.
 *   Approach for handling potential real-time features.
@@ -159,3 +158,9 @@ This document tracks the current status, progress, and evolution of the internsh
 *   **Phase 1 (Core Features):** Mostly Complete ✅
 *   **Phase 2 (Refinement & Testing):** In Progress ⏳ (Notifications, Settings, Trash, Logbook Dosen Notes & UI enhancements done. Testing started. Documentation updated.)
 *   **Phase 3 (Advanced Features):** Planned 📋
+
+[2025-05-08 18:50:25] - Discovered that memory-bank/decisionLog.md was missing during Memory Bank initialization. Created the file as part of the update process.
+[2025-05-08 23:49:25] - Completed task: Refactor - Remove 'title' Field from Internships. This involved creating a migration to drop the 'title' column from the `internships` table ([`database/migrations/2025_05_08_161822_remove_title_from_internships_table.php`](database/migrations/2025_05_08_161822_remove_title_from_internships_table.php)), updating the `Internship` model ([`app/Models/Internship.php`](app/Models/Internship.php)), `StoreInternshipRequest` ([`app/Http/Requests/StoreInternshipRequest.php`](app/Http/Requests/StoreInternshipRequest.php)), `UpdateInternshipRequest` ([`app/Http/Requests/UpdateInternshipRequest.php`](app/Http/Requests/UpdateInternshipRequest.php)), `InternshipFactory` ([`database/factories/InternshipFactory.php`](database/factories/InternshipFactory.php)), and `InternshipCrudTest.php` ([`tests/Feature/InternshipCrudTest.php`](tests/Feature/InternshipCrudTest.php)). The authorization logic in `InternshipApplicantController@edit` ([`app/Http/Controllers/Front/InternshipApplicantController.php`](app/Http/Controllers/Front/InternshipApplicantController.php)) was also fixed, resolving a previously failing test. All tests related to this refactoring are passing.
+[2025-05-08 23:58:00] - Removed the Internship Applicant 'show' page functionality. This included: deleting the `show.tsx` file (if it existed), updating the redirect in `InternshipCrudTest.php` from the non-existent show page to the index page, removing the 'show' route from `routes/web.php`, and confirming no frontend links pointed to it.
+
+[2025-05-09 12:03:24] - Debugged failing test `mahasiswa can update their own internship with valid data if editable` in `tests/Feature/InternshipCrudTest.php`. The issue was an incorrect redirect target in `app/Http/Controllers/Front/InternshipApplicantController.php@update`. Changed redirect from `show` route to `index` route. All tests in `InternshipCrudTest.php` now pass.

@@ -24,7 +24,6 @@ Route::middleware(['auth', 'verified'])->prefix('internships')->name('front.inte
         Route::get('/', [InternshipApplicantController::class, 'index'])->name('index');
         Route::get('/create', [InternshipApplicantController::class, 'create'])->name('create');
         Route::post('/', [InternshipApplicantController::class, 'store'])->name('store');
-        Route::get('/{internship}', [InternshipApplicantController::class, 'show'])->name('show');
         Route::get('/{internship}/edit', [InternshipApplicantController::class, 'edit'])->name('edit');
         Route::put('/{internship}', [InternshipApplicantController::class, 'update'])->name('update');
         Route::delete('/{internship}', [InternshipApplicantController::class, 'destroy'])->name('destroy');

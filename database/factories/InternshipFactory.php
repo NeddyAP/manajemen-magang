@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User; // Added User model
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,10 +17,11 @@ class InternshipFactory extends Factory
      */
     public function definition(): array
     {
-        $startDate = fake()->dateTimeBetween('-6 months', '+1 month');
-        $endDate = fake()->dateTimeBetween($startDate, '+6 months');
+        $startDate = fake()->dateTimeBetween('+1 day', '+1 month'); // Ensure start_date is in the future
+        $endDate = fake()->dateTimeBetween($startDate, (clone $startDate)->modify('+6 months')); // Ensure end_date is after start_date
 
         return [
+            'user_id' => User::factory(), // Added user_id
             'type' => fake()->randomElement(['kkl', 'kkn']),
             'application_file' => 'dummy_files/internship_'.fake()->unique()->uuid().'.pdf',
             'company_name' => fake()->company(),

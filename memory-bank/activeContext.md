@@ -3,8 +3,8 @@
 _This file tracks the current work focus, recent changes, immediate next steps, active decisions, important patterns/preferences discovered, and project insights._
 
 **Status:** Active Development
-**Last Reviewed:** May 7, 2025
-**Current Task:** Finalizing Memory Bank Update post-logbook enhancements.
+**Last Reviewed:** May 9, 2025
+**Current Task:** Performing a general review and update of Memory Bank files based on recent activities (Internship Applicant 'show' page removal and `InternshipCrudTest.php` fix).
 
 ## Project Overview
 
@@ -27,10 +27,11 @@ This is a comprehensive internship management system (Manajement Magang) built w
 4.  **Report Management:**
     *   Report submission (`reports` table) with file uploads.
     *   Visibility for students, assigned Dosen, and Admins.
+    *   Partial Dosen Feedback: `reviewer_notes` can be added when a report is rejected.
 5.  **Guidance System:**
     *   Class scheduling (`guidance_classes` table) by Admin/Dosen.
     *   Student assignment to classes.
-    *   Attendance tracking (`guidance_class_attendance` table - basic structure).
+    *   Attendance tracking (`guidance_class_attendance` table - QR code via URL & manual check-in implemented).
 6.  **Support & Content Management (Admin):**
     *   FAQs (`faqs` table).
     *   Tutorials (`tutorials` table).
@@ -90,16 +91,19 @@ This is a comprehensive internship management system (Manajement Magang) built w
 *   Implementation of User Settings pages (Profile, Password, Appearance).
 *   Implementation of Admin Trash Management feature.
 *   **Addition of Pest Feature tests for Authentication flows (Registration, Login, Password Reset, Email Verification).**
+*   **[2025-05-08 18:55:02] - Confirmed partial implementation of Dosen feedback for reports (via rejection notes). General feedback feature remains a future enhancement.**
+*   **[2025-05-08 19:02:28] - Guidance Class attendance feature (QR code via URL, manual Dosen check-in) confirmed as substantially implemented.**
+*   **[2025-05-09 00:06:00] - Removed Internship Applicant 'show' page:** Based on user feedback, the dedicated 'show' page for internship applicants, its route, and associated frontend file ([`resources/js/pages/front/internships/applicants/show.tsx`](resources/js/pages/front/internships/applicants/show.tsx:1)) were removed to simplify user flow. Test redirects in [`tests/Feature/InternshipCrudTest.php`](tests/Feature/InternshipCrudTest.php:1) were updated accordingly.
+*   **[2025-05-09 00:06:00] - Fixed `InternshipCrudTest.php`:** Resolved failing test `mahasiswa can update their own internship with valid data if editable` by correcting an incorrect redirect in [`app/Http/Controllers/Front/InternshipApplicantController.php`](app/Http/Controllers/Front/InternshipApplicantController.php:1) from the (now removed) 'show' route to the 'index' route. All tests in [`tests/Feature/InternshipCrudTest.php`](tests/Feature/InternshipCrudTest.php:1) are now passing.
 
 ## Current Focus Area
 
-*   **Task:** Completing the update of all Memory Bank documentation (`*.md` files in `memory-bank/`) to accurately reflect the current project state, including the recent logbook enhancements.
+*   **Task:** Updating Memory Bank files ([`memory-bank/progress.md`](memory-bank/progress.md:1), [`memory-bank/decisionLog.md`](memory-bank/decisionLog.md:1), [`memory-bank/activeContext.md`](memory-bank/activeContext.md:1), and others as needed) to reflect the removal of the Internship Applicant 'show' page and the fix for tests in [`tests/Feature/InternshipCrudTest.php`](tests/Feature/InternshipCrudTest.php:1).
 
 ## Next Steps (After Documentation Update)
 
 1.  **Testing:** Continue adding Pest tests for other core features (CRUD operations for Internships, Logbooks, Reports, Guidance Classes, FAQs, Tutorials, etc.). Aim for higher test coverage.
-2.  **Guidance Class Attendance:** Implement QR code generation/scanning or a simpler check-in mechanism.
-3.  **Dosen Feedback (Reports):** Add functionality for Dosen to add notes/feedback to Reports. (Logbook feedback partially implemented via supervisor notes).
+2.  **Dosen Feedback (Reports):** Implement a general feedback mechanism for Dosen on Reports (beyond rejection notes). (Logbook feedback partially implemented via supervisor notes; Report rejection notes also provide a feedback channel).
 4.  **Refinement:** Address any remaining `TODO` comments in the code. Improve UI/UX based on feedback. Optimize queries or backend logic where necessary.
 5.  **TypeScript:** Continue improving type safety, potentially defining more specific types for shared data structures (e.g., `NotificationData`).
 
@@ -117,3 +121,4 @@ This is a comprehensive internship management system (Manajement Magang) built w
 *   **Authorization Specificity:** Ensuring correct ID usage (e.g., `internship_id` for overall internship context vs. `logbook_id` for specific entries) in backend authorization queries is crucial for proper data access control. This was particularly relevant when fixing 'dosen' access to logbooks, where initial queries might have been too broad or used incorrect identifiers, leading to access issues.
 *   **Modal Interactivity:** When implementing modals for actions like adding supervisor notes, ensure smooth data flow and state management between the modal and the parent page to reflect changes immediately.
 *   **Component Reusability:** The back button and animation patterns can be abstracted into reusable components or hooks for consistency across different pages.
+

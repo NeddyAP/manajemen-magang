@@ -127,6 +127,9 @@ class InternshipApplicantController extends Controller
      */
     public function create()
     {
+        if (!auth()->user()->hasRole('mahasiswa')) {
+            abort(403, 'Hanya mahasiswa yang dapat membuat aplikasi magang.');
+        }
         return Inertia::render('front/internships/applicants/create');
     }
 
@@ -145,7 +148,7 @@ class InternshipApplicantController extends Controller
 
         $validated['user_id'] = auth()->id();
         $validated['status'] = 'waiting';
-        $validated['progress'] = '0';
+        $validated['progress'] = 0; // Changed to integer
 
         $internship = Internship::create($validated);
 
@@ -160,34 +163,6 @@ class InternshipApplicantController extends Controller
     }
 
     /**
-     * Display the specified internship application.
-     */
-    public function show(Internship $internship)
-    {
-        // Check if the internship belongs to the authenticated user
-        if ($internship->user_id !== auth()->id()) {
-            // Allow Dosen to view advisee's internship
-            $isAdvisee = false;
-            if (auth()->user()->hasRole('dosen')) {
-                $dosenProfile = DosenProfile::where('user_id', auth()->id())->first();
-                if ($dosenProfile) {
-                    $adviseeProfile = MahasiswaProfile::where('user_id', $internship->user_id)
-                        ->where('advisor_id', $dosenProfile->user_id)
-                        ->first();
-                    $isAdvisee = (bool) $adviseeProfile;
-                }
-            }
-            if (! $isAdvisee) {
-                abort(403, 'Tindakan tidak sah.');
-            }
-        }
-
-        return Inertia::render('front/internships/applicants/show', [
-            'internship' => $internship->load('user.mahasiswaProfile'), // Eager load user and profile
-        ]);
-    }
-
-    /**
      * Show the form for editing the specified internship application.
      */
     public function edit(Internship $internship)
@@ -198,8 +173,12 @@ class InternshipApplicantController extends Controller
             abort(403, 'Tindakan tidak sah.');
         }
 
+        if ($internship->status !== 'waiting') {
+            abort(403, 'Hanya aplikasi magang dengan status "waiting" yang dapat diedit.');
+        }
+        
         return Inertia::render('front/internships/applicants/edit', [
-            'internship' => $internship,
+            'internship' => $internship->load('user.mahasiswaProfile'), // Eager load user and profile
         ]);
     }
 

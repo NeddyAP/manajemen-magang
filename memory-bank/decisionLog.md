@@ -1,0 +1,21 @@
+# Decision Log
+
+This document records significant architectural and project decisions, their rationale, and implications.
+[2025-05-08 18:55:19] - Dosen Feedback for Reports: Current Implementation Review
+Decision: Confirmed that Dosen feedback on reports is partially implemented.
+Rationale: The system allows Dosen/Admins to add 'reviewer_notes' when rejecting a student's report. This note is visible to the student.
+Implications: While this covers feedback in a rejection scenario, a more general mechanism for Dosen to provide ongoing or non-rejection-related feedback on reports is not yet present and remains a potential future enhancement. The existing `reviewer_notes` field in the `reports` table and associated UI in `ReportActionsCell` ([`resources/js/pages/front/internships/reports/components/column.tsx`](resources/js/pages/front/internships/reports/components/column.tsx:109-143)) and display in `column.tsx` ([`resources/js/pages/front/internships/reports/components/column.tsx`](resources/js/pages/front/internships/reports/components/column.tsx:270-272)) serve this specific purpose.
+[2025-05-08 19:02:45] - Guidance Class Attendance Feature: Implementation Review
+Decision: Confirmed that the Guidance Class attendance feature is substantially implemented.
+Rationale: The system now supports QR code-based attendance (Dosen/Admin generate a unique URL rendered as a QR code; students scan this URL with their device to record attendance) and manual attendance marking by Dosen. This functionality is supported by backend logic in `GuidanceClassAttendanceController` ([`app/Http/Controllers/GuidanceClassAttendanceController.php`](app/Http/Controllers/GuidanceClassAttendanceController.php:1)) and `GuidanceClassController` ([`app/Http/Controllers/Admin/GuidanceClassController.php`](app/Http/Controllers/Admin/GuidanceClassController.php:1) and [`app/Http/Controllers/Front/GuidanceClassController.php`](app/Http/Controllers/Front/GuidanceClassController.php:1)), updates to the `GuidanceClassAttendance` ([`app/Models/GuidanceClassAttendance.php`](app/Models/GuidanceClassAttendance.php:1)) and `GuidanceClass` ([`app/Models/GuidanceClass.php`](app/Models/GuidanceClass.php:1)) models, and corresponding frontend UI components for QR code display and manual management by Dosen (e.g., in `resources/js/pages/front/internships/guidance-classes/components/manage-attendance.tsx`). The `qrcode.react` library is used for QR rendering.
+Implications: This fulfills a key planned feature, moving it from 'pending' to 'implemented'. Future enhancements could involve direct in-app QR scanning if desired, but the current URL-based QR method is functional.
+[2025-05-09 00:06:00] - Removal of Internship Applicant 'show' Page
+Decision: The Internship Applicant 'show' page and its associated route and functionalities were removed.
+Rationale: User feedback indicated that a dedicated 'show' page for individual internship applicants was unnecessary. The primary interaction points are the application listing/index and the edit/update functionalities. Simplifying the user flow was prioritized.
+Implications: This reduces the number of views and routes to maintain. The `show.tsx` file for applicants was deleted, the 'show' route was removed from `routes/web.php`, and tests in `InternshipCrudTest.php` were updated to reflect this change (e.g., redirecting to index after certain actions instead of show).
+
+[2025-05-09 00:06:00] - Fix for Failing Test: `mahasiswa can update their own internship with valid data if editable`
+Decision: Investigated and fixed the failing test `mahasiswa can update their own internship with valid data if editable` in `tests/Feature/InternshipCrudTest.php`.
+Rationale: The test was failing due to an incorrect redirect target in the `update` method of the `InternshipApplicantController.php`. After a successful update, the controller was attempting to redirect to a 'show' route that no longer existed (due to the decision above).
+Resolution: The redirect in `app/Http/Controllers/Front/InternshipApplicantController.php` was changed from `route('front.internships.applicants.show', $internship->id)` to `route('front.internships.index')`.
+Implications: All tests within `InternshipCrudTest.php` are now passing, ensuring the stability of the internship application update functionality for students.
