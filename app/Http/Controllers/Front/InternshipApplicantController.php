@@ -127,9 +127,10 @@ class InternshipApplicantController extends Controller
      */
     public function create()
     {
-        if (!auth()->user()->hasRole('mahasiswa')) {
+        if (! auth()->user()->hasRole('mahasiswa')) {
             abort(403, 'Hanya mahasiswa yang dapat membuat aplikasi magang.');
         }
+
         return Inertia::render('front/internships/applicants/create');
     }
 
@@ -176,7 +177,7 @@ class InternshipApplicantController extends Controller
         if ($internship->status !== 'waiting') {
             abort(403, 'Hanya aplikasi magang dengan status "waiting" yang dapat diedit.');
         }
-        
+
         return Inertia::render('front/internships/applicants/edit', [
             'internship' => $internship->load('user.mahasiswaProfile'), // Eager load user and profile
         ]);

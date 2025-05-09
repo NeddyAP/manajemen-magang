@@ -11,7 +11,9 @@ class StoreLogbookRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        // Assuming any authenticated user associated with an internship can create a logbook.
+        // More specific authorization can be handled in the controller or a policy.
+        return $this->user() && $this->route('internship');
     }
 
     /**
@@ -22,7 +24,10 @@ class StoreLogbookRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'activities' => ['required', 'string', 'min:3'],
+            'date' => ['required', 'date_format:Y-m-d'],
+            // Add other rules for fields like 'supervisor_notes' if they are part of the creation form
+            // and need validation. For now, assuming only 'kegiatan' and 'date' are primary.
         ];
     }
 }

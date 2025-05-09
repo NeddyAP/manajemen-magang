@@ -2,18 +2,18 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
-use App\Models\Internship;
-use App\Models\MahasiswaProfile;
 use App\Models\AdminProfile;
 use App\Models\DosenProfile;
-use App\Notifications\InternshipSubmittedNotification; // Placeholder
+use App\Models\Internship;
+use App\Models\MahasiswaProfile;
+use App\Models\User;
 use App\Notifications\InternshipStatusUpdatedNotification; // Placeholder
+use App\Notifications\InternshipSubmittedNotification; // Placeholder
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 use Spatie\Permission\Models\Role;
 
@@ -29,7 +29,6 @@ beforeEach(function () {
     $this->adminUser = User::factory()->create();
     $this->adminUser->assignRole('admin');
     AdminProfile::factory()->for($this->adminUser)->create();
-
 
     Storage::fake('public'); // Default disk for uploads
     Notification::fake();
@@ -47,6 +46,7 @@ function createUserWithRole(string $roleName): User
         'dosen' => DosenProfile::factory()->for($user)->create(),
         default => null,
     };
+
     return $user;
 }
 
@@ -59,7 +59,7 @@ test('mahasiswa can view the internship application form', function () {
         ->get(route('front.internships.applicants.create')) // Corrected route name
         ->assertOk()
         ->assertInertia(
-            fn(Assert $page) => $page
+            fn (Assert $page) => $page
                 ->component('front/internships/applicants/create') // Corrected component name casing
         );
 });
@@ -77,7 +77,6 @@ test('mahasiswa can submit a valid internship application', function () {
     // The factory also generates dates as DateTime objects, ensure they are strings for the POST request.
     $baseInternshipData['start_date'] = (new \DateTime($baseInternshipData['start_date']))->format('Y-m-d');
     $baseInternshipData['end_date'] = (new \DateTime($baseInternshipData['end_date']))->format('Y-m-d');
-
 
     $postData = array_merge(
         $baseInternshipData,
@@ -99,7 +98,6 @@ test('mahasiswa can submit a valid internship application', function () {
     $this->assertNotNull($createdInternship->application_file);
     Storage::disk('public')->assertExists($createdInternship->application_file);
 
-
     // Notification::assertSentTo($adminToNotify, InternshipSubmittedNotification::class); // Placeholder
 });
 
@@ -109,7 +107,7 @@ test('mahasiswa cannot submit an internship application with invalid data', func
     // Prepare valid base data and then make 'type' invalid
     $validBaseData = Internship::factory()->make([
         'user_id' => $mahasiswa->id,
-        'application_file' => UploadedFile::fake()->create('document.pdf', 1024, 'application/pdf')
+        'application_file' => UploadedFile::fake()->create('document.pdf', 1024, 'application/pdf'),
     ])->toArray();
     // Ensure dates are strings
     $validBaseData['start_date'] = (new \DateTime($validBaseData['start_date']))->format('Y-m-d');
@@ -117,7 +115,6 @@ test('mahasiswa cannot submit an internship application with invalid data', func
 
     // Make 'type' invalid
     $invalidData = array_merge($validBaseData, ['type' => 'invalid_type']);
-
 
     $this->actingAs($mahasiswa)
         ->post(route('front.internships.applicants.store'), $invalidData)
@@ -149,7 +146,6 @@ test('dosen users cannot access the student internship creation form', function 
         ->assertForbidden(); // Or assertRedirect to dosen dashboard
 });
 
-
 // --- READ Internships ---
 
 // Index Page
@@ -162,7 +158,7 @@ test('mahasiswa can view a list of their own internships', function () {
         ->get(route('front.internships.applicants.index')) // Corrected route name
         ->assertOk()
         ->assertInertia(
-            fn(Assert $page) => $page
+            fn (Assert $page) => $page
                 ->component('front/internships/applicants/index') // Corrected component name casing
                 ->has('internships', 3) // Corrected prop name and assertion
         );
@@ -176,7 +172,7 @@ test('admin can view a list of all internships', function () {
         ->get(route('admin.internships.index')) // Assuming admin route
         ->assertOk()
         ->assertInertia(
-            fn(Assert $page) => $page
+            fn (Assert $page) => $page
                 ->component('admin/internships/index') // Corrected component name casing
                 ->has('internships', 5) // Corrected prop name and assertion
         );
@@ -227,7 +223,6 @@ test('admin can view a list of all internships', function () {
 //         );
 // });
 
-
 // --- UPDATE Internship ---
 
 // Mahasiswa Editing Own Application
@@ -239,7 +234,7 @@ test('mahasiswa can view the edit form for their own internship if editable', fu
         ->get(route('front.internships.applicants.edit', $internship)) // Corrected route name
         ->assertOk()
         ->assertInertia(
-            fn(Assert $page) => $page
+            fn (Assert $page) => $page
                 ->component('front/internships/applicants/edit') // Corrected component name casing
                 ->has('internship')
                 ->where('internship.id', $internship->id)
@@ -287,7 +282,6 @@ test('mahasiswa can update their own internship with valid data if editable', fu
     // Remove user_id if it's not part of the update form data (usually it's not)
     unset($updatedData['user_id']);
 
-
     $this->actingAs($mahasiswa)
         ->put(route('front.internships.applicants.update', $internship), $updatedData)
         ->assertRedirect(route('front.internships.applicants.index'))
@@ -309,7 +303,6 @@ test('mahasiswa cannot update their internship with invalid data', function () {
     $validBaseDataForUpdate['end_date'] = (new \DateTime($validBaseDataForUpdate['end_date']))->format('Y-m-d');
     unset($validBaseDataForUpdate['application_file']); // Assuming file is not part of this specific update test or is optional
     unset($validBaseDataForUpdate['user_id']);
-
 
     $invalidUpdateData = array_merge($validBaseDataForUpdate, ['company_name' => '']); // Make company_name invalid
 
@@ -349,7 +342,6 @@ test('unauthorized users cannot update internships', function () {
     $this->put(route('front.internships.applicants.update', $internshipOfOther), ['company_name' => 'Trying to update Company'])
         ->assertStatus(403); // Changed to 403 as per actual response
 });
-
 
 // --- DELETE Internship (Consider Soft Deletes) ---
 
@@ -417,7 +409,6 @@ test('mahasiswa can submit an internship application with a file upload', functi
     $baseInternshipData['start_date'] = (new \DateTime($baseInternshipData['start_date']))->format('Y-m-d');
     $baseInternshipData['end_date'] = (new \DateTime($baseInternshipData['end_date']))->format('Y-m-d');
 
-
     $postData = array_merge(
         $baseInternshipData,
         ['application_file' => $file] // Changed 'application_document' to 'application_file'
@@ -448,7 +439,6 @@ test('internship application fails if uploaded file is invalid', function () {
     // Ensure dates are strings
     $baseInternshipData['start_date'] = (new \DateTime($baseInternshipData['start_date']))->format('Y-m-d');
     $baseInternshipData['end_date'] = (new \DateTime($baseInternshipData['end_date']))->format('Y-m-d');
-
 
     $postData = array_merge(
         $baseInternshipData,

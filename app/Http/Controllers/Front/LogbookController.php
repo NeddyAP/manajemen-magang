@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\front;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreLogbookRequest; // Import StoreLogbookRequest
+use App\Http\Requests\UpdateLogbookRequest; // Import UpdateLogbookRequest
 use App\Models\DosenProfile; // Add DosenProfile
 use App\Models\Internship;
 use App\Models\Logbook;
@@ -87,17 +89,14 @@ class LogbookController extends Controller
         ]);
     }
 
-    public function store(Request $request, Internship $internship)
+    public function store(StoreLogbookRequest $request, Internship $internship) // Use StoreLogbookRequest
     {
-        // Only owner can store
+        // Authorization is handled by StoreLogbookRequest and this check
         if ($internship->user_id !== auth()->id() || $internship->status !== 'accepted') {
-            abort(403, 'Unauthorized action.');
+            abort(403, 'Unauthorized action or internship not accepted.');
         }
 
-        $validated = $request->validate([
-            'date' => 'required|date',
-            'activities' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
         // Associate logbook with the internship owner (student)
         $validated['user_id'] = $internship->user_id;
@@ -129,18 +128,20 @@ class LogbookController extends Controller
         ]);
     }
 
-    public function update(Request $request, Internship $internship, Logbook $logbook)
+    public function update(UpdateLogbookRequest $request, Internship $internship, Logbook $logbook) // Use UpdateLogbookRequest
     {
-        // owner and advisor can editupdate
-        if ((! auth()->user()->hasRole('dosen') && $internship->user_id !== auth()->id()) || $logbook->internship_id !== $internship->id) {
-            abort(403, 'Unauthorized action.');
+        // Authorization is handled by UpdateLogbookRequest and this check
+        if ($logbook->internship_id !== $internship->id) { // Ensure logbook belongs to the internship
+            abort(404); // Or 403, depending on desired behavior
+        }
+        // Additional check if Dosen is trying to update notes vs student updating their entry
+        if (auth()->user()->hasRole('dosen')) {
+            $validated['supervisor_notes'] = $request->input('supervisor_notes');
         }
 
-        $validated = $request->validate([
-            'date' => 'required|date',
-            'activities' => 'required|string',
-            'supervisor_notes' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
+
+        // If a Dosen is updating, they might only be allowed to update supervisor_notes
 
         $logbook->update($validated);
 
@@ -150,11 +151,14 @@ class LogbookController extends Controller
 
     public function destroy(Internship $internship, Logbook $logbook)
     {
-        // Only owner can delete
-        if ($internship->user_id !== auth()->id() || $logbook->internship_id !== $internship->id) {
-            abort(403, 'Unauthorized action.');
+        // Ensure logbook belongs to the internship (route model binding should mostly handle this)
+        if ($logbook->internship_id !== $internship->id) {
+            abort(404); // Or 403
         }
-        $logbook->delete();
+
+        $this->authorize('delete', $logbook); // Use the policy for authorization
+
+        $logbook->delete(); // This will perform a soft delete
 
         return redirect()->route('front.internships.logbooks.index', $internship)
             ->with('success', 'Logbook berhasil dihapus');

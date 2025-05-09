@@ -145,3 +145,5 @@ sequenceDiagram
 4.  **CSRF Protection:** Handled automatically by Laravel/Inertia.
 5.  **XSS Protection:** React inherently helps prevent XSS by escaping content. Backend validation/sanitization adds another layer.
 6.  **Mass Assignment Protection:** Eloquent's `$fillable`/`$guarded` properties used.
+
+[2025-05-09 01:05:36] - Pest Test Description Format: Use `test('[Actor Role] [can/cannot] [Action] [Subject] [Condition]')` for consistency across feature tests (e.g., `ReportCrudTest`, `LogbookCrudTest`, `InternshipCrudTest`).

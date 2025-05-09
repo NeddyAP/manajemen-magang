@@ -17,6 +17,10 @@ return new class extends Migration
                 ->constrained('internships')
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
+            $table->foreignId('user_id') // Added user_id foreign key
+                ->constrained('users')
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
             $table->date('date');
             $table->text('activities');
             $table->text('supervisor_notes')->nullable();

@@ -11,7 +11,13 @@ class UpdateLogbookRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        // Authorization logic should ensure the user owns the logbook
+        // or has permission to edit it. This can be done via a Policy.
+        // For now, basic check: user is authenticated and logbook exists.
+        // The controller should verify ownership.
+        $logbook = $this->route('logbook');
+
+        return $this->user() && $logbook && $this->user()->can('update', $logbook);
     }
 
     /**
@@ -22,7 +28,11 @@ class UpdateLogbookRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'activities' => ['required', 'string', 'min:3'],
+            'date' => ['required', 'date_format:Y-m-d'],
+            'supervisor_notes' => ['nullable', 'string', 'max:255'],
+            // Add other rules for fields like 'supervisor_notes' if they are part of the update form
+            // and need validation.
         ];
     }
 }

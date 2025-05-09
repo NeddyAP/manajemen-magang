@@ -2,7 +2,7 @@
 
 This document tracks the current status, progress, and evolution of the internship management system (Manajement Magang).
 
-## Current Status (As of May 7, 2025)
+## Current Status (As of May 9, 2025)
 
 ### Core Features Status
 
@@ -17,6 +17,7 @@ This document tracks the current status, progress, and evolution of the internsh
 *   **Admin Dashboard:** ✅ (Basic Stats, Navigation Links)
 *   **Trash Management (Admin):** ✅ (View, Restore, Force Delete)
 *   **Testing (Auth):** ✅ (Pest Feature Tests for Registration, Login, PW Reset, Email Verification)
+*   **Testing (Logbook - Student):** ✅ (Pest Feature Tests for CRUD operations)
 
 ### Database Schema Status
 
@@ -41,6 +42,7 @@ This document tracks the current status, progress, and evolution of the internsh
 *   ✅ File upload handling (Laravel Filesystem)
 *   ✅ Soft Deletes implementation
 *   ✅ Basic API endpoints for notifications
+*   ✅ Logbook field `kegiatan` refactored to `activities` across relevant files.
 
 #### Frontend (React 18+ / TypeScript / Vite)
 
@@ -63,6 +65,7 @@ This document tracks the current status, progress, and evolution of the internsh
 *   ✅ `RefreshDatabase` trait usage
 *   ✅ Base `TestCase.php` configured
 *   ✅ Feature tests for Authentication flows (`tests/Feature/Auth/`)
+*   ✅ Feature tests for Logbook CRUD (Student perspective) (`tests/Feature/Front/LogbookCrudTest.php`)
 
 ## Recent Changes
 
@@ -77,6 +80,8 @@ This document tracks the current status, progress, and evolution of the internsh
 *   **Documentation:** Completed Memory Bank update to reflect recent changes.
 *   **[2025-05-08 18:54:33] - Clarified Dosen report feedback: Partially implemented via rejection notes; general feedback pending.**
 *   **[2025-05-08 19:02:06] - Confirmed substantial implementation of Guidance Class attendance feature (QR code via URL and manual check-in).**
+*   **[2025-05-09 00:36:35] - Completed Logbook CRUD Pest Tests (Student Perspective): Added 15 tests covering create, read, update, and delete operations in [`tests/Feature/Front/LogbookCrudTest.php`](tests/Feature/Front/LogbookCrudTest.php). All tests passing.**
+*   **[2025-05-09 00:36:35] - Refactored Logbook Field Name: Reverted `kegiatan` field to `activities` in migration, model, factory, form requests, controller, and tests for consistency (English column names).**
 
 ## Known Issues / Areas for Improvement
 
@@ -87,7 +92,7 @@ This document tracks the current status, progress, and evolution of the internsh
 ### Medium Priority
 
 *   **Dosen Feedback (Reports):** Partially implemented. Dosen can add `reviewer_notes` when rejecting a report. A general feedback mechanism is still pending. (Logbook supervisor notes also offer a form of feedback).
-*   **Testing Coverage:** Expand Pest test coverage beyond Auth to other core modules (Internships, Logbooks, Reports, etc.).
+*   **Testing Coverage:** Expand Pest test coverage beyond Auth and Logbook (Student) to other core modules (Internships, Reports, etc.).
 
 ### Low Priority
 
@@ -103,7 +108,7 @@ This document tracks the current status, progress, and evolution of the internsh
 ### Immediate Tasks (Post-Documentation)
 
 1.  **Testing:** Write Pest tests for Internship CRUD operations.
-2.  **Testing:** Write Pest tests for Logbook CRUD operations (Student perspective).
+2.  ~~**Testing:** Write Pest tests for Logbook CRUD operations (Student perspective).~~ ✅ **Completed [2025-05-09]**
 3.  **Testing:** Write Pest tests for Report CRUD operations (Student perspective).
 
 ### Short-term Goals
@@ -122,7 +127,7 @@ This document tracks the current status, progress, and evolution of the internsh
 ## Technical Debt
 
 *   **Code Quality:** Some controllers might benefit from refactoring into Services. Some frontend components could be further optimized or generalized.
-*   **Testing:** Significant portion of the application lacks automated tests.
+*   **Testing:** Significant portion of the application lacks automated tests beyond Auth and Logbook (Student).
 *   **Documentation:** API documentation (if needed) is missing. Inline code comments could be improved in complex sections.
 *   **Infrastructure:** Caching strategy not yet implemented. Queue worker setup might need refinement for production.
 
@@ -156,7 +161,7 @@ This document tracks the current status, progress, and evolution of the internsh
 ## Roadmap Status
 
 *   **Phase 1 (Core Features):** Mostly Complete ✅
-*   **Phase 2 (Refinement & Testing):** In Progress ⏳ (Notifications, Settings, Trash, Logbook Dosen Notes & UI enhancements done. Testing started. Documentation updated.)
+*   **Phase 2 (Refinement & Testing):** In Progress ⏳ (Notifications, Settings, Trash, Logbook Dosen Notes & UI enhancements done. Logbook CRUD tests (Student) completed. Logbook field name refactored. Testing ongoing. Documentation updated.)
 *   **Phase 3 (Advanced Features):** Planned 📋
 
 [2025-05-08 18:50:25] - Discovered that memory-bank/decisionLog.md was missing during Memory Bank initialization. Created the file as part of the update process.
@@ -164,3 +169,5 @@ This document tracks the current status, progress, and evolution of the internsh
 [2025-05-08 23:58:00] - Removed the Internship Applicant 'show' page functionality. This included: deleting the `show.tsx` file (if it existed), updating the redirect in `InternshipCrudTest.php` from the non-existent show page to the index page, removing the 'show' route from `routes/web.php`, and confirming no frontend links pointed to it.
 
 [2025-05-09 12:03:24] - Debugged failing test `mahasiswa can update their own internship with valid data if editable` in `tests/Feature/InternshipCrudTest.php`. The issue was an incorrect redirect target in `app/Http/Controllers/Front/InternshipApplicantController.php@update`. Changed redirect from `show` route to `index` route. All tests in `InternshipCrudTest.php` now pass.
+
+[2025-05-09 01:04:37] - Completed: Created Pest tests for student (Mahasiswa) report CRUD operations (`tests/Feature/Front/ReportCrudTest.php`). Debugged issues related to factory states, database schema mismatches (column names, statuses), request validation, and test description consistency. All tests are passing.

@@ -88,6 +88,7 @@ class DatabaseSeeder extends Seeder
                     Logbook::factory()->create([
                         'internship_id' => $internship->id,
                         'date' => fake()->dateTimeBetween($internship->start_date, $internship->end_date),
+                        'user_id' => $mahasiswaUser->id,
                     ]);
                 }
             }

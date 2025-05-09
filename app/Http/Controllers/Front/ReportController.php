@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Front; // Corrected namespace
 
 use App\Http\Controllers\Controller;
-use App\Models\DosenProfile; // Add DosenProfile
+use App\Http\Requests\UpdateReportRequest; // Add DosenProfile
+use App\Models\DosenProfile;
 use App\Models\Internship;
 use App\Models\MahasiswaProfile;
 use App\Models\Report;
-use App\Models\User;
+use App\Models\User; // Import UpdateReportRequest
 use App\Notifications\Reports\ReportStatusChanged; // Import Status Changed Notification
 use App\Notifications\Reports\ReportSubmitted; // Import Notification
-use Illuminate\Http\Request;
+use Illuminate\Http\Request; // Keep for store method maybe? Or remove if not used elsewhere
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -202,23 +203,17 @@ class ReportController extends Controller
         ]);
     }
 
-    public function update(Request $request, Internship $internship, Report $report)
+    public function update(UpdateReportRequest $request, Internship $internship, Report $report) // Change type hint
     {
-        // Authorization checks: Only owner can update
-        if ($internship->user_id !== auth()->id() || $report->internship_id !== $internship->id || $report->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        // Authorization checks: Only owner can update (Handled by UpdateReportRequest now)
+        // if ($internship->user_id !== auth()->id() || $report->internship_id !== $internship->id || $report->user_id !== auth()->id()) {
+        //     abort(403, 'Unauthorized action.');
+        // } // Correctly commented out block
 
-        // Prevent updating approved reports
-        if ($report->status === 'approved') {
-            return redirect()->route('front.internships.reports.index', $internship)
-                ->with('error', 'Laporan yang sudah disetujui tidak dapat diubah.');
-        }
+        // Policy check and validation are handled by UpdateReportRequest
 
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'report_file' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
-        ]);
+        // Get validated data from the form request
+        $validated = $request->validated(); // Now correctly inside the method
 
         $updateData = [
             'title' => $validated['title'],
@@ -257,7 +252,10 @@ class ReportController extends Controller
             abort(403, 'Tindakan tidak sah.');
         }
 
-        // Optionally, prevent deletion of approved reports
+        // Authorize using ReportPolicy
+        $this->authorize('delete', $report);
+
+        // Optionally, prevent deletion of approved reports (handled by policy now)
         // if ($report->status === 'approved') {
         //     return redirect()->route('front.internships.reports.index', $internship)
         //         ->with('error', 'Laporan yang sudah disetujui tidak dapat dihapus.');
@@ -312,29 +310,13 @@ class ReportController extends Controller
     // Method for Dosen/Admin to approve a report
     public function approve(Internship $internship, Report $report)
     {
-        $user = Auth::user();
-        $isAdvisor = false;
-
-        // Check if the report belongs to the internship
+        // Check if the report belongs to the internship first for a more specific error
         if ($report->internship_id !== $internship->id) {
             abort(404, 'Laporan tidak ditemukan untuk magang ini.');
         }
 
-        // Check if the user is the advisor
-        if ($user->hasRole('dosen')) {
-            $dosenProfile = DosenProfile::where('user_id', $user->id)->first();
-            if ($dosenProfile) {
-                $adviseeProfile = MahasiswaProfile::where('user_id', $internship->user_id)
-                    ->where('advisor_id', $dosenProfile->user_id)
-                    ->first();
-                $isAdvisor = (bool) $adviseeProfile;
-            }
-        }
-
-        // Authorize: Must be advisor or admin
-        if (! $isAdvisor && ! $user->hasRole('admin')) {
-            abort(403, 'Tindakan tidak sah.');
-        }
+        // Authorize using ReportPolicy
+        $this->authorize('approveOrReject', $report);
 
         // Check if the report is pending
         if ($report->status !== 'pending') {
@@ -356,29 +338,13 @@ class ReportController extends Controller
     // Method for Dosen/Admin to reject a report
     public function reject(Request $request, Internship $internship, Report $report)
     {
-        $user = Auth::user();
-        $isAdvisor = false;
-
-        // Check if the report belongs to the internship
+        // Check if the report belongs to the internship first for a more specific error
         if ($report->internship_id !== $internship->id) {
             abort(404, 'Laporan tidak ditemukan untuk magang ini.');
         }
 
-        // Check if the user is the advisor
-        if ($user->hasRole('dosen')) {
-            $dosenProfile = DosenProfile::where('user_id', $user->id)->first();
-            if ($dosenProfile) {
-                $adviseeProfile = MahasiswaProfile::where('user_id', $internship->user_id)
-                    ->where('advisor_id', $dosenProfile->user_id)
-                    ->first();
-                $isAdvisor = (bool) $adviseeProfile;
-            }
-        }
-
-        // Authorize: Must be advisor or admin
-        if (! $isAdvisor && ! $user->hasRole('admin')) {
-            abort(403, 'Tindakan tidak sah.');
-        }
+        // Authorize using ReportPolicy
+        $this->authorize('approveOrReject', $report);
 
         // Check if the report is pending
         if ($report->status !== 'pending') {

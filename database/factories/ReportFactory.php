@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Internship;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +19,14 @@ class ReportFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'user_id' => User::factory(),
+            'internship_id' => Internship::factory(),
+            'title' => $this->faker->sentence,
+            'report_file' => 'dummy_reports/'.$this->faker->uuid.'.pdf', // Dummy file path
+            // 'report_type', 'content', 'report_date' do not exist in the migration
+            'version' => 1,
+            'status' => 'pending', // Default status from migration
+            'reviewer_notes' => $this->faker->optional()->sentence,
         ];
     }
 }

@@ -11,7 +11,8 @@ class StoreReportRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        // Allow all authenticated users for now, or implement specific logic
+        return $this->user() !== null;
     }
 
     /**
@@ -22,7 +23,9 @@ class StoreReportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title' => ['required', 'string', 'max:255'],
+            // 'report_type', 'content', 'report_date' do not exist in the migration
+            'report_file' => ['required', 'file', 'mimes:pdf,doc,docx', 'max:2048'], // Adjust mimes and max size
         ];
     }
 }
