@@ -241,14 +241,29 @@ test('mahasiswa can view the edit form for their own internship if editable', fu
         );
 });
 
-test('mahasiswa cannot view edit form for their internship if not editable', function () {
+test('mahasiswa can view but cannot update internship if already accepted', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
-    // Change status to something not 'waiting' to trigger the new abort in controller's edit method
+    // Create internship with 'accepted' status
     $internship = Internship::factory()->for($mahasiswa)->create(['status' => 'accepted']);
 
+    // User can view the form
     $this->actingAs($mahasiswa)
         ->get(route('front.internships.applicants.edit', $internship))
-        ->assertForbidden();
+        ->assertOk();
+
+    // But cannot update the internship due to authorization check in UpdateInternshipRequest
+    $updatedData = Internship::factory()->make([
+        'company_name' => 'Updated Company Name',
+    ])->toArray();
+
+    unset($updatedData['user_id']);
+    unset($updatedData['application_file']);
+    $updatedData['start_date'] = (new \DateTime($updatedData['start_date']))->format('Y-m-d');
+    $updatedData['end_date'] = (new \DateTime($updatedData['end_date']))->format('Y-m-d');
+
+    $this->actingAs($mahasiswa)
+        ->put(route('front.internships.applicants.update', $internship), $updatedData)
+        ->assertForbidden(); // The request is denied by the form request's authorize() method
 });
 
 test('mahasiswa can update their own internship with valid data if editable', function () {
