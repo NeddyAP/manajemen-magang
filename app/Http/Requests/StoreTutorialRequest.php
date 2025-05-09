@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\TutorialAccessLevelEnum;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreTutorialRequest extends FormRequest
 {
@@ -11,7 +13,7 @@ class StoreTutorialRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->hasAnyRole(['superadmin', 'admin']);
     }
 
     /**
@@ -26,7 +28,7 @@ class StoreTutorialRequest extends FormRequest
             'content' => 'required|string',
             'file_name' => 'required|string|max:255',
             'file_path' => 'required|file|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,zip,rar|max:10240',
-            'access_level' => 'required|string|in:all,dosen,mahasiswa',
+            'access_level' => ['required', 'string', Rule::in(array_column(TutorialAccessLevelEnum::cases(), 'value'))],
             'is_active' => 'boolean',
         ];
     }

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('room')->nullable();
             $table->text('description')->nullable();
             $table->string('qr_code')->nullable();
+            $table->softDeletes();
             $table->timestamps();
 
             $table->index('lecturer_id');
@@ -32,6 +33,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('guidance_classes', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
         Schema::dropIfExists('guidance_classes');
     }
 };

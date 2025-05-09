@@ -17,7 +17,8 @@ return new class extends Migration
             $table->text('answer');
             $table->string('category')->nullable();
             $table->boolean('is_active')->default(true);
-            $table->integer('order')->default(0); // Order of the FAQ in the list
+            $table->integer('order')->default(0)->comment('Order of the FAQ in the list');
+            $table->softDeletes();
             $table->timestamps();
 
             // index
@@ -30,6 +31,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('faqs', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
         Schema::dropIfExists('faqs');
     }
 };

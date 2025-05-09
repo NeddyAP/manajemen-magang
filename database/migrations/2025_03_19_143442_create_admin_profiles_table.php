@@ -23,6 +23,7 @@ return new class extends Migration
             $table->text('address')->nullable()->comment('Alamat');
             $table->string('supervisor_name')->nullable()->comment('Nama Atasan');
             $table->string('work_location')->comment('Lokasi Kerja');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -32,6 +33,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('admin_profiles', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
         Schema::dropIfExists('admin_profiles');
     }
 };

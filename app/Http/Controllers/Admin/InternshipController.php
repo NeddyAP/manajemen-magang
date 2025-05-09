@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\InternshipStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Internship;
 use App\Notifications\Internship\ApplicationStatusChanged; // Import Notification
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule; // Import Rule
 use Inertia\Inertia;
 
 class InternshipController extends Controller
@@ -33,12 +35,12 @@ class InternshipController extends Controller
 
         // Handle explicit status filter
         if ($request->has('status') && $request->status !== '') {
-            $query->where('status', $request->status);
+            $query->where('status', $request->status); // Keep as is if request sends string value
         }
 
         // Handle explicit type filter
         if ($request->has('type') && $request->type !== '') {
-            $query->where('type', $request->type);
+            $query->where('type', $request->type); // Keep as is if request sends string value
         }
 
         // Handle general filters
@@ -91,8 +93,8 @@ class InternshipController extends Controller
     public function update(Request $request, Internship $internship)
     {
         $validated = $request->validate([
-            'status' => 'required|in:waiting,accepted,rejected',
-            'status_message' => 'required_if:status,rejected',
+            'status' => ['required', Rule::enum(InternshipStatusEnum::class)],
+            'status_message' => ['required_if:status,'.InternshipStatusEnum::REJECTED->value, 'nullable', 'string'],
         ]);
 
         $internship->update($validated);
@@ -110,8 +112,8 @@ class InternshipController extends Controller
     public function updateStatus(Request $request, Internship $internship)
     {
         $validated = $request->validate([
-            'status' => 'required|in:waiting,accepted,rejected',
-            'advisor_id' => 'required_if:status,accepted|nullable|exists:users,id',
+            'status' => ['required', Rule::enum(InternshipStatusEnum::class)],
+            'advisor_id' => ['required_if:status,'.InternshipStatusEnum::ACCEPTED->value, 'nullable', 'exists:users,id'],
         ]);
 
         // Update the advisor_id in the MahasiswaProfile instead of lecturer_id in Internship

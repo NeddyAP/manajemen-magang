@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ReportStatusEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -18,8 +19,9 @@ return new class extends Migration
             $table->string('title');
             $table->string('report_file');
             $table->integer('version')->default(1);
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->enum('status', array_column(ReportStatusEnum::cases(), 'value'))->default(ReportStatusEnum::PENDING->value);
             $table->text('reviewer_notes')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -29,6 +31,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('reports', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
         Schema::dropIfExists('reports');
     }
 };

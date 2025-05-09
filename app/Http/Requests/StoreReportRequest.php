@@ -12,7 +12,8 @@ class StoreReportRequest extends FormRequest
     public function authorize(): bool
     {
         // Allow all authenticated users for now, or implement specific logic
-        return $this->user() !== null;
+
+        return auth()->check() && auth()->user()->hasRole('mahasiswa');
     }
 
     /**

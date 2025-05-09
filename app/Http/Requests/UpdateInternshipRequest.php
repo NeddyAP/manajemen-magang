@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\InternshipTypeEnum;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateInternshipRequest extends FormRequest
 {
@@ -14,8 +16,8 @@ class UpdateInternshipRequest extends FormRequest
         // Check if user is authorized to update this internship
         // The internship model is route-model bound, so it's available as $this->internship
         return auth()->check() &&
-               auth()->user()->id === $this->internship->user_id &&
-               $this->internship->status === 'waiting';
+            auth()->user()->id === $this->internship->user_id &&
+            $this->internship->status !== 'accepted';
         // Removed role check as it's implied by the route/controller context for front-end updates by owner.
         // If other roles (e.g. admin) could use this form request via a different route,
         // then role checking or policy-based authorization would be more appropriate.
@@ -29,7 +31,7 @@ class UpdateInternshipRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', 'string', 'in:kkl,kkn'],
+            'type' => ['required', 'string', Rule::in(array_column(InternshipTypeEnum::cases(), 'value'))],
             'application_file' => ['nullable', 'file', 'mimes:pdf', 'max:2048'],
             'company_name' => ['required', 'string', 'max:255'],
             'company_address' => ['required', 'string', 'max:255'],

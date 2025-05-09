@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\TutorialAccessLevelEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,8 +18,9 @@ return new class extends Migration
             $table->text('content');
             $table->string('file_name');
             $table->string('file_path');
-            $table->enum('access_level', ['mahasiswa', 'dosen', 'all'])->default('all');
+            $table->enum('access_level', array_column(TutorialAccessLevelEnum::cases(), 'value'))->default(TutorialAccessLevelEnum::ALL->value);
             $table->boolean('is_active')->default(true);
+            $table->softDeletes();
             $table->timestamps();
 
             // index
@@ -31,6 +33,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('tutorials', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
         Schema::dropIfExists('tutorials');
     }
 };

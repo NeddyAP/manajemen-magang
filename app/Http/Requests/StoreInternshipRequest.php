@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\InternshipTypeEnum;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreInternshipRequest extends FormRequest
 {
@@ -22,7 +24,7 @@ class StoreInternshipRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', 'string', 'in:kkl,kkn'],
+            'type' => ['required', 'string', Rule::in(array_column(InternshipTypeEnum::cases(), 'value'))],
             'application_file' => ['required', 'file', 'mimes:pdf', 'max:2048'],
             'company_name' => ['required', 'string', 'max:255'],
             'company_address' => ['required', 'string', 'max:255'],

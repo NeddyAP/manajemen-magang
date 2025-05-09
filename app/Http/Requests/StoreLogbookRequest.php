@@ -13,7 +13,7 @@ class StoreLogbookRequest extends FormRequest
     {
         // Assuming any authenticated user associated with an internship can create a logbook.
         // More specific authorization can be handled in the controller or a policy.
-        return $this->user() && $this->route('internship');
+        return auth()->check() && auth()->user()->hasRole('mahasiswa') && $this->route('internship');
     }
 
     /**

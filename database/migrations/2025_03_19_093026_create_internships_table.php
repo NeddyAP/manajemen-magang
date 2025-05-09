@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\InternshipStatusEnum;
+use App\Enums\InternshipTypeEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,15 +16,16 @@ return new class extends Migration
         Schema::create('internships', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->enum('type', ['kkl', 'kkn']);
+            $table->enum('type', array_column(InternshipTypeEnum::cases(), 'value'));
             $table->string('application_file');
             $table->string('company_name');
             $table->string('company_address');
             $table->date('start_date');
             $table->date('end_date');
-            $table->enum('status', ['waiting', 'accepted', 'rejected'])->default('waiting');
+            $table->enum('status', array_column(InternshipStatusEnum::cases(), 'value'))->default(InternshipStatusEnum::WAITING->value);
             $table->text('status_message')->nullable();
             $table->char('progress', 2)->default('0');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -32,6 +35,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('internships', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
         Schema::dropIfExists('internships');
     }
 };

@@ -11,7 +11,7 @@ class UpdateTutorialRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()->hasAnyRole(['superadmin', 'admin']);
     }
 
     /**
@@ -26,7 +26,7 @@ class UpdateTutorialRequest extends FormRequest
             'content' => 'required|string',
             'file_name' => 'required|string|max:255',
             'file_path' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,zip,rar|max:10240',
-            'access_level' => 'required|string|in:all,dosen,mahasiswa',
+            'access_level' => ['required', 'string', Rule::in(array_column(TutorialAccessLevelEnum::cases(), 'value'))],
             'is_active' => 'boolean',
         ];
     }

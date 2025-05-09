@@ -174,10 +174,6 @@ class InternshipApplicantController extends Controller
             abort(403, 'Tindakan tidak sah.');
         }
 
-        if ($internship->status !== 'waiting') {
-            abort(403, 'Hanya aplikasi magang dengan status "waiting" yang dapat diedit.');
-        }
-
         return Inertia::render('front/internships/applicants/edit', [
             'internship' => $internship->load('user.mahasiswaProfile'), // Eager load user and profile
         ]);
@@ -283,7 +279,6 @@ class InternshipApplicantController extends Controller
             // Dosen or other roles cannot bulk delete via this method
             return back()->with('error', 'Tindakan tidak sah untuk penghapusan massal.');
         }
-
     }
 
     /**

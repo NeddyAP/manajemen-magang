@@ -17,13 +17,14 @@ return new class extends Migration
                 ->constrained('internships')
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
-            $table->foreignId('user_id') // Added user_id foreign key
+            $table->foreignId('user_id')
                 ->constrained('users')
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
             $table->date('date');
             $table->text('activities');
             $table->text('supervisor_notes')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -33,6 +34,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('logbooks', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
         Schema::dropIfExists('logbooks');
     }
 };
