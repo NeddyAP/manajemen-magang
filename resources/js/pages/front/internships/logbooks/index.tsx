@@ -84,22 +84,22 @@ export default function LogbooksIndex({ internship, logbooks, totalLogbookCount,
                                                 // Placeholder for actual backend endpoint
                                                 const exportUrl = route('front.internships.logbooks.export.word', { internship: internship.id });
                                                 window.open(exportUrl, '_blank');
-                                                toast.info('Memulai proses ekspor ke Word...');
+                                                toast.info('Memulai proses eksport ke Word...');
                                             }}
                                         >
                                             <FileText className="mr-2 h-4 w-4" />
-                                            Ekspor ke Word
+                                            Eksport ke Word
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onClick={() => {
                                                 // Placeholder for actual backend endpoint
                                                 const exportUrl = route('front.internships.logbooks.export.pdf', { internship: internship.id });
                                                 window.open(exportUrl, '_blank');
-                                                toast.info('Memulai proses ekspor ke PDF...');
+                                                toast.info('Memulai proses eksport ke PDF...');
                                             }}
                                         >
                                             <FileCode className="mr-2 h-4 w-4" />
-                                            Ekspor ke PDF
+                                            Eksport ke PDF
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
