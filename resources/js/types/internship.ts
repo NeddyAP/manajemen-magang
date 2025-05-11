@@ -65,11 +65,13 @@ export interface Report {
     };
     title?: string;
     report_file?: string;
+    revised_file_path?: string | null; // Added for Dosen's revised file
     version?: number;
     status?: 'pending' | 'approved' | 'rejected';
     reviewer_notes?: string;
     created_at?: string;
     updated_at?: string;
+    revision_uploaded_at?: string | null; // Added for Dosen's revised file upload time
 }
 
 /**

@@ -61,20 +61,37 @@ sequenceDiagram
     %% Admin->>System: Updates Status (Future Enhancement)
 ```
 
+### 3.1. Report Revision Upload Flow (Dosen Upload)
+
+```mermaid
+sequenceDiagram
+    participant Dosen
+    participant System (Laravel + Inertia + React)
+    participant Mahasiswa
+
+    Dosen->>System: Accesses Report List, selects "Unggah Revisi" for a student's report (React Page)
+    Dosen->>System: Uploads revised report file via Inertia `useForm` in Modal
+    System->>System: Validates request (Laravel Form Request - StoreReportRevisionRequest)
+    System->>System: Stores revised report file path & timestamp (Eloquent Model - Report, Filesystem)
+    System->>System: Deletes old revised file if exists (Filesystem)
+    System->>System: Creates Notification for Mahasiswa (ReportRevisionUploaded)
+    System->>Mahasiswa: Receives In-App Notification (React Header/Page)
+```
+
 ## Architectural Patterns
 
 1.  **Model-View-Controller (MVC) Variant (Laravel Backend):**
-    *   **Models:** Eloquent models (`app/Models/`) define data structure and relationships.
-    *   **Views:** Handled by React components rendered via Inertia. Blade templates (`resources/views/app.blade.php`) serve as the base entry point.
-    *   **Controllers:** (`app/Http/Controllers/`) Handle HTTP requests, interact with models, perform business logic, and return Inertia responses (`Inertia::render`).
+    - **Models:** Eloquent models (`app/Models/`) define data structure and relationships.
+    - **Views:** Handled by React components rendered via Inertia. Blade templates (`resources/views/app.blade.php`) serve as the base entry point.
+    - **Controllers:** (`app/Http/Controllers/`) Handle HTTP requests, interact with models, perform business logic, and return Inertia responses (`Inertia::render`).
 2.  **Single Page Application (SPA) via Inertia.js:**
-    *   Laravel backend provides data to React frontend via Inertia responses.
-    *   Frontend navigation handled by Inertia links (`<Link>`), avoiding full page reloads.
-    *   React components (`resources/js/pages/`) act as "pages".
+    - Laravel backend provides data to React frontend via Inertia responses.
+    - Frontend navigation handled by Inertia links (`<Link>`), avoiding full page reloads.
+    - React components (`resources/js/pages/`) act as "pages".
 3.  **Component-Based UI (React):**
-    *   UI built using reusable React components (`resources/js/components/`).
-    *   Heavy reliance on Shadcn UI components (`resources/js/components/ui/`) for base elements (Buttons, Forms, Tables, Dialogs, etc.).
-    *   Layout components (`resources/js/layouts/`) define overall page structure.
+    - UI built using reusable React components (`resources/js/components/`).
+    - Heavy reliance on Shadcn UI components (`resources/js/components/ui/`) for base elements (Buttons, Forms, Tables, Dialogs, etc.).
+    - Layout components (`resources/js/layouts/`) define overall page structure.
 
 ## Backend Patterns (Laravel)
 
@@ -112,35 +129,35 @@ sequenceDiagram
 ## Data Flow Patterns
 
 1.  **Request Lifecycle (Typical Inertia Request):**
-    *   User interacts with React UI (e.g., clicks `<Link>`).
-    *   Inertia makes XHR request to Laravel backend.
-    *   Laravel routing directs request to a Controller method.
-    *   Middleware (Auth, Inertia, Roles) executes.
-    *   Controller fetches data (Eloquent), performs logic.
-    *   Controller returns `Inertia::render('PageName', ['prop' => $data])`.
-    *   `HandleInertiaRequests` middleware adds shared props.
-    *   Inertia receives JSON response.
-    *   React updates the relevant page component with new props.
+    - User interacts with React UI (e.g., clicks `<Link>`).
+    - Inertia makes XHR request to Laravel backend.
+    - Laravel routing directs request to a Controller method.
+    - Middleware (Auth, Inertia, Roles) executes.
+    - Controller fetches data (Eloquent), performs logic.
+    - Controller returns `Inertia::render('PageName', ['prop' => $data])`.
+    - `HandleInertiaRequests` middleware adds shared props.
+    - Inertia receives JSON response.
+    - React updates the relevant page component with new props.
 2.  **Form Submission:**
-    *   User fills form managed by `useForm`.
-    *   `useForm` POSTs data to Laravel endpoint.
-    *   Laravel Form Request validates data.
-    *   Controller processes valid data (saves to DB, etc.).
-    *   Controller typically redirects back or returns an Inertia response.
-    *   If validation fails, Laravel returns errors; `useForm` automatically populates its `errors` object.
+    - User fills form managed by `useForm`.
+    - `useForm` POSTs data to Laravel endpoint.
+    - Laravel Form Request validates data.
+    - Controller processes valid data (saves to DB, etc.).
+    - Controller typically redirects back or returns an Inertia response.
+    - If validation fails, Laravel returns errors; `useForm` automatically populates its `errors` object.
 3.  **Notifications:**
-    *   Backend action triggers a Notification class (`User->notify(new NotificationClass())`).
-    *   Notification sent via `database` channel, stored in `notifications` table.
-    *   Frontend periodically fetches unread notifications (e.g., via shared Inertia props or dedicated API call) for header display.
-    *   Notification history page fetches all notifications via API.
+    - Backend action triggers a Notification class (`User->notify(new NotificationClass())`).
+    - Notification sent via `database` channel, stored in `notifications` table.
+    - Frontend periodically fetches unread notifications (e.g., via shared Inertia props or dedicated API call) for header display.
+    - Notification history page fetches all notifications via API.
 
 ## Security Patterns
 
 1.  **Authentication:** Handled by Laravel Fortify/Sanctum (adapted for Inertia sessions).
 2.  **Authorization:**
-    *   Route Middleware (`role:admin`, `permission:edit articles`).
-    *   Controller Authorization (`$this->authorize('update', $post)`).
-    *   Conditional rendering in Frontend based on user roles/permissions passed via props.
+    - Route Middleware (`role:admin`, `permission:edit articles`).
+    - Controller Authorization (`$this->authorize('update', $post)`).
+    - Conditional rendering in Frontend based on user roles/permissions passed via props.
 3.  **Input Validation:** Laravel Form Requests on the backend.
 4.  **CSRF Protection:** Handled automatically by Laravel/Inertia.
 5.  **XSS Protection:** React inherently helps prevent XSS by escaping content. Backend validation/sanitization adds another layer.

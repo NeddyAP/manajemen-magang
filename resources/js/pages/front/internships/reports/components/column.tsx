@@ -32,13 +32,59 @@ import { Link, router, usePage } from '@inertiajs/react'; // Import usePage
 import { type ColumnDef, type Row, type VisibilityState } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { CheckCircle, FileSpreadsheet, MoreHorizontal, XCircle } from 'lucide-react'; // Import CheckCircle and XCircle
+import { CheckCircle, FileSpreadsheet, MoreHorizontal, Upload, XCircle } from 'lucide-react'; // Import CheckCircle, XCircle, and Upload
 import { useState } from 'react'; // Import useState
+import UploadRevisionModal from './UploadRevisionModal'; // Import the modal
 
 export const initialColumnVisibility: VisibilityState = {
     id: false,
     updated_at: false,
 };
+
+// New component for the Upload Revision Cell
+function UploadRevisionCell({ row }: { row: Row<Report> }) {
+    const report = row.original;
+    const { auth } = usePage<PageProps>().props;
+    const user = auth.user;
+
+    const isAdvisorOrAdmin = user.roles?.some((role: { name: string }) => ['dosen', 'admin'].includes(role.name)) ?? false;
+    const canUploadRevision = isAdvisorOrAdmin && (report.status === 'approved' || report.status === 'rejected');
+
+    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
+    if (!canUploadRevision) {
+        return null; // Or some placeholder if you prefer
+    }
+
+    return (
+        <>
+            <TooltipProvider delayDuration={100}>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-blue-600 hover:text-blue-700"
+                            onClick={() => setIsUploadModalOpen(true)}
+                        >
+                            <Upload className="h-4 w-4" />
+                            <span className="sr-only">Unggah Revisi</span>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Unggah Revisi Laporan</TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+            {report && typeof report.internship_id === 'number' && (
+                <UploadRevisionModal
+                    internshipId={report.internship_id}
+                    report={report}
+                    isOpen={isUploadModalOpen}
+                    onClose={() => setIsUploadModalOpen(false)}
+                />
+            )}
+        </>
+    );
+}
 
 // Actions cell component to enable Hook usage within a component
 function ReportActionsCell({ row }: { row: Row<Report> }) {
@@ -253,17 +299,47 @@ export const columns: ColumnDef<Report>[] = [
         accessorKey: 'report_file',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Berkas" />,
         cell: ({ row }) => {
-            const filePath = row.getValue('report_file');
-            if (!filePath || typeof filePath !== 'string') return '-';
+            const originalFilePath = row.original.report_file;
+            const revisedFilePath = row.original.revised_file_path;
 
-            const fileUrl = `/storage/${filePath}`;
+            const originalFileUrl = originalFilePath ? `/storage/${originalFilePath}` : null;
+            const revisedFileUrl = revisedFilePath ? `/storage/${revisedFilePath}` : null;
 
             return (
-                <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                    <FileSpreadsheet className="mr-2 inline h-4 w-4" />
-                </a>
+                <div className="flex flex-col space-y-1">
+                    {originalFileUrl && (
+                        <a
+                            href={originalFileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline flex items-center"
+                        >
+                            <FileSpreadsheet className="mr-1 h-4 w-4 flex-shrink-0" />
+                            <span className="truncate">Laporan Asli</span>
+                        </a>
+                    )}
+                    {revisedFileUrl && (
+                        <a
+                            href={revisedFileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-purple-600 hover:underline flex items-center"
+                        >
+                            <FileSpreadsheet className="mr-1 h-4 w-4 flex-shrink-0" />
+                            <span className="truncate">Laporan Revisi</span>
+                        </a>
+                    )}
+                    {!originalFileUrl && !revisedFileUrl && '-'}
+                </div>
             );
         },
+    },
+    {
+        id: 'upload_revision',
+        header: 'Unggah Revisi',
+        cell: ({ row }) => <UploadRevisionCell row={row} />,
+        enableSorting: false,
+        enableHiding: false,
     },
     {
         accessorKey: 'reviewer_notes',

@@ -9,7 +9,7 @@ This document tracks the current status, progress, and evolution of the internsh
 - **User Management & Auth:** ✅ (Login, Register, PW Reset, Email Verify, Profiles, Roles/Permissions)
 - **Internship Management:** ✅ (Application CRUD, Status Tracking, File Upload) - _Applicant 'show' page removed_
 - **Logbook System:** ✅ (Student CRUD, Dosen Supervisor Notes via Modal, PDF/Word Export)
-- **Report Management:** ✅ (Student CRUD, File Upload) - _Dosen feedback/formal review flow pending_
+- **Report Management:** ✅ (Student CRUD, File Upload, Dosen feedback via `reviewer_notes` on rejection, **Dosen revision upload for approved/rejected reports**)
 - **Guidance System:** ✅ (Class CRUD, Student Assignment, QR Code & Manual Attendance Tracking)
 - **Support Features (Admin):** ✅ (FAQ CRUD, Tutorial CRUD, Global Variable CRUD)
 - **Notification System:** ✅ (In-App DB-driven, Header Dropdown, History Page, Mark Read/Unread, Delete)
@@ -19,6 +19,7 @@ This document tracks the current status, progress, and evolution of the internsh
 - **Testing (Auth):** ✅ (Pest Feature Tests for Registration, Login, PW Reset, Email Verification)
 - **Testing (Logbook - Student):** ✅ (Pest Feature Tests for CRUD operations)
 - **Testing (Report - Student):** ✅ (Pest Feature Tests for CRUD operations)
+- **Testing (Report - Dosen Revision Upload):** ✅ (Pest Feature Tests for revision upload functionality)
 - **Testing (Internship - Student):** ✅ (Pest Feature Tests for CRUD, including fixes for removed 'show' page logic)
 
 ### Database Schema Status
@@ -46,6 +47,7 @@ This document tracks the current status, progress, and evolution of the internsh
 - ✅ Basic API endpoints for notifications
 - ✅ Logbook field `kegiatan` refactored to `activities` across relevant files.
 - ✅ Logbook export to Word and PDF functionality confirmed and routes updated.
+- ✅ **Report Revision Upload:** Added `revised_file_path`, `revision_uploaded_at` to `Report` model/migration. New controller method, request, route, and notification for Dosen revision uploads.
 
 #### Frontend (React 18+ / TypeScript / Vite)
 
@@ -62,6 +64,7 @@ This document tracks the current status, progress, and evolution of the internsh
 - ✅ TypeScript types for core models and props (ongoing refinement)
 - ✅ Logbook page optimizations (back button, animations, modal for supervisor notes)
 - ❌ Internship Applicant 'show' page removed.
+- ✅ **Report Revision Upload:** Updated `Report` type. Added UI elements in report table for Dosen to upload revisions and view revised files. New `UploadRevisionModal` component.
 
 #### Testing (Pest PHP / SQLite :memory:)
 
@@ -72,9 +75,11 @@ This document tracks the current status, progress, and evolution of the internsh
 - ✅ Feature tests for Logbook CRUD (Student perspective) (`tests/Feature/Front/LogbookCrudTest.php`)
 - ✅ Feature tests for Report CRUD (Student perspective) (`tests/Feature/Front/ReportCrudTest.php`)
 - ✅ Feature tests for Internship CRUD (Student perspective) (`tests/Feature/InternshipCrudTest.php`), including fixes related to removed 'show' page.
+- ✅ **Feature tests for Dosen Report Revision Upload (`tests/Feature/ReportRevisionUploadTest.php`).**
 
 ## Recent Changes
 
+- **[2025-05-11] - Feature: Dosen Report Revision Upload.** Implemented backend (model, migration, controller, request, route, notification) and frontend (TypeScript type, UI in table, new modal) for Dosen to upload revised student reports. Added comprehensive Pest feature tests.
 - **[2025-05-11] - General Memory Bank Update:** Updated `activeContext.md`, `techContext.md`, `progress.md`, `decisionLog.md` to reflect the current application state.
 - **[2025-05-11 09:25:53] - Confirmed and updated backend functionality for logbook export to Word and PDF. Routes in `routes/web.php` were updated to match frontend naming conventions. Existing `LogbookController` methods for export were verified.**
 - **Logbook Enhancements:**
@@ -100,7 +105,6 @@ This document tracks the current status, progress, and evolution of the internsh
 
 ### Medium Priority
 
-- **Dosen Feedback (Reports):** Partially implemented. Dosen can add `reviewer_notes` when rejecting a report. A general feedback mechanism is still pending. (Logbook supervisor notes also offer a form of feedback).
 - **Testing Coverage:** Expand Pest test coverage beyond current modules to other core modules (Guidance, FAQs, Tutorials, Users, Settings, Admin functions).
 
 ### Low Priority
@@ -122,9 +126,8 @@ This document tracks the current status, progress, and evolution of the internsh
 
 ### Short-term Goals
 
-1.  Implement general Dosen feedback feature for Reports (beyond rejection notes) and enhance Logbook feedback if needed.
-2.  Continue expanding test coverage (Users, Settings, Admin functions).
-3.  Refine Admin dashboard with more useful statistics.
+1.  Continue expanding test coverage (Users, Settings, Admin functions).
+2.  Refine Admin dashboard with more useful statistics.
 
 ### Long-term Goals
 

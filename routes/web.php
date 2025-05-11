@@ -55,9 +55,10 @@ Route::middleware(['auth', 'verified'])->prefix('internships')->name('front.inte
         Route::get('/reports/{internship}/{report}/edit', [ReportController::class, 'edit'])->name('reports.edit');
         Route::put('/reports/{internship}/{report}', [ReportController::class, 'update'])->name('reports.update'); // Use PUT for updates
         Route::delete('/reports/{internship}/{report}', [ReportController::class, 'destroy'])->name('reports.destroy');
-        Route::get('/reports/{internship}/{report}/download', [ReportController::class, 'downloadReportFile'])->name('reports.download'); // Add download route back if missing
-        Route::post('/reports/{internship}/{report}/approve', [ReportController::class, 'approve'])->name('reports.approve'); // Approve route
-        Route::post('/reports/{internship}/{report}/reject', [ReportController::class, 'reject'])->name('reports.reject'); // Reject route
+        Route::get('/reports/{internship}/{report}/download', [ReportController::class, 'downloadReportFile'])->name('reports.download');
+        Route::post('/reports/{internship}/{report}/approve', [ReportController::class, 'approve'])->name('reports.approve');
+        Route::post('/reports/{internship}/{report}/reject', [ReportController::class, 'reject'])->name('reports.reject');
+        Route::post('/reports/{internship}/{report}/upload-revision', [ReportController::class, 'uploadRevision'])->name('reports.uploadRevision'); // New route for Dosen revision upload
     });
 
     // Guidance Classes routes
@@ -94,6 +95,6 @@ Route::get('/notifications', [NotificationController::class, 'history'])
     ->middleware(['auth', 'verified'])
     ->name('notifications.index');
 
-require __DIR__.'/admin.php';
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/admin.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';

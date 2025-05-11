@@ -19,6 +19,8 @@ class Report extends Model
         'version',
         'status',
         'reviewer_notes',
+        'revised_file_path',
+        'revision_uploaded_at',
     ];
 
     public function user()

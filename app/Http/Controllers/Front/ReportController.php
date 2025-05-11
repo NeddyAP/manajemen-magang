@@ -1,21 +1,24 @@
 <?php
 
-namespace App\Http\Controllers\Front; // Corrected namespace
+namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\UpdateReportRequest; // Add DosenProfile
+use App\Http\Requests\UpdateReportRequest;
+use App\Http\Requests\StoreReportRevisionRequest;
 use App\Models\DosenProfile;
 use App\Models\Internship;
 use App\Models\MahasiswaProfile;
 use App\Models\Report;
-use App\Models\User; // Import UpdateReportRequest
-use App\Notifications\Reports\ReportStatusChanged; // Import Status Changed Notification
-use App\Notifications\Reports\ReportSubmitted; // Import Notification
-use Illuminate\Http\Request; // Keep for store method maybe? Or remove if not used elsewhere
+use App\Models\User;
+use App\Notifications\Reports\ReportStatusChanged;
+use App\Notifications\Reports\ReportSubmitted;
+use App\Notifications\Reports\ReportRevisionUploaded; // Uncommented and imported
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Illuminate\Http\RedirectResponse;
 
 class ReportController extends Controller
 {
@@ -42,7 +45,6 @@ class ReportController extends Controller
                             });
                     });
                 }
-
             } else {
                 $query->whereRaw('1 = 0'); // No advisees, show nothing
             }
@@ -372,5 +374,54 @@ class ReportController extends Controller
         }
 
         return back()->with('success', 'Laporan berhasil ditolak dengan catatan.');
+    }
+
+    /**
+     * Store a newly uploaded report revision by a Dosen.
+     */
+    public function uploadRevision(StoreReportRevisionRequest $request, Internship $internship, Report $report): RedirectResponse
+    {
+        // Authorization: Basic role check is in StoreReportRevisionRequest.
+        // Policy for specific report authorization (e.g., is this Dosen the advisor for this student's report)
+        // can be added here or via a ReportPolicy.
+        // Example: $this->authorize('uploadRevision', $report);
+
+        // Ensure the report belongs to the specified internship.
+        if ($report->internship_id !== $internship->id) {
+            abort(404, 'Laporan tidak ditemukan untuk magang ini.');
+        }
+
+        // Check if report status is not pending
+        if ($report->status === 'pending') {
+            return redirect()->back()->with('error', 'Tidak dapat mengunggah revisi untuk laporan yang masih pending.');
+        }
+
+        if ($request->hasFile('revised_file')) {
+            $file = $request->file('revised_file');
+
+            // Define a specific path for revised files, including internship ID for organization.
+            $path = $file->store("internships/{$internship->id}/report_revisions", 'public');
+
+            // If a previous revised file exists, delete it to prevent orphaned files and save storage.
+            if ($report->revised_file_path && Storage::disk('public')->exists($report->revised_file_path)) {
+                Storage::disk('public')->delete($report->revised_file_path);
+            }
+
+            $report->revised_file_path = $path;
+            $report->revision_uploaded_at = now();
+            $report->save();
+
+            // Notify the student about the revision.
+            $student = $report->user; // Eager load user if not already loaded: $report->load('user'); $student = $report->user;
+            if ($student) {
+                // Ensure ReportRevisionUploaded notification class exists and is properly configured.
+                $student->notify(new ReportRevisionUploaded($report, Auth::user())); // Auth::user() is the Dosen
+            }
+
+            return redirect()->route('front.internships.reports.index', $internship)
+                ->with('success', 'Report revision uploaded successfully.');
+        }
+
+        return redirect()->back()->with('error', 'Failed to upload report revision. Please try again.');
     }
 }

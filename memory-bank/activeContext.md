@@ -97,6 +97,21 @@ This is a comprehensive internship management system (Manajement Magang) built w
 - **[2025-05-09 00:06:00] - Fixed `InternshipCrudTest.php`:** Resolved failing test `mahasiswa can update their own internship with valid data if editable` by correcting an incorrect redirect in `app/Http/Controllers/Front/InternshipApplicantController.php` from the (now removed) 'show' route to the 'index' route. All tests in `tests/Feature/InternshipCrudTest.php` are now passing.
 - **[2025-05-09] - Applied Soft Deletes to Individual Migrations:** Instead of a consolidated migration, `softDeletes()` and `dropSoftDeletes()` were added to the `up()` and `down()` methods respectively of the original creation migration for each of the following tables: `users`, `admin_profiles`, `dosen_profiles`, `faqs`, `global_variables`, `guidance_classes`, `internships`, `logbooks`, `mahasiswa_profiles`, `reports`, `tutorials`. The consolidated migration file `2025_03_22_091458_add_soft_deletes_to_all_tables.php` was deleted.
 - \*\*[2025-05-09 01:05:21] - Recent Changes: Created and debugged Pest tests for student report CRUD (`tests/Feature/Front/ReportCrudTest.php`). Ensured consistency with database schema, factories, requests, and other test files. Refactored test descriptions.
+- **[2025-05-11] - Feature: Dosen Report Revision Upload.**
+    - **Backend:**
+        - Added `revised_file_path` and `revision_uploaded_at` to `reports` table migration and `Report` model.
+        - Created `StoreReportRevisionRequest` for validation (Indonesian messages).
+        - Added `uploadRevision` method to `ReportController` to handle file storage, old revision deletion, model update, and notification dispatch.
+        - Added route for `uploadRevision`.
+        - Created `ReportRevisionUploaded` notification.
+    - **Frontend:**
+        - Updated `Report` TypeScript interface.
+        - Modified `column.tsx` in report views to display links to original and revised files, and added an "Unggah Revisi" (Upload Revision) button/modal for Dosen.
+        - Created `UploadRevisionModal.tsx` component.
+    - **Testing:**
+        - Created `ReportRevisionUploadTest.php` with feature tests for various scenarios.
+        - Fixed failing tests related to report ownership and status checks in the controller.
+- **[2025-05-11] - General Memory Bank Update:** Updated `activeContext.md`, `techContext.md`, `progress.md`, `decisionLog.md` to reflect the current application state.
 
 ## Current Focus Area
 
