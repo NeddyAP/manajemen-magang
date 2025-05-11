@@ -80,7 +80,7 @@ Sistem ini bertujuan untuk:
 1.  **Clone repositori:**
 
     ```bash
-    git clone <url-repositori>
+    git clone https://github.com/NeddyAP/manajemen-magang
     cd manajement-magang
     ```
 
