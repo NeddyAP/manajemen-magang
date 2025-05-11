@@ -69,6 +69,7 @@ This document tracks the current status, progress, and evolution of the internsh
 
 ## Recent Changes
 
+- **[2025-05-11 09:25:53] - Confirmed and updated backend functionality for logbook export to Word and PDF. Routes in [`routes/web.php`](routes/web.php) were updated to match frontend naming conventions. Existing [`LogbookController`](app/Http/Controllers/Front/LogbookController.php) methods for export were verified.**
 - **Logbook Enhancements:**
     - Enabled 'dosen' users to add supervisor notes to logbooks via a modal.
     - Optimized logbook pages: added back button, incorporated Tailwind CSS animations for better UX.

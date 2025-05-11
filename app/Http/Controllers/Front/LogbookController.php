@@ -11,32 +11,18 @@ use App\Models\Logbook;
 use App\Models\MahasiswaProfile;
 use App\Models\User;
 use App\Notifications\Logbook\EntrySubmitted; // Import Notification
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use PhpOffice\PhpWord\IOFactory;
+use PhpOffice\PhpWord\PhpWord; // Assuming laravel-dompdf is installed
 
 class LogbookController extends Controller
 {
     public function index(Request $request, Internship $internship)
     {
-        $user = Auth::user();
-        $isOwner = $internship->user_id === $user->id;
-        $isAdvisor = false;
-
-        if ($user->hasRole('dosen')) {
-            $dosenProfile = DosenProfile::where('user_id', $user->id)->first();
-            if ($dosenProfile) {
-                $adviseeProfile = MahasiswaProfile::where('user_id', $internship->user_id)
-                    ->where('advisor_id', $dosenProfile->user_id)
-                    ->first();
-                $isAdvisor = (bool) $adviseeProfile;
-            }
-        }
-
-        // Authorize: Must be owner or advisor, and internship must be accepted
-        if ((! $isOwner && ! $isAdvisor) || $internship->status !== 'accepted') {
-            abort(403, 'Unauthorized access or internship not accepted.');
-        }
+        $this->authorizeAccess($internship);
 
         $query = $internship->logbooks();
 
@@ -164,6 +150,94 @@ class LogbookController extends Controller
             ->with('success', 'Logbook berhasil dihapus');
     }
 
+    public function exportWord(Internship $internship)
+    {
+        $this->authorizeAccess($internship);
+        $internship->load('user:id,name'); // Ensure user is loaded
+        $logbooks = $internship->logbooks()->orderBy('date', 'asc')->get();
+        $studentName = $internship->user->name;
+
+        $phpWord = new PhpWord;
+        // $phpWord->getSettings()->setUpdateFields(true); // Not needed if no ToC or fields
+
+        // Minimal section setup
+        $section = $phpWord->addSection();
+
+        // Define table style for the whole table, including header
+        $tableStyleSettings = ['borderSize' => 6, 'borderColor' => '000000', 'cellMargin' => 80];
+        $phpWord->addTableStyle('LogbookTable', $tableStyleSettings, ['bgColor' => 'E9E9E9']); // Header style part of table style
+
+        $table = $section->addTable('LogbookTable');
+
+        $headerCellStyle = ['bgColor' => 'E9E9E9']; // Lighter header, though can be part of addTableStyle's second param
+        $headerFontStyle = ['bold' => true, 'size' => 10];
+        $cellFontStyle = ['size' => 10];
+        $cellStyle = ['valign' => 'top']; // Align text to top for cells
+
+        // Add header row
+        $table->addRow(); // No specific height for header row
+        $table->addCell(2000, $headerCellStyle)->addText('Tanggal', $headerFontStyle, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::LEFT]);
+        $table->addCell(8000, $headerCellStyle)->addText('Rincian Kegiatan', $headerFontStyle, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::LEFT]);
+
+        // Add data rows
+        if ($logbooks->isEmpty()) {
+            $table->addRow();
+            // Apply basic cell style for the "no data" message, ensuring it spans and is centered
+            $noDataCellStyle = ['gridSpan' => 2, 'valign' => 'center'] + $cellStyle;
+            $table->addCell(10000, $noDataCellStyle)->addText('Tidak ada data logbook.', $cellFontStyle, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+        } else {
+            foreach ($logbooks as $logbook) {
+                $table->addRow();
+                $dateText = isset($logbook->date) ? \Carbon\Carbon::parse($logbook->date)->translatedFormat('d M Y') : 'N/A';
+                $table->addCell(2000, $cellStyle)->addText($dateText, $cellFontStyle);
+                $table->addCell(8000, $cellStyle)->addText($logbook->activities ?? '', $cellFontStyle);
+            }
+        }
+
+        $filename = 'Logbook_Table_'.str_replace([' ', '/'], '_', $studentName).'_'.$internship->id.'.docx';
+
+        ob_clean(); // Clean output buffer before sending headers
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        header('Content-Disposition: attachment;filename="'.$filename.'"');
+        header('Cache-Control: max-age=0');
+
+        $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
+        $objWriter->save('php://output');
+        exit;
+    }
+
+    public function exportPdf(Internship $internship)
+    {
+        $this->authorizeAccess($internship);
+        $internship->load('user:id,name'); // Ensure user is loaded
+        $logbooks = $internship->logbooks()->orderBy('date', 'asc')->get();
+        $studentName = $internship->user->name;
+
+        $data = [
+            'internship' => $internship,
+            'logbooks' => $logbooks,
+            'studentName' => $studentName,
+            'title' => 'Logbook Magang - '.$studentName,
+        ];
+
+        // The view 'pdf.logbook_export' needs to be created in resources/views/pdf/
+        // Example content for the view is provided in the thought process.
+        try {
+            $pdf = Pdf::loadView('pdf.logbook_export', $data);
+            $filename = 'Logbook_'.str_replace([' ', '/'], '_', $studentName).'_'.$internship->id.'.pdf';
+
+            return $pdf->download($filename);
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            \Illuminate\Support\Facades\Log::error('PDF Export Error: '.$e->getMessage().' for internship '.$internship->id);
+
+            // Return a user-friendly error response
+            // Consider a redirect back with an error message or an error view
+            return response('Gagal membuat PDF. Silakan coba lagi nanti atau hubungi administrator. Error: '.$e->getMessage(), 500);
+        }
+    }
+
     public function internList(Request $request)
     {
         $user = Auth::user();
@@ -205,5 +279,28 @@ class LogbookController extends Controller
             'internships' => $internships, // This will now include 'logbooks_count' attribute
             'filters' => ['search' => $search], // Pass search term back to view
         ]);
+    }
+
+    private function authorizeAccess(Internship $internship)
+    {
+        $user = Auth::user();
+        $isOwner = $internship->user_id === $user->id;
+        $isAdvisor = false;
+
+        if ($user->hasRole('dosen')) {
+            $dosenProfile = DosenProfile::where('user_id', $user->id)->first();
+            if ($dosenProfile) {
+                // Ensure $internship->user_id is the student's user_id
+                // And the student's advisor_id matches the current dosen's user_id
+                $studentProfile = MahasiswaProfile::where('user_id', $internship->user_id)->first();
+                if ($studentProfile && $studentProfile->advisor_id === $dosenProfile->user_id) {
+                    $isAdvisor = true;
+                }
+            }
+        }
+
+        if ((! $isOwner && ! $isAdvisor) || $internship->status !== 'accepted') {
+            abort(403, 'Akses tidak diizinkan atau status magang belum diterima.');
+        }
     }
 }

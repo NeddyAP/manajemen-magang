@@ -42,6 +42,8 @@ Route::middleware(['auth', 'verified'])->prefix('internships')->name('front.inte
         Route::get('/logbooks/{internship}/{logbook}/edit', [LogbookController::class, 'edit'])->name('logbooks.edit');
         Route::put('/logbooks/{internship}/{logbook}', [LogbookController::class, 'update'])->name('logbooks.update');
         Route::delete('/logbooks/{internship}/{logbook}', [LogbookController::class, 'destroy'])->name('logbooks.destroy');
+        Route::get('/logbooks/{internship}/export-word', [LogbookController::class, 'exportWord'])->name('logbooks.export.word');
+        Route::get('/logbooks/{internship}/export-pdf', [LogbookController::class, 'exportPdf'])->name('logbooks.export.pdf');
     });
 
     // Report routes

@@ -1,13 +1,15 @@
 import { DataTable } from '@/components/data-table/data-table';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'; // Import Card components
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import FrontLayout from '@/layouts/front-layout';
 import { TableMeta, type BreadcrumbItem } from '@/types';
 import { Internship, Logbook } from '@/types/internship';
 import { Head, Link } from '@inertiajs/react';
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { ArrowLeft, Plus } from 'lucide-react'; // Import ArrowLeft
+import { ArrowLeft, FileCode, FileText, MoreVertical, Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import { columns, initialColumnVisibility } from './components/column';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -69,6 +71,38 @@ export default function LogbooksIndex({ internship, logbooks, totalLogbookCount,
                                         Tambah Logbook
                                     </Link>
                                 </Button>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" size="icon">
+                                            <MoreVertical className="h-4 w-4" />
+                                            <span className="sr-only">Opsi Lain</span>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem
+                                            onClick={() => {
+                                                // Placeholder for actual backend endpoint
+                                                const exportUrl = route('front.internships.logbooks.export.word', { internship: internship.id });
+                                                window.open(exportUrl, '_blank');
+                                                toast.info('Memulai proses ekspor ke Word...');
+                                            }}
+                                        >
+                                            <FileText className="mr-2 h-4 w-4" />
+                                            Ekspor ke Word
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            onClick={() => {
+                                                // Placeholder for actual backend endpoint
+                                                const exportUrl = route('front.internships.logbooks.export.pdf', { internship: internship.id });
+                                                window.open(exportUrl, '_blank');
+                                                toast.info('Memulai proses ekspor ke PDF...');
+                                            }}
+                                        >
+                                            <FileCode className="mr-2 h-4 w-4" />
+                                            Ekspor ke PDF
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
                         </div>
 
