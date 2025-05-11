@@ -20,8 +20,11 @@ class ReportRevisionUploadTest extends TestCase
     use RefreshDatabase;
 
     private User $dosenUser;
+
     private User $mahasiswaUser;
+
     private Internship $internship;
+
     private Report $report;
 
     protected function setUp(): void

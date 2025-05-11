@@ -95,6 +95,6 @@ Route::get('/notifications', [NotificationController::class, 'history'])
     ->middleware(['auth', 'verified'])
     ->name('notifications.index');
 
-require __DIR__ . '/admin.php';
-require __DIR__ . '/settings.php';
-require __DIR__ . '/auth.php';
+require __DIR__.'/admin.php';
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';

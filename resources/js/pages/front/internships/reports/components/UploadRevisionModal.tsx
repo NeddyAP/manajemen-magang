@@ -1,15 +1,8 @@
 import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { type Report, type Internship } from '@/types/internship';
+import { type Report } from '@/types/internship';
 import { useForm } from '@inertiajs/react';
 import { FormEventHandler, useEffect } from 'react';
 
@@ -57,7 +50,6 @@ export default function UploadRevisionModal({ internshipId, report, isOpen, onCl
         }
     }, [isOpen, report, reset]);
 
-
     if (!report) return null;
 
     return (
@@ -83,9 +75,7 @@ export default function UploadRevisionModal({ internshipId, report, isOpen, onCl
                                 required
                             />
                         </div>
-                        {errors.revised_file && (
-                            <div className="col-span-4 text-sm text-red-500 text-right">{errors.revised_file}</div>
-                        )}
+                        {errors.revised_file && <div className="col-span-4 text-right text-sm text-red-500">{errors.revised_file}</div>}
                     </div>
                     <DialogFooter>
                         <Button type="button" variant="outline" onClick={onClose} disabled={processing}>

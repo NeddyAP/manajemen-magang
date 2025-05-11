@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Report;
 use App\Http\Requests\StoreReportRevisionRequest;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Report;
 use App\Notifications\ReportRevisionUploaded;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 
@@ -47,7 +46,7 @@ class ReportController extends Controller
     // public function show(Report $report): InertiaResponse
     // {
     //     // Ensure the user is authorized to view this report (student owns it, or Dosen/Admin has rights)
-    //     // $this->authorize('view', $report); 
+    //     // $this->authorize('view', $report);
 
     //     return Inertia::render('Reports/Show', [
     //         'report' => $report->load('user', 'internship'), // Eager load relationships

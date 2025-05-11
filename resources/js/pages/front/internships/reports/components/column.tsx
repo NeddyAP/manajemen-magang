@@ -312,7 +312,7 @@ export const columns: ColumnDef<Report>[] = [
                             href={originalFileUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline flex items-center"
+                            className="flex items-center text-blue-600 hover:underline"
                         >
                             <FileSpreadsheet className="mr-1 h-4 w-4 flex-shrink-0" />
                             <span className="truncate">Laporan Asli</span>
@@ -323,7 +323,7 @@ export const columns: ColumnDef<Report>[] = [
                             href={revisedFileUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-purple-600 hover:underline flex items-center"
+                            className="flex items-center text-purple-600 hover:underline"
                         >
                             <FileSpreadsheet className="mr-1 h-4 w-4 flex-shrink-0" />
                             <span className="truncate">Laporan Revisi</span>

@@ -14,6 +14,7 @@ class ReportRevisionUploaded extends Notification implements ShouldQueue
     use Queueable;
 
     public Report $report;
+
     public User $dosen;
 
     /**
@@ -44,8 +45,8 @@ class ReportRevisionUploaded extends Notification implements ShouldQueue
 
         return (new MailMessage)
             ->subject('Revisi Laporan Magang Telah Diunggah')
-            ->greeting('Halo ' . $notifiable->name . ',')
-            ->line('Dosen ' . $this->dosen->name . ' telah mengunggah revisi untuk laporan magang Anda yang berjudul \"' . $this->report->title . '\".')
+            ->greeting('Halo '.$notifiable->name.',')
+            ->line('Dosen '.$this->dosen->name.' telah mengunggah revisi untuk laporan magang Anda yang berjudul \"'.$this->report->title.'\".')
             ->line('Silakan periksa revisi tersebut pada sistem.')
             ->action('Lihat Laporan', $reportUrl)
             ->line('Terima kasih.');
@@ -64,7 +65,7 @@ class ReportRevisionUploaded extends Notification implements ShouldQueue
             'internship_id' => $this->report->internship_id,
             'dosen_id' => $this->dosen->id,
             'dosen_name' => $this->dosen->name,
-            'message' => 'Dosen ' . $this->dosen->name . ' telah mengunggah revisi untuk laporan Anda: ' . $this->report->title,
+            'message' => 'Dosen '.$this->dosen->name.' telah mengunggah revisi untuk laporan Anda: '.$this->report->title,
             'url' => route('front.internships.reports.index', $this->report->internship_id), // Adjust if a more specific URL is available
         ];
     }
