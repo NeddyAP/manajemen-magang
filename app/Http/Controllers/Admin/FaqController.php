@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreFaqRequest;
 use App\Http\Requests\UpdateFaqRequest;
 use App\Models\Faq;
+use Exception;
 use Illuminate\Http\Request;
 
 class FaqController extends Controller
@@ -20,7 +21,7 @@ class FaqController extends Controller
         // Handle search
         if ($request->has('search')) {
             $searchTerm = $request->search;
-            $query->where(function ($q) use ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm): void {
                 $q->where('question', 'like', "%{$searchTerm}%")
                     ->orWhere('answer', 'like', "%{$searchTerm}%");
             });
@@ -73,7 +74,7 @@ class FaqController extends Controller
             Faq::create($request->validated());
 
             return redirect()->route('admin.faqs.index')->with('success', 'FAQ berhasil dibuat.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with('error', 'Gagal membuat FAQ: '.$e->getMessage());
         }
     }
@@ -95,7 +96,7 @@ class FaqController extends Controller
             $faq->update($request->validated());
 
             return redirect()->route('admin.faqs.index')->with('success', 'FAQ berhasil diperbarui.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with('error', 'Gagal memperbarui FAQ: '.$e->getMessage());
         }
     }
@@ -109,7 +110,7 @@ class FaqController extends Controller
             $faq->update(['is_active' => ! $faq->is_active]);
 
             return redirect()->route('admin.faqs.index')->with('success', 'Status FAQ berhasil diperbarui.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with('error', 'Gagal memperbarui status FAQ: '.$e->getMessage());
         }
     }
@@ -123,7 +124,7 @@ class FaqController extends Controller
             $faq->delete();
 
             return redirect()->route('admin.faqs.index')->with('success', 'FAQ berhasil dihapus.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with('error', 'Gagal menghapus FAQ: '.$e->getMessage());
         }
     }
@@ -138,7 +139,7 @@ class FaqController extends Controller
             Faq::destroy($ids);
 
             return redirect()->route('admin.faqs.index')->with('success', 'FAQ berhasil dihapus.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with('error', 'Gagal menghapus FAQ: '.$e->getMessage());
         }
     }

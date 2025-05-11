@@ -9,7 +9,6 @@ use App\Models\DosenProfile;
 use App\Models\Internship;
 use App\Models\MahasiswaProfile;
 use App\Models\Report;
-use App\Models\User;
 use App\Notifications\Reports\ReportRevisionUploaded;
 use App\Notifications\Reports\ReportStatusChanged;
 use App\Notifications\Reports\ReportSubmitted;
@@ -38,9 +37,9 @@ class ReportController extends Controller
 
                 // Apply search if term exists
                 if ($search) {
-                    $query->whereHas('user', function ($userQuery) use ($search) {
+                    $query->whereHas('user', function ($userQuery) use ($search): void {
                         $userQuery->where('name', 'like', "%{$search}%")
-                            ->orWhereHas('mahasiswaProfile', function ($profileQuery) use ($search) {
+                            ->orWhereHas('mahasiswaProfile', function ($profileQuery) use ($search): void {
                                 $profileQuery->where('student_number', 'like', "%{$search}%");
                             });
                     });

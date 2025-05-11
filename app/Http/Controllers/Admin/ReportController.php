@@ -25,10 +25,10 @@ class ReportController extends Controller
         if ($request->has('search')) {
             $searchTerm = $request->search;
             $query->where('title', 'LIKE', "%{$searchTerm}%")
-                ->orWhereHas('user', function ($query) use ($searchTerm) {
+                ->orWhereHas('user', function ($query) use ($searchTerm): void {
                     $query->where('name', 'LIKE', "%{$searchTerm}%");
                 })
-                ->orWhereHas('internship', function ($query) use ($searchTerm) {
+                ->orWhereHas('internship', function ($query) use ($searchTerm): void {
                     $query->where('company_name', 'LIKE', "%{$searchTerm}%");
                 });
         }

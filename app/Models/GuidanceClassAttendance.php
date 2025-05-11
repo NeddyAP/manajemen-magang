@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Exception;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Facades\DB;
@@ -49,7 +50,7 @@ class GuidanceClassAttendance extends Pivot
             $this->notes = $notes;
             $this->save();
         } else {
-            throw new \Exception('Student is not eligible to attend this class.');
+            throw new Exception('Student is not eligible to attend this class.');
         }
     }
 
@@ -87,10 +88,10 @@ class GuidanceClassAttendance extends Pivot
      */
     public function scopeEligible($query)
     {
-        return $query->whereHas('user', function ($q) {
-            $q->whereHas('mahasiswaProfile', function ($q) {
+        return $query->whereHas('user', function ($q): void {
+            $q->whereHas('mahasiswaProfile', function ($q): void {
                 $q->where('academic_status', 'Aktif');
-            })->whereHas('internships', function ($q) {
+            })->whereHas('internships', function ($q): void {
                 $q->where('status', 'accepted');
             });
         });

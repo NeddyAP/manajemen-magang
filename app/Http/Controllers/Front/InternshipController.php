@@ -43,12 +43,12 @@ class InternshipController extends Controller
             $counts['accepted_internships'] = Internship::whereIn('user_id', $adviseeIds)
                 ->where('status', 'accepted')
                 ->count();
-            $counts['pending_logbooks'] = Logbook::whereHas('internship', function ($q) use ($adviseeIds) {
+            $counts['pending_logbooks'] = Logbook::whereHas('internship', function ($q) use ($adviseeIds): void {
                 $q->whereIn('user_id', $adviseeIds)->where('status', 'accepted');
             })
                 ->whereNull('supervisor_notes') // Assuming null notes means pending review
                 ->count();
-            $counts['pending_reports'] = Report::whereHas('internship', function ($q) use ($adviseeIds) {
+            $counts['pending_reports'] = Report::whereHas('internship', function ($q) use ($adviseeIds): void {
                 $q->whereIn('user_id', $adviseeIds)->where('status', 'accepted');
             })
                 ->where('status', 'pending')

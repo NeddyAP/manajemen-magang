@@ -7,6 +7,8 @@ use App\Models\GuidanceClass;
 use App\Models\GuidanceClassAttendance;
 use App\Models\User;
 use App\Notifications\GuidanceClass\ClassScheduled;
+use Exception;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,13 +17,14 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Inertia\Inertia\Response;
 
 class GuidanceClassController extends Controller
 {
     /**
      * Display a listing of guidance classes.
      *
-     * @return \Inertia\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -35,8 +38,8 @@ class GuidanceClassController extends Controller
         if ($userRole === 'dosen') {
             // Dosen melihat kelas yang mereka ampu
             $query = GuidanceClass::where('lecturer_id', $user->id)
-                ->with(['lecturer', 'students' => function ($query) {
-                    $query->with('internships', function ($query) {
+                ->with(['lecturer', 'students' => function ($query): void {
+                    $query->with('internships', function ($query): void {
                         $query->where('status', 'accepted')
                             ->latest()
                             ->first();
@@ -46,9 +49,9 @@ class GuidanceClassController extends Controller
             // Mahasiswa melihat kelas dari dosen pembimbing mereka
             if ($user->mahasiswaProfile && $user->mahasiswaProfile->advisor_id) {
                 $query = GuidanceClass::where('lecturer_id', $user->mahasiswaProfile->advisor_id)
-                    ->with(['lecturer', 'students' => function ($query) use ($user) {
+                    ->with(['lecturer', 'students' => function ($query) use ($user): void {
                         $query->where('users.id', $user->id)
-                            ->with('internships', function ($query) {
+                            ->with('internships', function ($query): void {
                                 $query->where('status', 'accepted')
                                     ->latest()
                                     ->first();
@@ -67,11 +70,11 @@ class GuidanceClassController extends Controller
         // Handle search
         if ($request->has('search')) {
             $searchTerm = $request->search;
-            $query->where(function ($q) use ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm): void {
                 $q->where('title', 'like', "%{$searchTerm}%")
                     ->orWhere('room', 'like', "%{$searchTerm}%")
                     ->orWhere('description', 'like', "%{$searchTerm}%")
-                    ->orWhereHas('lecturer', function ($subQuery) use ($searchTerm) {
+                    ->orWhereHas('lecturer', function ($subQuery) use ($searchTerm): void {
                         $subQuery->where('name', 'like', "%{$searchTerm}%");
                     });
             });
@@ -88,7 +91,7 @@ class GuidanceClassController extends Controller
                             break;
                         case 'ongoing':
                             $query->where('start_date', '<=', $now)
-                                ->where(function ($q) use ($now) {
+                                ->where(function ($q) use ($now): void {
                                     $q->whereNull('end_date')
                                         ->orWhere('end_date', '>=', $now);
                                 });
@@ -147,7 +150,7 @@ class GuidanceClassController extends Controller
     /**
      * Show the form for creating a new guidance class.
      *
-     * @return \Inertia\Response
+     * @return Response
      */
     public function create()
     {
@@ -165,7 +168,7 @@ class GuidanceClassController extends Controller
     /**
      * Store a newly created guidance class in storage.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function store(Request $request)
     {
@@ -204,7 +207,7 @@ class GuidanceClassController extends Controller
             if ($eligibleStudents->isNotEmpty()) {
                 Notification::send($eligibleStudents, new ClassScheduled($guidanceClass));
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Log error if notification sending fails, but don't block the user
             Log::error('Failed to send ClassScheduled notification', ['error' => $e->getMessage(), 'class_id' => $guidanceClass->id]);
         }
@@ -217,7 +220,7 @@ class GuidanceClassController extends Controller
      * Display the specified guidance class.
      *
      * @param  int  $id
-     * @return \Inertia\Response
+     * @return Response
      */
     public function show($id)
     {
@@ -225,7 +228,7 @@ class GuidanceClassController extends Controller
         $userRole = $user->roles->first()->name === 'dosen' ? 'dosen' : 'mahasiswa';
 
         $guidanceClass = GuidanceClass::with([
-            'lecturer' => function ($query) {
+            'lecturer' => function ($query): void {
                 $query->with('dosenProfile');
             },
         ])->findOrFail($id);
@@ -244,13 +247,13 @@ class GuidanceClassController extends Controller
 
         // Get eligible students (those advised by this lecturer and with accepted internships)
         $query = User::role('mahasiswa')
-            ->whereHas('mahasiswaProfile', function ($query) use ($guidanceClass) {
+            ->whereHas('mahasiswaProfile', function ($query) use ($guidanceClass): void {
                 $query->where('advisor_id', $guidanceClass->lecturer_id)
                     ->where('academic_status', 'Aktif');
             })
             ->with([
                 'mahasiswaProfile',
-                'internships' => function ($query) {
+                'internships' => function ($query): void {
                     $query->where('status', 'accepted')
                         ->latest();
                 },
@@ -321,7 +324,7 @@ class GuidanceClassController extends Controller
      * Show the form for editing the specified guidance class.
      *
      * @param  int  $id
-     * @return \Inertia\Response
+     * @return Response
      */
     public function edit($id)
     {
@@ -349,7 +352,7 @@ class GuidanceClassController extends Controller
      * Update the specified guidance class in storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function update(Request $request, $id)
     {
@@ -395,7 +398,7 @@ class GuidanceClassController extends Controller
      * Generate QR code for attendance.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function generateQrCode($id)
     {
@@ -430,7 +433,7 @@ class GuidanceClassController extends Controller
      *
      * @param  int  $classId
      * @param  int  $studentId
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function markAttendance(Request $request, $classId, $studentId)
     {
@@ -472,7 +475,7 @@ class GuidanceClassController extends Controller
             $attendance->save();
 
             return back()->with('success', 'Kehadiran mahasiswa berhasil dicatat.'); // Revert to redirect
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Still return back with error on exception
             return back()->with('error', 'Gagal mencatat kehadiran: '.$e->getMessage());
         }
@@ -483,7 +486,7 @@ class GuidanceClassController extends Controller
      *
      * @param  int  $classId
      * @param  int  $studentId
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function resetAttendance($classId, $studentId)
     {
@@ -511,7 +514,7 @@ class GuidanceClassController extends Controller
      * Remove the specified guidance class from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function destroy($id)
     {

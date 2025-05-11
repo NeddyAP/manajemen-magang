@@ -9,14 +9,17 @@ use App\Models\DosenProfile;
 use App\Models\Internship;
 use App\Models\Logbook;
 use App\Models\MahasiswaProfile;
-use App\Models\User;
 use App\Notifications\Logbook\EntrySubmitted;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
+use PhpOffice\PhpWord\SimpleType\Jc;
 
 class LogbookController extends Controller
 {
@@ -29,7 +32,7 @@ class LogbookController extends Controller
         // Handle search
         if ($request->has('search') && ! empty($request->search)) {
             $searchTerm = $request->search;
-            $query->where(function ($q) use ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm): void {
                 $q->where('activities', 'like', "%{$searchTerm}%")
                     ->orWhere('date', 'like', "%{$searchTerm}%");
             });
@@ -184,11 +187,11 @@ class LogbookController extends Controller
             $table->addRow();
             // Apply basic cell style for the "no data" message, ensuring it spans and is centered
             $noDataCellStyle = ['gridSpan' => 2, 'valign' => 'center'] + $cellStyle;
-            $table->addCell(10000, $noDataCellStyle)->addText('Tidak ada data logbook.', $cellFontStyle, ['alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER]);
+            $table->addCell(10000, $noDataCellStyle)->addText('Tidak ada data logbook.', $cellFontStyle, ['alignment' => Jc::CENTER]);
         } else {
             foreach ($logbooks as $logbook) {
                 $table->addRow();
-                $dateText = isset($logbook->date) ? \Carbon\Carbon::parse($logbook->date)->translatedFormat('d M Y') : 'N/A';
+                $dateText = isset($logbook->date) ? Carbon::parse($logbook->date)->translatedFormat('d M Y') : 'N/A';
                 $table->addCell(2000, $cellStyle)->addText($dateText, $cellFontStyle);
                 $table->addCell(8000, $cellStyle)->addText($logbook->activities ?? '', $cellFontStyle);
             }
@@ -228,9 +231,9 @@ class LogbookController extends Controller
             $filename = 'Logbook_'.str_replace([' ', '/'], '_', $studentName).'_'.$internship->id.'.pdf';
 
             return $pdf->download($filename);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Log the error for debugging
-            \Illuminate\Support\Facades\Log::error('PDF Export Error: '.$e->getMessage().' for internship '.$internship->id);
+            Log::error('PDF Export Error: '.$e->getMessage().' for internship '.$internship->id);
 
             // Return a user-friendly error response
             // Consider a redirect back with an error message or an error view
@@ -254,9 +257,9 @@ class LogbookController extends Controller
 
                 // Apply search if term exists
                 if ($search) {
-                    $query->whereHas('user', function ($userQuery) use ($search) {
+                    $query->whereHas('user', function ($userQuery) use ($search): void {
                         $userQuery->where('name', 'like', "%{$search}%")
-                            ->orWhereHas('mahasiswaProfile', function ($profileQuery) use ($search) {
+                            ->orWhereHas('mahasiswaProfile', function ($profileQuery) use ($search): void {
                                 $profileQuery->where('student_number', 'like', "%{$search}%");
                             });
                     });

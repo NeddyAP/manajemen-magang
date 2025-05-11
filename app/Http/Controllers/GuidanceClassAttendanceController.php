@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\GuidanceClass;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 
 class GuidanceClassAttendanceController extends Controller
@@ -62,7 +63,7 @@ class GuidanceClassAttendanceController extends Controller
             }
 
             return back()->with('success', 'Kehadiran berhasil dicatat.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return back()->with('error', 'Terjadi kesalahan saat mencatat kehadiran. Silakan coba lagi.');
         }
     }

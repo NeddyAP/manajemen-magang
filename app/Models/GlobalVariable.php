@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\GlobalVariableFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class GlobalVariable extends Model
 {
-    /** @use HasFactory<\Database\Factories\GlobalVariableFactory> */
+    /** @use HasFactory<GlobalVariableFactory> */
     use HasFactory, SoftDeletes;
 
     protected $fillable = [

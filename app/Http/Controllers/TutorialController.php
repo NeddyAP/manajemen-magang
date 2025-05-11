@@ -34,7 +34,7 @@ class TutorialController extends Controller
 
         // Apply search filter if provided
         if ($search = $request->input('search')) {
-            $query->where(function ($q) use ($search) {
+            $query->where(function ($q) use ($search): void {
                 $q->where('title', 'like', "%{$search}%")
                     ->orWhere('file_name', 'like', "%{$search}%");
             });

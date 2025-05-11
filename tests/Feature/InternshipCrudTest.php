@@ -7,8 +7,7 @@ use App\Models\DosenProfile;
 use App\Models\Internship;
 use App\Models\MahasiswaProfile;
 use App\Models\User;
-use App\Notifications\InternshipStatusUpdatedNotification; // Placeholder
-use App\Notifications\InternshipSubmittedNotification; // Placeholder
+use DateTime; // Placeholder
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
@@ -19,7 +18,7 @@ use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Seed roles
     Role::create(['name' => 'mahasiswa', 'guard_name' => 'web']);
     Role::create(['name' => 'admin', 'guard_name' => 'web']);
@@ -55,7 +54,7 @@ function createUserWithRole(string $roleName): User
 // CREATE INTERNSHIP (MAHASISWA PERSPECTIVE)
 // ------------------------------------------------------------------------
 
-test('[mahasiswa] can view the internship application form', function () {
+test('[mahasiswa] can view the internship application form', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
 
     $this->actingAs($mahasiswa)
@@ -67,7 +66,7 @@ test('[mahasiswa] can view the internship application form', function () {
         );
 });
 
-test('[mahasiswa] can submit a valid internship application', function () {
+test('[mahasiswa] can submit a valid internship application', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     $adminToNotify = $this->adminUser; // Use the admin created in beforeEach
 
@@ -78,8 +77,8 @@ test('[mahasiswa] can submit a valid internship application', function () {
     // The factory generates a string for 'application_file', remove it as we'll upload a fake file.
     unset($baseInternshipData['application_file']);
     // The factory also generates dates as DateTime objects, ensure they are strings for the POST request.
-    $baseInternshipData['start_date'] = (new \DateTime($baseInternshipData['start_date']))->format('Y-m-d');
-    $baseInternshipData['end_date'] = (new \DateTime($baseInternshipData['end_date']))->format('Y-m-d');
+    $baseInternshipData['start_date'] = (new DateTime($baseInternshipData['start_date']))->format('Y-m-d');
+    $baseInternshipData['end_date'] = (new DateTime($baseInternshipData['end_date']))->format('Y-m-d');
 
     $postData = array_merge(
         $baseInternshipData,
@@ -104,7 +103,7 @@ test('[mahasiswa] can submit a valid internship application', function () {
     // Notification::assertSentTo($adminToNotify, InternshipSubmittedNotification::class); // Placeholder
 });
 
-test('[mahasiswa] cannot submit an internship application with invalid data', function () {
+test('[mahasiswa] cannot submit an internship application with invalid data', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
 
     // Prepare valid base data and then make 'type' invalid
@@ -113,8 +112,8 @@ test('[mahasiswa] cannot submit an internship application with invalid data', fu
         'application_file' => UploadedFile::fake()->create('document.pdf', 1024, 'application/pdf'),
     ])->toArray();
     // Ensure dates are strings
-    $validBaseData['start_date'] = (new \DateTime($validBaseData['start_date']))->format('Y-m-d');
-    $validBaseData['end_date'] = (new \DateTime($validBaseData['end_date']))->format('Y-m-d');
+    $validBaseData['start_date'] = (new DateTime($validBaseData['start_date']))->format('Y-m-d');
+    $validBaseData['end_date'] = (new DateTime($validBaseData['end_date']))->format('Y-m-d');
 
     // Make 'type' invalid
     $invalidData = array_merge($validBaseData, ['type' => 'invalid_type']);
@@ -125,24 +124,24 @@ test('[mahasiswa] cannot submit an internship application with invalid data', fu
         ->assertRedirect(); // Or assert status 302
 });
 
-test('[unauthenticated] users are redirected from the internship application form', function () {
+test('[unauthenticated] users are redirected from the internship application form', function (): void {
     $this->get(route('front.internships.applicants.create')) // Corrected route name
         ->assertRedirect(route('login'));
 });
 
-test('[unauthenticated] users cannot submit an internship application', function () {
+test('[unauthenticated] users cannot submit an internship application', function (): void {
     $this->post(route('front.internships.applicants.store'), []) // Corrected route name
         ->assertRedirect(route('login'));
 });
 
-test('[admin] users cannot access the student internship creation form', function () {
+test('[admin] users cannot access the student internship creation form', function (): void {
     $admin = createUserWithRole('admin');
     $this->actingAs($admin)
         ->get(route('front.internships.applicants.create')) // Corrected route name
         ->assertForbidden(); // Or assertRedirect to admin dashboard
 });
 
-test('[dosen] users cannot access the student internship creation form', function () {
+test('[dosen] users cannot access the student internship creation form', function (): void {
     $dosen = createUserWithRole('dosen');
     $this->actingAs($dosen)
         ->get(route('front.internships.applicants.create')) // Corrected route name
@@ -153,7 +152,7 @@ test('[dosen] users cannot access the student internship creation form', functio
 // READ INTERNSHIPS
 // ------------------------------------------------------------------------
 
-test('[mahasiswa] can view a list of their own internships', function () {
+test('[mahasiswa] can view a list of their own internships', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     Internship::factory()->count(3)->for($mahasiswa)->create();
     Internship::factory()->count(2)->create(); // Other internships
@@ -168,7 +167,7 @@ test('[mahasiswa] can view a list of their own internships', function () {
         );
 });
 
-test('[admin] can view a list of all internships', function () {
+test('[admin] can view a list of all internships', function (): void {
     $admin = createUserWithRole('admin');
     Internship::factory()->count(5)->create();
 
@@ -186,7 +185,7 @@ test('[admin] can view a list of all internships', function () {
 // UPDATE INTERNSHIP
 // ------------------------------------------------------------------------
 
-test('[mahasiswa] can view the edit form for their own internship if editable', function () {
+test('[mahasiswa] can view the edit form for their own internship if editable', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = Internship::factory()->for($mahasiswa)->create(['status' => 'waiting']); // Changed 'draft' to 'waiting'
 
@@ -201,7 +200,7 @@ test('[mahasiswa] can view the edit form for their own internship if editable', 
         );
 });
 
-test('[mahasiswa] can view but cannot update internship if already accepted', function () {
+test('[mahasiswa] can view but cannot update internship if already accepted', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     // Create internship with 'accepted' status
     $internship = Internship::factory()->for($mahasiswa)->create(['status' => 'accepted']);
@@ -218,30 +217,30 @@ test('[mahasiswa] can view but cannot update internship if already accepted', fu
 
     unset($updatedData['user_id']);
     unset($updatedData['application_file']);
-    $updatedData['start_date'] = (new \DateTime($updatedData['start_date']))->format('Y-m-d');
-    $updatedData['end_date'] = (new \DateTime($updatedData['end_date']))->format('Y-m-d');
+    $updatedData['start_date'] = (new DateTime($updatedData['start_date']))->format('Y-m-d');
+    $updatedData['end_date'] = (new DateTime($updatedData['end_date']))->format('Y-m-d');
 
     $this->actingAs($mahasiswa)
         ->put(route('front.internships.applicants.update', $internship), $updatedData)
         ->assertForbidden(); // The request is denied by the form request's authorize() method
 });
 
-test('[mahasiswa] can update their own internship with valid data if editable', function () {
+test('[mahasiswa] can update their own internship with valid data if editable', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = Internship::factory()->for($mahasiswa)->create(['status' => 'waiting', 'company_name' => 'Old Company']);
 
     // Prepare full valid data for update, then override specific fields
     $baseUpdateData = $internship->toArray(); // Get existing data
     // Ensure dates are strings if they are part of the form
-    $baseUpdateData['start_date'] = (new \DateTime($baseUpdateData['start_date']))->format('Y-m-d');
-    $baseUpdateData['end_date'] = (new \DateTime($baseUpdateData['end_date']))->format('Y-m-d');
+    $baseUpdateData['start_date'] = (new DateTime($baseUpdateData['start_date']))->format('Y-m-d');
+    $baseUpdateData['end_date'] = (new DateTime($baseUpdateData['end_date']))->format('Y-m-d');
     // If application_file is part of the update form and can be changed:
     // $baseUpdateData['application_file'] = UploadedFile::fake()->create('new_document.pdf', 1024, 'application/pdf');
     // For this test, we are only changing the title and company.
     // The controller might require all fields, so we use the factory to make a valid set.
     $validDataForUpdate = Internship::factory()->make()->toArray();
-    $validDataForUpdate['start_date'] = (new \DateTime($validDataForUpdate['start_date']))->format('Y-m-d');
-    $validDataForUpdate['end_date'] = (new \DateTime($validDataForUpdate['end_date']))->format('Y-m-d');
+    $validDataForUpdate['start_date'] = (new DateTime($validDataForUpdate['start_date']))->format('Y-m-d');
+    $validDataForUpdate['end_date'] = (new DateTime($validDataForUpdate['end_date']))->format('Y-m-d');
     // Remove file from factory data if not updating it, or provide a new one.
     // For simplicity, let's assume file is not updated here or is optional on update.
     // If it's required, it must be provided.
@@ -268,14 +267,14 @@ test('[mahasiswa] can update their own internship with valid data if editable', 
     ]);
 });
 
-test('[mahasiswa] cannot update their internship with invalid data', function () {
+test('[mahasiswa] cannot update their internship with invalid data', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = Internship::factory()->for($mahasiswa)->create(['status' => 'waiting']);
 
     // Prepare valid base data for update, then make 'title' invalid
     $validBaseDataForUpdate = Internship::factory()->make()->toArray();
-    $validBaseDataForUpdate['start_date'] = (new \DateTime($validBaseDataForUpdate['start_date']))->format('Y-m-d');
-    $validBaseDataForUpdate['end_date'] = (new \DateTime($validBaseDataForUpdate['end_date']))->format('Y-m-d');
+    $validBaseDataForUpdate['start_date'] = (new DateTime($validBaseDataForUpdate['start_date']))->format('Y-m-d');
+    $validBaseDataForUpdate['end_date'] = (new DateTime($validBaseDataForUpdate['end_date']))->format('Y-m-d');
     unset($validBaseDataForUpdate['application_file']); // Assuming file is not part of this specific update test or is optional
     unset($validBaseDataForUpdate['user_id']);
 
@@ -286,7 +285,7 @@ test('[mahasiswa] cannot update their internship with invalid data', function ()
         ->assertSessionHasErrors('company_name');
 });
 
-test('[admin] can update an internship status', function () {
+test('[admin] can update an internship status', function (): void {
     $admin = createUserWithRole('admin');
     $internship = Internship::factory()->create(['status' => 'waiting']); // Changed 'submitted' to 'waiting'
     $updateData = ['status' => 'accepted']; // Changed 'approved' to 'accepted'
@@ -303,7 +302,7 @@ test('[admin] can update an internship status', function () {
     // Notification::assertSentTo($internship->user, InternshipStatusUpdatedNotification::class); // Placeholder
 });
 
-test('[unauthorized] users cannot update internships', function () {
+test('[unauthorized] users cannot update internships', function (): void {
     $user = createUserWithRole('mahasiswa'); // A mahasiswa
     $otherMahasiswa = createUserWithRole('mahasiswa');
     $internshipOfOther = Internship::factory()->for($otherMahasiswa)->create(['status' => 'waiting']); // Changed 'draft' to 'waiting'
@@ -321,7 +320,7 @@ test('[unauthorized] users cannot update internships', function () {
 // DELETE INTERNSHIP
 // ------------------------------------------------------------------------
 
-test('[mahasiswa] can delete their own internship if in editable state', function () {
+test('[mahasiswa] can delete their own internship if in editable state', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = Internship::factory()->for($mahasiswa)->create(['status' => 'waiting']); // Changed 'draft' to 'waiting'
 
@@ -332,7 +331,7 @@ test('[mahasiswa] can delete their own internship if in editable state', functio
     $this->assertSoftDeleted('internships', ['id' => $internship->id]);
 });
 
-test('[mahasiswa] cannot delete their internship if not in editable state', function () {
+test('[mahasiswa] cannot delete their internship if not in editable state', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = Internship::factory()->for($mahasiswa)->create(['status' => 'accepted']); // Changed to 'accepted' as per controller logic for non-deletable
 
@@ -344,7 +343,7 @@ test('[mahasiswa] cannot delete their internship if not in editable state', func
     $this->assertNotSoftDeleted('internships', ['id' => $internship->id]);
 });
 
-test('[admin] can delete an internship', function () {
+test('[admin] can delete an internship', function (): void {
     $admin = createUserWithRole('admin');
     $internship = Internship::factory()->create();
 
@@ -355,7 +354,7 @@ test('[admin] can delete an internship', function () {
     $this->assertSoftDeleted('internships', ['id' => $internship->id]);
 });
 
-test('[unauthorized] users cannot delete internships', function () {
+test('[unauthorized] users cannot delete internships', function (): void {
     $user = createUserWithRole('mahasiswa');
     $otherMahasiswa = createUserWithRole('mahasiswa');
     $internshipOfOther = Internship::factory()->for($otherMahasiswa)->create();
@@ -372,7 +371,7 @@ test('[unauthorized] users cannot delete internships', function () {
 // FILE UPLOADS
 // ------------------------------------------------------------------------
 
-test('[mahasiswa] can submit an internship application with a file upload', function () {
+test('[mahasiswa] can submit an internship application with a file upload', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     $adminToNotify = $this->adminUser;
 
@@ -385,8 +384,8 @@ test('[mahasiswa] can submit an internship application with a file upload', func
     // The factory generates a string for 'application_file', remove it.
     unset($baseInternshipData['application_file']);
     // Ensure dates are strings
-    $baseInternshipData['start_date'] = (new \DateTime($baseInternshipData['start_date']))->format('Y-m-d');
-    $baseInternshipData['end_date'] = (new \DateTime($baseInternshipData['end_date']))->format('Y-m-d');
+    $baseInternshipData['start_date'] = (new DateTime($baseInternshipData['start_date']))->format('Y-m-d');
+    $baseInternshipData['end_date'] = (new DateTime($baseInternshipData['end_date']))->format('Y-m-d');
 
     $postData = array_merge(
         $baseInternshipData,
@@ -406,7 +405,7 @@ test('[mahasiswa] can submit an internship application with a file upload', func
     // Notification::assertSentTo($adminToNotify, InternshipSubmittedNotification::class);
 });
 
-test('internship application fails if uploaded file is invalid', function () {
+test('internship application fails if uploaded file is invalid', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     // e.g. too large, wrong type - depends on validation rules
     $invalidFile = UploadedFile::fake()->create('large_document.pdf', 50000, 'application/pdf'); // Assuming 50MB is too large based on some validation rule
@@ -416,8 +415,8 @@ test('internship application fails if uploaded file is invalid', function () {
     ])->toArray();
     unset($baseInternshipData['application_file']); // Remove factory string path
     // Ensure dates are strings
-    $baseInternshipData['start_date'] = (new \DateTime($baseInternshipData['start_date']))->format('Y-m-d');
-    $baseInternshipData['end_date'] = (new \DateTime($baseInternshipData['end_date']))->format('Y-m-d');
+    $baseInternshipData['start_date'] = (new DateTime($baseInternshipData['start_date']))->format('Y-m-d');
+    $baseInternshipData['end_date'] = (new DateTime($baseInternshipData['end_date']))->format('Y-m-d');
 
     $postData = array_merge(
         $baseInternshipData,

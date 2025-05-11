@@ -8,6 +8,7 @@ use App\Models\Internship;
 use App\Models\Logbook;
 use App\Models\MahasiswaProfile;
 use App\Models\User;
+use DateTimeInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
@@ -16,7 +17,7 @@ use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Seed roles
     Role::create(['name' => 'mahasiswa', 'guard_name' => 'web']);
     Role::create(['name' => 'admin', 'guard_name' => 'web']);
@@ -59,7 +60,7 @@ function createActiveInternshipForMahasiswa(User $mahasiswa): Internship
 // CREATE LOGBOOK (MAHASISWA PERSPECTIVE)
 // ------------------------------------------------------------------------
 
-test('[mahasiswa] can view the logbook creation form for their active internship', function () {
+test('[mahasiswa] can view the logbook creation form for their active internship', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = createActiveInternshipForMahasiswa($mahasiswa);
 
@@ -74,7 +75,7 @@ test('[mahasiswa] can view the logbook creation form for their active internship
         );
 });
 
-test('[mahasiswa] can create a new logbook entry for their active internship', function () {
+test('[mahasiswa] can create a new logbook entry for their active internship', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = createActiveInternshipForMahasiswa($mahasiswa);
 
@@ -83,7 +84,7 @@ test('[mahasiswa] can create a new logbook entry for their active internship', f
         'user_id' => $mahasiswa->id, // Ensure factory associates with user if not automatic
     ])->toArray();
     // Ensure date is in 'Y-m-d' format if your factory produces DateTime objects
-    if (isset($logbookData['date']) && $logbookData['date'] instanceof \DateTimeInterface) {
+    if (isset($logbookData['date']) && $logbookData['date'] instanceof DateTimeInterface) {
         $logbookData['date'] = $logbookData['date']->format('Y-m-d');
     }
 
@@ -99,7 +100,7 @@ test('[mahasiswa] can create a new logbook entry for their active internship', f
     ]);
 });
 
-test('[mahasiswa] cannot create a logbook entry with invalid data', function () {
+test('[mahasiswa] cannot create a logbook entry with invalid data', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = createActiveInternshipForMahasiswa($mahasiswa);
 
@@ -108,7 +109,7 @@ test('[mahasiswa] cannot create a logbook entry with invalid data', function () 
         'user_id' => $mahasiswa->id,
         'activities' => '', // Assuming 'activities' is required
     ])->toArray();
-    if (isset($invalidLogbookData['date']) && $invalidLogbookData['date'] instanceof \DateTimeInterface) {
+    if (isset($invalidLogbookData['date']) && $invalidLogbookData['date'] instanceof DateTimeInterface) {
         $invalidLogbookData['date'] = $invalidLogbookData['date']->format('Y-m-d');
     }
 
@@ -118,13 +119,13 @@ test('[mahasiswa] cannot create a logbook entry with invalid data', function () 
         ->assertRedirect();
 });
 
-test('[mahasiswa] cannot create a logbook for an internship not belonging to them', function () {
+test('[mahasiswa] cannot create a logbook for an internship not belonging to them', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     $otherMahasiswa = createUserWithRole('mahasiswa');
     $otherInternship = createActiveInternshipForMahasiswa($otherMahasiswa);
 
     $logbookData = Logbook::factory()->make()->toArray();
-    if (isset($logbookData['date']) && $logbookData['date'] instanceof \DateTimeInterface) {
+    if (isset($logbookData['date']) && $logbookData['date'] instanceof DateTimeInterface) {
         $logbookData['date'] = $logbookData['date']->format('Y-m-d');
     }
 
@@ -137,7 +138,7 @@ test('[mahasiswa] cannot create a logbook for an internship not belonging to the
 // READ LOGBOOKS (MAHASISWA PERSPECTIVE)
 // ------------------------------------------------------------------------
 
-test('[mahasiswa] can view a list of their own logbook entries for an internship', function () {
+test('[mahasiswa] can view a list of their own logbook entries for an internship', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = createActiveInternshipForMahasiswa($mahasiswa);
     Logbook::factory()->count(3)->for($internship)->for($mahasiswa, 'user')->create();
@@ -160,7 +161,7 @@ test('[mahasiswa] can view a list of their own logbook entries for an internship
         );
 });
 
-test('[mahasiswa] cannot view logbook entries of other students via index', function () {
+test('[mahasiswa] cannot view logbook entries of other students via index', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     // Own internship, but no logbooks for it yet.
     $ownInternship = createActiveInternshipForMahasiswa($mahasiswa);
@@ -181,7 +182,7 @@ test('[mahasiswa] cannot view logbook entries of other students via index', func
 // UPDATE LOGBOOK (MAHASISWA PERSPECTIVE)
 // ------------------------------------------------------------------------
 
-test('[mahasiswa] can view the edit form for their own logbook entry', function () {
+test('[mahasiswa] can view the edit form for their own logbook entry', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = createActiveInternshipForMahasiswa($mahasiswa);
     $logbook = Logbook::factory()->for($internship)->for($mahasiswa, 'user')->create();
@@ -199,19 +200,19 @@ test('[mahasiswa] can view the edit form for their own logbook entry', function 
         );
 });
 
-test('[mahasiswa] can update their own logbook entry', function () {
+test('[mahasiswa] can update their own logbook entry', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = createActiveInternshipForMahasiswa($mahasiswa);
     $logbook = Logbook::factory()->for($internship)->for($mahasiswa, 'user')->create(['activities' => 'Kegiatan Lama']);
 
     $updatedData = [
-        'date' => $logbook->date instanceof \DateTimeInterface ? $logbook->date->format('Y-m-d') : $logbook->date, // Keep original date or update
+        'date' => $logbook->date instanceof DateTimeInterface ? $logbook->date->format('Y-m-d') : $logbook->date, // Keep original date or update
         'activities' => 'Kegiatan Baru yang Diperbarui',
         // Add other fields from your Logbook factory/model that are part of the form
     ];
     // If your Logbook factory has more fields, ensure they are included or make them optional in request
     $fullUpdateData = array_merge(Logbook::factory()->make()->toArray(), $updatedData);
-    if (isset($fullUpdateData['date']) && $fullUpdateData['date'] instanceof \DateTimeInterface) {
+    if (isset($fullUpdateData['date']) && $fullUpdateData['date'] instanceof DateTimeInterface) {
         $fullUpdateData['date'] = $fullUpdateData['date']->format('Y-m-d');
     }
     unset($fullUpdateData['internship_id'], $fullUpdateData['user_id']); // These are usually not in form
@@ -227,17 +228,17 @@ test('[mahasiswa] can update their own logbook entry', function () {
     ]);
 });
 
-test('[mahasiswa] cannot update their logbook entry with invalid data', function () {
+test('[mahasiswa] cannot update their logbook entry with invalid data', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = createActiveInternshipForMahasiswa($mahasiswa);
     $logbook = Logbook::factory()->for($internship)->for($mahasiswa, 'user')->create();
 
     $invalidUpdateData = [
-        'date' => $logbook->date instanceof \DateTimeInterface ? $logbook->date->format('Y-m-d') : $logbook->date,
+        'date' => $logbook->date instanceof DateTimeInterface ? $logbook->date->format('Y-m-d') : $logbook->date,
         'activities' => '', // Invalid
     ];
     $fullInvalidData = array_merge(Logbook::factory()->make()->toArray(), $invalidUpdateData);
-    if (isset($fullInvalidData['date']) && $fullInvalidData['date'] instanceof \DateTimeInterface) {
+    if (isset($fullInvalidData['date']) && $fullInvalidData['date'] instanceof DateTimeInterface) {
         $fullInvalidData['date'] = $fullInvalidData['date']->format('Y-m-d');
     }
     unset($fullInvalidData['internship_id'], $fullInvalidData['user_id']);
@@ -248,7 +249,7 @@ test('[mahasiswa] cannot update their logbook entry with invalid data', function
         ->assertRedirect();
 });
 
-test('[mahasiswa] cannot update a logbook entry not belonging to them', function () {
+test('[mahasiswa] cannot update a logbook entry not belonging to them', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     $ownInternship = createActiveInternshipForMahasiswa($mahasiswa); // Student has an internship
 
@@ -267,7 +268,7 @@ test('[mahasiswa] cannot update a logbook entry not belonging to them', function
 // DELETE LOGBOOK (MAHASISWA PERSPECTIVE)
 // ------------------------------------------------------------------------
 
-test('[mahasiswa] can delete their own logbook entry', function () {
+test('[mahasiswa] can delete their own logbook entry', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = createActiveInternshipForMahasiswa($mahasiswa);
     $logbook = Logbook::factory()->for($internship)->for($mahasiswa, 'user')->create();
@@ -279,7 +280,7 @@ test('[mahasiswa] can delete their own logbook entry', function () {
     $this->assertSoftDeleted('logbooks', ['id' => $logbook->id]); // Changed to assertSoftDeleted
 });
 
-test('[mahasiswa] cannot delete a logbook entry not belonging to them', function () {
+test('[mahasiswa] cannot delete a logbook entry not belonging to them', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
     $ownInternship = createActiveInternshipForMahasiswa($mahasiswa);
 
@@ -303,7 +304,7 @@ test('[mahasiswa] cannot delete a logbook entry not belonging to them', function
 // AUTHENTICATION/AUTHORIZATION
 // ------------------------------------------------------------------------
 
-test('[unauthenticated] users are redirected from logbook pages', function () {
+test('[unauthenticated] users are redirected from logbook pages', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa'); // Create user to get an internship and logbook ID
     $internship = createActiveInternshipForMahasiswa($mahasiswa);
     $logbook = Logbook::factory()->for($internship)->for($mahasiswa, 'user')->create();
@@ -317,7 +318,7 @@ test('[unauthenticated] users are redirected from logbook pages', function () {
     // $this->get(route('front.internships.logbooks.show', ['internship' => $internship, 'logbook' => $logbook]))->assertRedirect(route('login'));
 });
 
-test('[admin] users cannot access student logbook creation form via student routes', function () {
+test('[admin] users cannot access student logbook creation form via student routes', function (): void {
     $admin = createUserWithRole('admin');
     // Need an internship to pass to the route, even if it's not used by admin for this specific action.
     // Create a dummy one, or one associated with a mahasiswa.
@@ -329,7 +330,7 @@ test('[admin] users cannot access student logbook creation form via student rout
         ->assertForbidden(); // Or assertRedirect to admin dashboard
 });
 
-test('[dosen] users cannot access student logbook creation form via student routes', function () {
+test('[dosen] users cannot access student logbook creation form via student routes', function (): void {
     $dosen = createUserWithRole('dosen');
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = createActiveInternshipForMahasiswa($mahasiswa);

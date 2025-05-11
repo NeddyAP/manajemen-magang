@@ -17,7 +17,7 @@ const REPORT_STATUS_PENDING = 'pending'; // Can be used for draft/submitted init
 const REPORT_STATUS_APPROVED = 'approved';
 const REPORT_STATUS_REJECTED = 'rejected';
 
-beforeEach(function () {
+beforeEach(function (): void {
     Storage::fake('public'); // Fake the public disk for file uploads
 
     // Create a student user
@@ -41,7 +41,7 @@ beforeEach(function () {
 // CREATE REPORTS (MAHASISWA PERSPECTIVE)
 // ------------------------------------------------------------------------
 
-test('[mahasiswa] can submit a new report with a file', function () {
+test('[mahasiswa] can submit a new report with a file', function (): void {
     $reportData = [
         'title' => 'Laporan Mingguan 1',
         'report_file' => UploadedFile::fake()->create('laporan_mingguan_1.pdf', 100, 'application/pdf'),
@@ -63,7 +63,7 @@ test('[mahasiswa] can submit a new report with a file', function () {
     Storage::disk('public')->assertExists($report->report_file);
 });
 
-test('[mahasiswa] cannot submit a report for an internship that is not active or not theirs', function () {
+test('[mahasiswa] cannot submit a report for an internship that is not active or not theirs', function (): void {
     $otherInternship = Internship::factory()->create(['status' => 'rejected']);
     $reportData = [
         'title' => 'Laporan Tidak Sah',
@@ -78,7 +78,7 @@ test('[mahasiswa] cannot submit a report for an internship that is not active or
 // READ REPORTS (MAHASISWA PERSPECTIVE)
 // ------------------------------------------------------------------------
 
-test('[mahasiswa] can view a list of their own submitted reports', function () {
+test('[mahasiswa] can view a list of their own submitted reports', function (): void {
     $report = Report::factory()->create([
         'internship_id' => $this->internship->id,
         'user_id' => $this->mahasiswaUser->id,
@@ -99,7 +99,7 @@ test('[mahasiswa] can view a list of their own submitted reports', function () {
     $response->assertDontSee($otherReport->title);
 });
 
-test('[mahasiswa] can view the details (edit page) of one of their own submitted reports', function () {
+test('[mahasiswa] can view the details (edit page) of one of their own submitted reports', function (): void {
     $report = Report::factory()->create([
         'internship_id' => $this->internship->id,
         'user_id' => $this->mahasiswaUser->id,
@@ -112,7 +112,7 @@ test('[mahasiswa] can view the details (edit page) of one of their own submitted
     $response->assertSee($report->title);
 });
 
-test('[mahasiswa] cannot view details (edit page) of reports of other students', function () {
+test('[mahasiswa] cannot view details (edit page) of reports of other students', function (): void {
     $otherUser = User::factory()->mahasiswa()->create();
     $otherInternship = Internship::factory()->create(['user_id' => $otherUser->id]);
     $otherReport = Report::factory()->create([
@@ -129,7 +129,7 @@ test('[mahasiswa] cannot view details (edit page) of reports of other students',
 // UPDATE REPORTS (MAHASISWA PERSPECTIVE)
 // ------------------------------------------------------------------------
 
-test('[mahasiswa] can update their own report if it is in pending status', function () {
+test('[mahasiswa] can update their own report if it is in pending status', function (): void {
     $pendingReport = Report::factory()->create([
         'internship_id' => $this->internship->id,
         'user_id' => $this->mahasiswaUser->id,
@@ -156,7 +156,7 @@ test('[mahasiswa] can update their own report if it is in pending status', funct
     expect($pendingReport->report_file)->not->toBe('old_pending_file_update.pdf');
 });
 
-test('[mahasiswa] can update their own report if it is in rejected status', function () {
+test('[mahasiswa] can update their own report if it is in rejected status', function (): void {
     $rejectedReport = Report::factory()->create([
         'internship_id' => $this->internship->id,
         'user_id' => $this->mahasiswaUser->id,
@@ -175,7 +175,7 @@ test('[mahasiswa] can update their own report if it is in rejected status', func
     Storage::disk('public')->assertExists($rejectedReport->report_file);
 });
 
-test('[mahasiswa] cannot update their own report if it has been approved', function () {
+test('[mahasiswa] cannot update their own report if it has been approved', function (): void {
     $approvedReport = Report::factory()->create([
         'internship_id' => $this->internship->id,
         'user_id' => $this->mahasiswaUser->id,
@@ -188,7 +188,7 @@ test('[mahasiswa] cannot update their own report if it has been approved', funct
     $response->assertStatus(403);
 });
 
-test('[mahasiswa] cannot update reports of other students', function () {
+test('[mahasiswa] cannot update reports of other students', function (): void {
     $otherUser = User::factory()->mahasiswa()->create();
     $otherInternship = Internship::factory()->create(['user_id' => $otherUser->id]);
     $otherUserReport = Report::factory()->create(['internship_id' => $otherInternship->id, 'user_id' => $otherUser->id, 'status' => REPORT_STATUS_PENDING]);
@@ -202,7 +202,7 @@ test('[mahasiswa] cannot update reports of other students', function () {
 // DELETE REPORTS (MAHASISWA PERSPECTIVE)
 // ------------------------------------------------------------------------
 
-test('[mahasiswa] can delete their own report if it is in pending status', function () {
+test('[mahasiswa] can delete their own report if it is in pending status', function (): void {
     $pendingReport = Report::factory()->create([
         'internship_id' => $this->internship->id,
         'user_id' => $this->mahasiswaUser->id,
@@ -218,7 +218,7 @@ test('[mahasiswa] can delete their own report if it is in pending status', funct
     Storage::disk('public')->assertMissing($pendingReport->report_file);
 });
 
-test('[mahasiswa] cannot delete their own report if it has been approved or rejected', function () {
+test('[mahasiswa] cannot delete their own report if it has been approved or rejected', function (): void {
     $approvedReport = Report::factory()->create([
         'internship_id' => $this->internship->id,
         'user_id' => $this->mahasiswaUser->id,
@@ -238,7 +238,7 @@ test('[mahasiswa] cannot delete their own report if it has been approved or reje
     $this->assertDatabaseHas('reports', ['id' => $rejectedReport->id]);
 });
 
-test('[mahasiswa] cannot delete reports of other students', function () {
+test('[mahasiswa] cannot delete reports of other students', function (): void {
     $otherUser = User::factory()->mahasiswa()->create();
     $otherInternship = Internship::factory()->create(['user_id' => $otherUser->id]);
     $otherUserReport = Report::factory()->create(['internship_id' => $otherInternship->id, 'user_id' => $otherUser->id, 'status' => REPORT_STATUS_PENDING]);

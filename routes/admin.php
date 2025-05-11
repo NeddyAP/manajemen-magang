@@ -13,7 +13,7 @@ use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/dashboard', '/admin/dashboard');
-Route::middleware(['auth', 'role:superadmin|admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:superadmin|admin'])->prefix('admin')->name('admin.')->group(function (): void {
     Route::redirect('/', '/dashboard');
 
     Route::get('dashboard', DashboardController::class)->name('dashboard');
@@ -65,7 +65,7 @@ require __DIR__.'/auth.php';
 use App\Http\Controllers\Admin\AnalyticsController;
 
 // Analytics Routes
-Route::middleware(['auth', 'role:superadmin|admin'])->prefix('analytics')->name('admin.analytics.')->group(function () {
+Route::middleware(['auth', 'role:superadmin|admin'])->prefix('analytics')->name('admin.analytics.')->group(function (): void {
     Route::get('/internship-stats', [AnalyticsController::class, 'getInternshipStats'])->name('internship-stats');
     Route::get('/student-performance', [AnalyticsController::class, 'getStudentPerformance'])->name('student-performance');
     Route::get('/system-usage', [AnalyticsController::class, 'getSystemUsage'])->name('system-usage');

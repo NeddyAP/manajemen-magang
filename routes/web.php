@@ -16,11 +16,11 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/buku-panduan', [TutorialController::class, 'index'])->name('tutorials.index');
 
 // Front Internship Routes
-Route::middleware(['auth', 'verified'])->prefix('internships')->name('front.internships.')->group(function () {
+Route::middleware(['auth', 'verified'])->prefix('internships')->name('front.internships.')->group(function (): void {
     Route::get('/', [InternshipController::class, 'index'])->name('index');
 
     // Applicants routes
-    Route::prefix('applicants')->name('applicants.')->group(function () {
+    Route::prefix('applicants')->name('applicants.')->group(function (): void {
         Route::get('/', [InternshipApplicantController::class, 'index'])->name('index');
         Route::get('/create', [InternshipApplicantController::class, 'create'])->name('create');
         Route::post('/', [InternshipApplicantController::class, 'store'])->name('store');
@@ -34,7 +34,7 @@ Route::middleware(['auth', 'verified'])->prefix('internships')->name('front.inte
     });
 
     // Logbook routes
-    Route::middleware(['auth'])->group(function () {
+    Route::middleware(['auth'])->group(function (): void {
         Route::get('/logbooks', [LogbookController::class, 'internList'])->name('logbooks.intern-list');
         Route::get('/logbooks/{internship}', [LogbookController::class, 'index'])->name('logbooks.index');
         Route::get('/logbooks/{internship}/create', [LogbookController::class, 'create'])->name('logbooks.create');
@@ -47,7 +47,7 @@ Route::middleware(['auth', 'verified'])->prefix('internships')->name('front.inte
     });
 
     // Report routes
-    Route::middleware(['auth'])->group(function () {
+    Route::middleware(['auth'])->group(function (): void {
         Route::get('/reports', [ReportController::class, 'internList'])->name('reports.intern-list');
         Route::get('/reports/{internship}', [ReportController::class, 'index'])->name('reports.index');
         Route::get('/reports/{internship}/create', [ReportController::class, 'create'])->name('reports.create');
@@ -62,7 +62,7 @@ Route::middleware(['auth', 'verified'])->prefix('internships')->name('front.inte
     });
 
     // Guidance Classes routes
-    Route::middleware(['auth'])->group(function () {
+    Route::middleware(['auth'])->group(function (): void {
         // all front Guidance Classes route here
         Route::get('/guidance-classes', [GuidanceClassController::class, 'index'])->name('guidance-classes.index');
         Route::get('/guidance-classes/create', [GuidanceClassController::class, 'create'])->name('guidance-classes.create');
@@ -82,12 +82,12 @@ Route::get('guidance-classes/attend/{token}', [GuidanceClassAttendanceController
     ->name('guidance-classes.attend');
 
 // API Routes for Notifications
-Route::middleware(['auth'])->prefix('api')->name('api.')->group(function () {
-    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/mark-as-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
-    Route::post('/notifications/mark-all-as-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
-    Route::post('/notifications/mark-as-unread', [\App\Http\Controllers\NotificationController::class, 'markAsUnread'])->name('notifications.markAsUnread');
-    Route::delete('/notifications/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
+Route::middleware(['auth'])->prefix('api')->name('api.')->group(function (): void {
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+    Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
+    Route::post('/notifications/mark-as-unread', [NotificationController::class, 'markAsUnread'])->name('notifications.markAsUnread');
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 });
 
 // Notification History Page (Web Route)

@@ -9,6 +9,7 @@ use App\Models\GuidanceClass;
 use App\Models\GuidanceClassAttendance;
 use App\Models\User;
 use App\Notifications\GuidanceClass\ClassScheduled;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
@@ -25,7 +26,7 @@ class GuidanceClassController extends Controller
         // Add search functionality
         if ($search = $request->input('search')) {
             $query->where('title', 'like', "%{$search}%")
-                ->orWhereHas('lecturer', function ($q) use ($search) {
+                ->orWhereHas('lecturer', function ($q) use ($search): void {
                     $q->where('name', 'like', "%{$search}%");
                 });
         }
@@ -99,11 +100,11 @@ class GuidanceClassController extends Controller
 
             // Get all eligible students for this lecturer
             $eligibleStudents = User::role('mahasiswa')
-                ->whereHas('mahasiswaProfile', function ($query) use ($guidanceClass) {
+                ->whereHas('mahasiswaProfile', function ($query) use ($guidanceClass): void {
                     $query->where('advisor_id', $guidanceClass->lecturer_id)
                         ->where('academic_status', 'Aktif');
                 })
-                ->whereHas('internships', function ($query) {
+                ->whereHas('internships', function ($query): void {
                     $query->where('status', 'accepted');
                 })
                 ->pluck('id')
@@ -126,7 +127,7 @@ class GuidanceClassController extends Controller
             return redirect()
                 ->route('admin.guidance-classes.index')
                 ->with('success', 'Kelas bimbingan berhasil dibuat dan presensi mahasiswa telah disiapkan.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()
                 ->route('admin.guidance-classes.index')
                 ->with('error', 'Terjadi kesalahan saat membuat kelas bimbingan.');
@@ -143,13 +144,13 @@ class GuidanceClassController extends Controller
 
         // Get eligible students (those advised by this lecturer, active, and have accepted internships)
         $query = User::role('mahasiswa')
-            ->whereHas('mahasiswaProfile', function ($query) use ($guidanceClass) {
+            ->whereHas('mahasiswaProfile', function ($query) use ($guidanceClass): void {
                 $query->where('advisor_id', $guidanceClass->lecturer_id)
                     ->where('academic_status', 'Aktif');
             })
             ->with([
                 'mahasiswaProfile',
-                'internships' => function ($query) {
+                'internships' => function ($query): void {
                     $query->where('status', 'accepted')
                         ->latest();
                 },
@@ -157,9 +158,9 @@ class GuidanceClassController extends Controller
 
         // Add search functionality
         if ($search = $request->input('search')) {
-            $query->where(function ($q) use ($search) {
+            $query->where(function ($q) use ($search): void {
                 $q->where('name', 'like', "%{$search}%")
-                    ->orWhereHas('mahasiswaProfile', function ($q) use ($search) {
+                    ->orWhereHas('mahasiswaProfile', function ($q) use ($search): void {
                         $q->where('student_number', 'like', "%{$search}%");
                     });
             });
@@ -174,13 +175,13 @@ class GuidanceClassController extends Controller
                 $attendanceQuery = $filters['attendance.attended_at'];
                 if ($attendanceQuery === 'hadir') {
                     // Filter for students who are present (attended_at is not null)
-                    $query->whereHas('guidanceClassAttendance', function ($q) use ($guidanceClass) {
+                    $query->whereHas('guidanceClassAttendance', function ($q) use ($guidanceClass): void {
                         $q->where('guidance_class_id', $guidanceClass->id)
                             ->whereNotNull('attended_at');
                     });
                 } elseif ($attendanceQuery === 'belum_hadir') {
                     // Filter for students who are not present (attended_at is null)
-                    $query->whereHas('guidanceClassAttendance', function ($q) use ($guidanceClass) {
+                    $query->whereHas('guidanceClassAttendance', function ($q) use ($guidanceClass): void {
                         $q->where('guidance_class_id', $guidanceClass->id)
                             ->whereNull('attended_at');
                     });

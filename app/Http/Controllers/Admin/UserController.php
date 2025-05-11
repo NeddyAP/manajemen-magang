@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\User\StoreRequest;
 use App\Http\Requests\Admin\User\UpdateRequest;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Log;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -16,8 +18,8 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $query = User::with(['roles'])
-            ->when($request->role, function ($query, $role) {
-                $query->whereHas('roles', function ($q) use ($role) {
+            ->when($request->role, function ($query, $role): void {
+                $query->whereHas('roles', function ($q) use ($role): void {
                     $q->where('name', $role);
                 });
             });
@@ -25,10 +27,10 @@ class UserController extends Controller
         // Handle search
         if ($request->has('search')) {
             $searchTerm = $request->search;
-            $query->where(function ($q) use ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm): void {
                 $q->where('name', 'like', "{$searchTerm}%")
                     ->orWhere('email', 'like', "{$searchTerm}%")
-                    ->orWhereHas('roles', function ($q) use ($searchTerm) {
+                    ->orWhereHas('roles', function ($q) use ($searchTerm): void {
                         $q->where('name', 'like', "%{$searchTerm}%");
                     });
             });
@@ -69,7 +71,7 @@ class UserController extends Controller
     {
         // get all dosen for mahasiswa dropdown
         $lecturers = User::with(['roles'])->select('id', 'name')
-            ->whereHas('roles', function ($query) {
+            ->whereHas('roles', function ($query): void {
                 $query->where('name', 'dosen');
             })
             ->get();
@@ -134,10 +136,10 @@ class UserController extends Controller
             DB::commit();
 
             return redirect()->route('admin.users.index')->with('success', 'Pengguna berhasil dibuat.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
-            \Log::error('User creation failed: '.$e->getMessage());
-            \Log::error('Request data: '.json_encode($request->all()));
+            Log::error('User creation failed: '.$e->getMessage());
+            Log::error('Request data: '.json_encode($request->all()));
 
             return back()
                 ->withInput()
@@ -160,7 +162,7 @@ class UserController extends Controller
 
         // Get all dosen for mahasiswa dropdown
         $lecturers = User::with(['roles'])->select('id', 'name')
-            ->whereHas('roles', function ($query) {
+            ->whereHas('roles', function ($query): void {
                 $query->where('name', 'dosen');
             })
             ->get();
@@ -324,11 +326,11 @@ class UserController extends Controller
             DB::commit();
 
             return redirect()->route('admin.users.index')->with('success', 'Pengguna berhasil diperbarui.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
-            \Log::error('User update failed: '.$e->getMessage());
-            \Log::error('Request data: '.json_encode($request->all()));
-            \Log::error('Stack trace: '.$e->getTraceAsString());
+            Log::error('User update failed: '.$e->getMessage());
+            Log::error('Request data: '.json_encode($request->all()));
+            Log::error('Stack trace: '.$e->getTraceAsString());
 
             return back()
                 ->withInput()
@@ -355,7 +357,7 @@ class UserController extends Controller
             DB::commit();
 
             return back()->with('success', 'Pengguna berhasil dihapus.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
 
             return back()->withErrors(['error' => 'Gagal menghapus pengguna. '.$e->getMessage()]);
@@ -389,9 +391,9 @@ class UserController extends Controller
             DB::commit();
 
             return back()->with('success', count($userIds).' pengguna berhasil dihapus.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
-            \Log::error('Bulk user deletion failed: '.$e->getMessage());
+            Log::error('Bulk user deletion failed: '.$e->getMessage());
 
             return back()->withErrors(['error' => 'Gagal menghapus pengguna. '.$e->getMessage()]);
         }

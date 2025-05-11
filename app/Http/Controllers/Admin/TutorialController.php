@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTutorialRequest;
 use App\Http\Requests\UpdateTutorialRequest;
 use App\Models\Tutorial;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -21,7 +22,7 @@ class TutorialController extends Controller
         // Handle search
         if ($request->has('search')) {
             $searchTerm = $request->search;
-            $query->where(function ($q) use ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm): void {
                 $q->where('title', 'like', "{$searchTerm}%")
                     ->orWhere('content', 'like', "{$searchTerm}%");
             });
@@ -88,7 +89,7 @@ class TutorialController extends Controller
             $tutorial = Tutorial::create($data);
 
             return redirect()->route('admin.tutorials.index')->with('success', 'Tutorial berhasil dibuat.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with('error', 'Gagal membuat tutorial: '.$e->getMessage());
         }
     }
@@ -102,7 +103,7 @@ class TutorialController extends Controller
             return inertia('admin/tutorials/edit', [
                 'tutorial' => $tutorial,
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with('error', 'Gagal memuat tutorial: '.$e->getMessage());
         }
     }
@@ -138,7 +139,7 @@ class TutorialController extends Controller
             $tutorial->update($data);
 
             return redirect()->route('admin.tutorials.index')->with('success', 'Tutorial berhasil diperbarui.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with('error', 'Gagal memperbarui tutorial: '.$e->getMessage());
         }
     }
@@ -152,7 +153,7 @@ class TutorialController extends Controller
             $tutorial->update(['is_active' => ! $tutorial->is_active]);
 
             return redirect()->back()->with('success', 'Status tutorial berhasil diperbarui.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with('error', 'Gagal memperbarui status tutorial: '.$e->getMessage());
         }
     }
@@ -171,7 +172,7 @@ class TutorialController extends Controller
             $tutorial->delete();
 
             return redirect()->route('admin.tutorials.index')->with('success', 'Tutorial berhasil dihapus.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with('error', 'Gagal menghapus tutorial: '.$e->getMessage());
         }
     }
@@ -195,7 +196,7 @@ class TutorialController extends Controller
             Tutorial::whereIn('id', $ids)->delete();
 
             return redirect()->route('admin.tutorials.index')->with('success', 'Tutorial berhasil dihapus.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with('error', 'Gagal menghapus tutorial: '.$e->getMessage());
         }
     }

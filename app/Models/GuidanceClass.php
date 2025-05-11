@@ -30,7 +30,7 @@ class GuidanceClass extends Model
     protected static function booted()
     {
         // After a guidance class is created, generate attendance records
-        static::created(function ($guidanceClass) {
+        static::created(function ($guidanceClass): void {
             $guidanceClass->generateAttendanceRecords();
         });
     }
@@ -52,14 +52,14 @@ class GuidanceClass extends Model
     {
         return $this->belongsToMany(User::class, 'guidance_class_attendance')
             ->whereHas('roles', fn ($query) => $query->where('name', 'mahasiswa'))
-            ->whereHas('mahasiswaProfile', function ($query) {
+            ->whereHas('mahasiswaProfile', function ($query): void {
                 $query->where('advisor_id', $this->lecturer_id)
                     ->where('academic_status', 'Aktif');
             })
-            ->whereHas('internships', function ($query) {
+            ->whereHas('internships', function ($query): void {
                 $query->where('status', 'accepted');
             })
-            ->with(['mahasiswaProfile', 'internships' => function ($query) {
+            ->with(['mahasiswaProfile', 'internships' => function ($query): void {
                 $query->where('status', 'accepted')
                     ->latest();
             }])
@@ -73,11 +73,11 @@ class GuidanceClass extends Model
     public function getEligibleStudents()
     {
         return User::role('mahasiswa')
-            ->whereHas('mahasiswaProfile', function ($query) {
+            ->whereHas('mahasiswaProfile', function ($query): void {
                 $query->where('advisor_id', $this->lecturer_id)
                     ->where('academic_status', 'Aktif');
             })
-            ->whereHas('internships', function ($query) {
+            ->whereHas('internships', function ($query): void {
                 $query->where('status', 'accepted');
             })
             ->get();
@@ -195,10 +195,10 @@ class GuidanceClass extends Model
      */
     public static function getStudentClasses($studentId)
     {
-        return static::whereHas('students', function ($query) use ($studentId) {
+        return static::whereHas('students', function ($query) use ($studentId): void {
             $query->where('users.id', $studentId);
         })
-            ->with(['lecturer.dosenProfile', 'students' => function ($query) use ($studentId) {
+            ->with(['lecturer.dosenProfile', 'students' => function ($query) use ($studentId): void {
                 $query->where('users.id', $studentId);
             }])
             ->get();

@@ -16,7 +16,7 @@ use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
-beforeEach(function () {
+beforeEach(function (): void {
     Storage::fake('public');
     Notification::fake();
 
@@ -61,7 +61,7 @@ function uploadRevision($user, $internship, $report, $file = null)
 // SUCCESSFUL REVISION UPLOADS
 // ------------------------------------------------------------------------
 
-test('[dosen] can upload revision for approved report', function () {
+test('[dosen] can upload revision for approved report', function (): void {
     $file = UploadedFile::fake()->create('revised_report.pdf', 1000, 'application/pdf');
 
     $response = uploadRevision($this->dosenUser, $this->internship, $this->report, $file);
@@ -84,7 +84,7 @@ test('[dosen] can upload revision for approved report', function () {
     );
 });
 
-test('[dosen] can upload revision for rejected report', function () {
+test('[dosen] can upload revision for rejected report', function (): void {
     $this->report->update(['status' => 'rejected']);
 
     $file = UploadedFile::fake()->create('revised_report_rejected.pdf', 1000, 'application/pdf');
@@ -101,7 +101,7 @@ test('[dosen] can upload revision for rejected report', function () {
     Notification::assertSentTo($this->mahasiswaUser, ReportRevisionUploaded::class);
 });
 
-test('previous revision file is deleted when new one is uploaded', function () {
+test('previous revision file is deleted when new one is uploaded', function (): void {
     // Upload first revision
     $oldFile = UploadedFile::fake()->create('old_revision.pdf', 500);
     uploadRevision($this->dosenUser, $this->internship, $this->report, $oldFile);
@@ -126,7 +126,7 @@ test('previous revision file is deleted when new one is uploaded', function () {
 // AUTHORIZATION TESTS
 // ------------------------------------------------------------------------
 
-test('[mahasiswa] cannot upload revision', function () {
+test('[mahasiswa] cannot upload revision', function (): void {
     $file = UploadedFile::fake()->create('mahasiswa_attempt.pdf', 100);
 
     $response = uploadRevision($this->mahasiswaUser, $this->internship, $this->report, $file);
@@ -139,7 +139,7 @@ test('[mahasiswa] cannot upload revision', function () {
     Notification::assertNotSentTo($this->mahasiswaUser, ReportRevisionUploaded::class);
 });
 
-test('[dosen] cannot upload revision for pending report', function () {
+test('[dosen] cannot upload revision for pending report', function (): void {
     $this->report->update(['status' => 'pending']);
 
     $file = UploadedFile::fake()->create('pending_revision_attempt.pdf', 100);
@@ -159,7 +159,7 @@ test('[dosen] cannot upload revision for pending report', function () {
 // VALIDATION TESTS
 // ------------------------------------------------------------------------
 
-test('revised file is required', function () {
+test('revised file is required', function (): void {
     $response = test()->actingAs($this->dosenUser)
         ->post(route('front.internships.reports.uploadRevision', [
             'internship' => $this->internship->id,
@@ -174,7 +174,7 @@ test('revised file is required', function () {
     expect($this->report->revised_file_path)->toBeNull();
 });
 
-test('revised file must be a valid file type', function () {
+test('revised file must be a valid file type', function (): void {
     $file = UploadedFile::fake()->create('invalid_type.txt', 100, 'text/plain');
 
     $response = uploadRevision($this->dosenUser, $this->internship, $this->report, $file);
@@ -185,7 +185,7 @@ test('revised file must be a valid file type', function () {
     expect($this->report->revised_file_path)->toBeNull();
 });
 
-test('revised file must not exceed max size', function () {
+test('revised file must not exceed max size', function (): void {
     // Max size is 5MB (5120 KB)
     $file = UploadedFile::fake()->create('too_large_file.pdf', 6000, 'application/pdf'); // 6MB
 
@@ -201,7 +201,7 @@ test('revised file must not exceed max size', function () {
 // EDGE CASES
 // ------------------------------------------------------------------------
 
-test('upload revision to non-existent report returns 404', function () {
+test('upload revision to non-existent report returns 404', function (): void {
     $file = UploadedFile::fake()->create('report.pdf', 100);
 
     $response = test()->actingAs($this->dosenUser)
@@ -215,7 +215,7 @@ test('upload revision to non-existent report returns 404', function () {
     $response->assertNotFound();
 });
 
-test('upload revision to report not belonging to internship returns 404', function () {
+test('upload revision to report not belonging to internship returns 404', function (): void {
     $otherInternship = Internship::factory()->create(['user_id' => $this->mahasiswaUser->id]);
     // Report belongs to $this->internship, not $otherInternship
     $file = UploadedFile::fake()->create('report.pdf', 100);

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Logbook;
+use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 
 class LogbookController extends Controller
@@ -20,7 +22,7 @@ class LogbookController extends Controller
 
         if ($request->has('search')) {
             $searchTerm = $request->search;
-            $query->whereHas('internship.user', function ($q) use ($searchTerm) {
+            $query->whereHas('internship.user', function ($q) use ($searchTerm): void {
                 $q->where('name', 'like', "{$searchTerm}%")
                     ->orWhere('email', 'like', "{$searchTerm}%");
             });
@@ -39,7 +41,7 @@ class LogbookController extends Controller
         $logbooks = $query->paginate($perPage)->withQueryString();
 
         // Get unique mahasiswas for the filter
-        $mahasiswas = \App\Models\User::whereHas('internships.logbooks')
+        $mahasiswas = User::whereHas('internships.logbooks')
             ->select('id', 'name')
             ->orderBy('name')
             ->get();
@@ -79,7 +81,7 @@ class LogbookController extends Controller
             $logbook->delete();
 
             return redirect()->route('admin.logbooks.index')->with('success', 'Logbook berhasil dihapus.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with('error', 'Gagal menghapus logbook: '.$e->getMessage());
         }
     }
@@ -94,7 +96,7 @@ class LogbookController extends Controller
             Logbook::destroy($ids);
 
             return redirect()->route('admin.logbooks.index')->with('success', 'Logbook berhasil dihapus.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with('error', 'Gagal menghapus logbook: '.$e->getMessage());
         }
     }

@@ -14,6 +14,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 
 class AnalyticsController extends Controller
 {
@@ -201,7 +202,7 @@ class AnalyticsController extends Controller
         foreach ($rolesToCount as $roleName) {
             // Count users with the specific role
             // Ensure the role exists before querying to avoid errors if a role is removed
-            if (\Spatie\Permission\Models\Role::where('name', $roleName)->exists()) {
+            if (Role::where('name', $roleName)->exists()) {
                 $count = User::role($roleName)->count();
                 $usersByRole[] = ['role' => $roleName, 'total' => $count];
             } else {

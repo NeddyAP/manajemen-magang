@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App\Services\InternshipCompletion;
+use Database\Factories\InternshipFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Internship extends Model
 {
-    /** @use HasFactory<\Database\Factories\InternshipFactory> */
+    /** @use HasFactory<InternshipFactory> */
     use HasFactory, SoftDeletes;
 
     protected $fillable = [

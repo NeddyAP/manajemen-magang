@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\InternshipStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Internship;
-use App\Notifications\Internship\ApplicationStatusChanged; 
+use App\Notifications\Internship\ApplicationStatusChanged;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -28,7 +28,7 @@ class InternshipController extends Controller
             $searchTerm = $request->search;
             $query->where('company_name', 'LIKE', "%{$searchTerm}%")
                 ->orWhere('company_address', 'LIKE', "%{$searchTerm}%")
-                ->orWhereHas('user', function ($query) use ($searchTerm) {
+                ->orWhereHas('user', function ($query) use ($searchTerm): void {
                     $query->where('name', 'LIKE', "%{$searchTerm}%");
                 });
         }
