@@ -12,7 +12,7 @@ use App\Models\Report;
 use App\Models\User;
 use App\Notifications\Reports\ReportRevisionUploaded;
 use App\Notifications\Reports\ReportStatusChanged;
-use App\Notifications\Reports\ReportSubmitted; // Uncommented and imported
+use App\Notifications\Reports\ReportSubmitted;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

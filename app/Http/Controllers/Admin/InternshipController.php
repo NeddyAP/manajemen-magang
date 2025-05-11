@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\InternshipStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Internship;
-use App\Notifications\Internship\ApplicationStatusChanged; // Import Notification
+use App\Notifications\Internship\ApplicationStatusChanged; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule; // Import Rule
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class InternshipController extends Controller

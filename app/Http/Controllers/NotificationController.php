@@ -6,7 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use Inertia\Response as InertiaResponse; // Import Inertia Response
+use Inertia\Response as InertiaResponse;
 
 class NotificationController extends Controller
 {

@@ -5,15 +5,15 @@ namespace App\Http\Controllers\Front;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreInternshipRequest;
 use App\Http\Requests\UpdateInternshipRequest;
-use App\Models\DosenProfile; // Add DosenProfile model
+use App\Models\DosenProfile;
 use App\Models\Internship;
 use App\Models\MahasiswaProfile;
 use App\Models\User;
-use App\Notifications\Internship\ApplicationSubmitted; // Import Notification class
+use App\Notifications\Internship\ApplicationSubmitted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Notification; // Import Notification facade
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
