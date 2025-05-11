@@ -2,13 +2,13 @@
 
 This document tracks the current status, progress, and evolution of the internship management system (Manajement Magang).
 
-## Current Status (As of May 9, 2025)
+## Current Status (As of May 11, 2025)
 
 ### Core Features Status
 
 - **User Management & Auth:** ✅ (Login, Register, PW Reset, Email Verify, Profiles, Roles/Permissions)
-- **Internship Management:** ✅ (Application CRUD, Status Tracking, File Upload)
-- **Logbook System:** ✅ (Student CRUD, Dosen Supervisor Notes via Modal) - _Full Dosen feedback on reports pending_
+- **Internship Management:** ✅ (Application CRUD, Status Tracking, File Upload) - _Applicant 'show' page removed_
+- **Logbook System:** ✅ (Student CRUD, Dosen Supervisor Notes via Modal, PDF/Word Export)
 - **Report Management:** ✅ (Student CRUD, File Upload) - _Dosen feedback/formal review flow pending_
 - **Guidance System:** ✅ (Class CRUD, Student Assignment, QR Code & Manual Attendance Tracking)
 - **Support Features (Admin):** ✅ (FAQ CRUD, Tutorial CRUD, Global Variable CRUD)
@@ -18,6 +18,8 @@ This document tracks the current status, progress, and evolution of the internsh
 - **Trash Management (Admin):** ✅ (View, Restore, Force Delete)
 - **Testing (Auth):** ✅ (Pest Feature Tests for Registration, Login, PW Reset, Email Verification)
 - **Testing (Logbook - Student):** ✅ (Pest Feature Tests for CRUD operations)
+- **Testing (Report - Student):** ✅ (Pest Feature Tests for CRUD operations)
+- **Testing (Internship - Student):** ✅ (Pest Feature Tests for CRUD, including fixes for removed 'show' page logic)
 
 ### Database Schema Status
 
@@ -40,9 +42,10 @@ This document tracks the current status, progress, and evolution of the internsh
 - ✅ Inertia.js integration (`HandleInertiaRequests` middleware, data sharing)
 - ✅ Notification system (Laravel Notifications, Database channel, API endpoints)
 - ✅ File upload handling (Laravel Filesystem)
-- ✅ Soft Deletes implementation (added to individual table migrations)
+- ✅ Soft Deletes implementation (added to individual table migrations, consolidated migration deleted)
 - ✅ Basic API endpoints for notifications
 - ✅ Logbook field `kegiatan` refactored to `activities` across relevant files.
+- ✅ Logbook export to Word and PDF functionality confirmed and routes updated.
 
 #### Frontend (React 18+ / TypeScript / Vite)
 
@@ -58,6 +61,7 @@ This document tracks the current status, progress, and evolution of the internsh
 - ✅ Trash Management UI
 - ✅ TypeScript types for core models and props (ongoing refinement)
 - ✅ Logbook page optimizations (back button, animations, modal for supervisor notes)
+- ❌ Internship Applicant 'show' page removed.
 
 #### Testing (Pest PHP / SQLite :memory:)
 
@@ -66,25 +70,27 @@ This document tracks the current status, progress, and evolution of the internsh
 - ✅ Base `TestCase.php` configured
 - ✅ Feature tests for Authentication flows (`tests/Feature/Auth/`)
 - ✅ Feature tests for Logbook CRUD (Student perspective) (`tests/Feature/Front/LogbookCrudTest.php`)
+- ✅ Feature tests for Report CRUD (Student perspective) (`tests/Feature/Front/ReportCrudTest.php`)
+- ✅ Feature tests for Internship CRUD (Student perspective) (`tests/Feature/InternshipCrudTest.php`), including fixes related to removed 'show' page.
 
 ## Recent Changes
 
-- **[2025-05-11 09:25:53] - Confirmed and updated backend functionality for logbook export to Word and PDF. Routes in [`routes/web.php`](routes/web.php) were updated to match frontend naming conventions. Existing [`LogbookController`](app/Http/Controllers/Front/LogbookController.php) methods for export were verified.**
+- **[2025-05-11] - General Memory Bank Update:** Updated `activeContext.md`, `techContext.md`, `progress.md`, `decisionLog.md` to reflect the current application state.
+- **[2025-05-11 09:25:53] - Confirmed and updated backend functionality for logbook export to Word and PDF. Routes in `routes/web.php` were updated to match frontend naming conventions. Existing `LogbookController` methods for export were verified.**
 - **Logbook Enhancements:**
     - Enabled 'dosen' users to add supervisor notes to logbooks via a modal.
     - Optimized logbook pages: added back button, incorporated Tailwind CSS animations for better UX.
     - Resolved backend authorization issues for 'dosen' access to logbooks, ensuring correct student data visibility.
 - **Features:** Implemented Notification System, User Settings, Admin Trash Management.
-- **Backend:** Added Notification controllers/API, refined Dosen access logic for other modules, added soft deletes.
-- **Frontend:** Built UI for Notifications, Settings, Trash. Added analytics cards.
-- **Testing:** Added Pest Feature tests for Authentication.
-- **Documentation:** Completed Memory Bank update to reflect recent changes.
+- **Backend:** Added Notification controllers/API, refined Dosen access logic for other modules, added soft deletes to individual migrations and removed consolidated one.
+- **Frontend:** Built UI for Notifications, Settings, Trash. Added analytics cards. Removed Internship Applicant 'show' page.
+- **Testing:** Added Pest Feature tests for Authentication, Logbooks (Student), Reports (Student), Internships (Student). Fixed tests related to Internship 'show' page removal.
+- **Documentation:** Ongoing Memory Bank updates.
 - **[2025-05-08 18:54:33] - Clarified Dosen report feedback: Partially implemented via rejection notes; general feedback pending.**
 - **[2025-05-08 19:02:06] - Confirmed substantial implementation of Guidance Class attendance feature (QR code via URL and manual check-in).**
-- **[2025-05-09 00:36:35] - Completed Logbook CRUD Pest Tests (Student Perspective): Added 15 tests covering create, read, update, and delete operations in [`tests/Feature/Front/LogbookCrudTest.php`](tests/Feature/Front/LogbookCrudTest.php). All tests passing.**
-- **[2025-05-09 00:36:35] - Refactored Logbook Field Name: Reverted `kegiatan` field to `activities` in migration, model, factory, form requests, controller, and tests for consistency (English column names).**
-- \*\*[2025-05-09 01:04:37] - Completed: Created Pest tests for student (Mahasiswa) report CRUD operations (`tests/Feature/Front/ReportCrudTest.php`). Debugged issues related to factory states, database schema mismatches (column names, statuses), request validation, and test description consistency. All tests are passing.
-- **[Timestamp] - Applied Soft Deletes to Individual Migrations:** Instead of a consolidated migration, `softDeletes()` and `dropSoftDeletes()` were added to the `up()` and `down()` methods respectively of the original creation migration for each of the relevant tables. The consolidated migration file `2025_03_22_091458_add_soft_deletes_to_all_tables.php` is no longer needed.
+- **[2025-05-09 00:06:00] - Removed Internship Applicant 'show' page and fixed related tests in `InternshipCrudTest.php`.**
+- **[2025-05-09 00:36:35] - Completed Logbook CRUD Pest Tests (Student Perspective) and refactored logbook field name from `kegiatan` to `activities`.**
+- **[2025-05-09 01:04:37] - Completed Report CRUD Pest Tests (Student Perspective).**
 
 ## Known Issues / Areas for Improvement
 
@@ -95,7 +101,7 @@ This document tracks the current status, progress, and evolution of the internsh
 ### Medium Priority
 
 - **Dosen Feedback (Reports):** Partially implemented. Dosen can add `reviewer_notes` when rejecting a report. A general feedback mechanism is still pending. (Logbook supervisor notes also offer a form of feedback).
-- **Testing Coverage:** Expand Pest test coverage beyond Auth and Logbook (Student) to other core modules (Internships, Reports, etc.).
+- **Testing Coverage:** Expand Pest test coverage beyond current modules to other core modules (Guidance, FAQs, Tutorials, Users, Settings, Admin functions).
 
 ### Low Priority
 
@@ -110,14 +116,14 @@ This document tracks the current status, progress, and evolution of the internsh
 
 ### Immediate Tasks (Post-Documentation)
 
-1.  **Testing:** Write Pest tests for Internship CRUD operations.
-2.  ~~**Testing:** Write Pest tests for Logbook CRUD operations (Student perspective).~~ ✅ **Completed [2025-05-09]**
-3.  **Testing:** Write Pest tests for Report CRUD operations (Student perspective).
+1.  **Testing:** Write Pest tests for Guidance Class CRUD operations.
+2.  **Testing:** Write Pest tests for FAQ CRUD operations (Admin).
+3.  **Testing:** Write Pest tests for Tutorial CRUD operations (Admin).
 
 ### Short-term Goals
 
 1.  Implement general Dosen feedback feature for Reports (beyond rejection notes) and enhance Logbook feedback if needed.
-2.  Continue expanding test coverage (Guidance, FAQs, Tutorials, Users, Settings).
+2.  Continue expanding test coverage (Users, Settings, Admin functions).
 3.  Refine Admin dashboard with more useful statistics.
 
 ### Long-term Goals
@@ -130,28 +136,13 @@ This document tracks the current status, progress, and evolution of the internsh
 ## Technical Debt
 
 - **Code Quality:** Some controllers might benefit from refactoring into Services. Some frontend components could be further optimized or generalized.
-- **Testing:** Significant portion of the application lacks automated tests beyond Auth and Logbook (Student).
+- **Testing:** Significant portion of the application lacks automated tests beyond Auth, Logbook (Student), Report (Student), and Internship (Student).
 - **Documentation:** API documentation (if needed) is missing. Inline code comments could be improved in complex sections.
 - **Infrastructure:** Caching strategy not yet implemented. Queue worker setup might need refinement for production.
 
-## Decisions Log
+## Decisions Log Link
 
-### Recent Decisions
-
-- Adopted Pest PHP for testing.
-- Using SQLite `:memory:` for test database.
-- Implemented In-App Notifications via Database channel.
-- Standardized on Shadcn UI for frontend components.
-- Implemented Soft Deletes for recoverable data.
-- Used Indonesian language for UI text.
-- Implemented supervisor notes for logbooks using a modal.
-- Prioritized fixing 'dosen' authorization for logbooks by ensuring correct `internship_id` and `user_id` checks.
-
-### Pending Decisions
-
-- Caching strategy (Redis vs. File vs. DB).
-- Deployment strategy and infrastructure choices for production.
-- Approach for handling potential real-time features.
+- See [`decisionLog.md`](./decisionLog.md) for detailed decisions.
 
 ## Metrics & KPIs (Targets)
 
@@ -164,13 +155,5 @@ This document tracks the current status, progress, and evolution of the internsh
 ## Roadmap Status
 
 - **Phase 1 (Core Features):** Mostly Complete ✅
-- **Phase 2 (Refinement & Testing):** In Progress ⏳ (Notifications, Settings, Trash, Logbook Dosen Notes & UI enhancements done. Logbook CRUD tests (Student) completed. Logbook field name refactored. Testing ongoing. Documentation updated.)
+- **Phase 2 (Refinement & Testing):** In Progress ⏳ (Notifications, Settings, Trash, Logbook Dosen Notes & UI enhancements, Logbook/Report/Internship CRUD tests (Student) completed. Logbook field name refactored. Soft Deletes strategy implemented. Internship 'show' page removed. Testing ongoing. Documentation updated.)
 - **Phase 3 (Advanced Features):** Planned 📋
-
-[2025-05-08 18:50:25] - Discovered that memory-bank/decisionLog.md was missing during Memory Bank initialization. Created the file as part of the update process.
-[2025-05-08 23:49:25] - Completed task: Refactor - Remove 'title' Field from Internships. This involved creating a migration to drop the 'title' column from the `internships` table ([`database/migrations/2025_05_08_161822_remove_title_from_internships_table.php`](database/migrations/2025_05_08_161822_remove_title_from_internships_table.php)), updating the `Internship` model ([`app/Models/Internship.php`](app/Models/Internship.php)), `StoreInternshipRequest` ([`app/Http/Requests/StoreInternshipRequest.php`](app/Http/Requests/StoreInternshipRequest.php)), `UpdateInternshipRequest` ([`app/Http/Requests/UpdateInternshipRequest.php`](app/Http/Requests/UpdateInternshipRequest.php)), `InternshipFactory` ([`database/factories/InternshipFactory.php`](database/factories/InternshipFactory.php)), and `InternshipCrudTest.php` ([`tests/Feature/InternshipCrudTest.php`](tests/Feature/InternshipCrudTest.php)). The authorization logic in `InternshipApplicantController@edit` ([`app/Http/Controllers/Front/InternshipApplicantController.php`](app/Http/Controllers/Front/InternshipApplicantController.php)) was also fixed, resolving a previously failing test. All tests related to this refactoring are passing.
-[2025-05-08 23:58:00] - Removed the Internship Applicant 'show' page functionality. This included: deleting the `show.tsx` file (if it existed), updating the redirect in `InternshipCrudTest.php` from the non-existent show page to the index page, removing the 'show' route from `routes/web.php`, and confirming no frontend links pointed to it.
-
-[2025-05-09 12:03:24] - Debugged failing test `mahasiswa can update their own internship with valid data if editable` in `tests/Feature/InternshipCrudTest.php`. The issue was an incorrect redirect target in `app/Http/Controllers/Front/InternshipApplicantController.php@update`. Changed redirect from `show` route to `index` route. All tests in `InternshipCrudTest.php` now pass.
-
-[2025-05-09 01:04:37] - Completed: Created Pest tests for student (Mahasiswa) report CRUD operations (`tests/Feature/Front/ReportCrudTest.php`). Debugged issues related to factory states, database schema mismatches (column names, statuses), request validation, and test description consistency. All tests are passing.

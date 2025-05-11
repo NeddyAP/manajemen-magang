@@ -3,8 +3,8 @@
 _This file tracks the current work focus, recent changes, immediate next steps, active decisions, important patterns/preferences discovered, and project insights._
 
 **Status:** Active Development
-**Last Reviewed:** May 9, 2025
-**Current Task:** Performing a general review and update of Memory Bank files based on recent activities (Internship Applicant 'show' page removal and `InternshipCrudTest.php` fix).
+**Last Reviewed:** May 11, 2025
+**Current Task:** General Memory Bank update.
 
 ## Project Overview
 
@@ -93,14 +93,14 @@ This is a comprehensive internship management system (Manajement Magang) built w
 - **Addition of Pest Feature tests for Authentication flows (Registration, Login, Password Reset, Email Verification).**
 - **[2025-05-08 18:55:02] - Confirmed partial implementation of Dosen feedback for reports (via rejection notes). General feedback feature remains a future enhancement.**
 - **[2025-05-08 19:02:28] - Guidance Class attendance feature (QR code via URL, manual Dosen check-in) confirmed as substantially implemented.**
-- **[2025-05-09 00:06:00] - Removed Internship Applicant 'show' page:** Based on user feedback, the dedicated 'show' page for internship applicants, its route, and associated frontend file ([`resources/js/pages/front/internships/applicants/show.tsx`](resources/js/pages/front/internships/applicants/show.tsx:1)) were removed to simplify user flow. Test redirects in [`tests/Feature/InternshipCrudTest.php`](tests/Feature/InternshipCrudTest.php:1) were updated accordingly.
-- **[2025-05-09 00:06:00] - Fixed `InternshipCrudTest.php`:** Resolved failing test `mahasiswa can update their own internship with valid data if editable` by correcting an incorrect redirect in [`app/Http/Controllers/Front/InternshipApplicantController.php`](app/Http/Controllers/Front/InternshipApplicantController.php:1) from the (now removed) 'show' route to the 'index' route. All tests in [`tests/Feature/InternshipCrudTest.php`](tests/Feature/InternshipCrudTest.php:1) are now passing.
-- **[Timestamp] - Applied Soft Deletes to Individual Migrations:** Instead of a consolidated migration, `softDeletes()` and `dropSoftDeletes()` were added to the `up()` and `down()` methods respectively of the original creation migration for each of the following tables: `users`, `admin_profiles`, `dosen_profiles`, `faqs`, `global_variables`, `guidance_classes`, `internships`, `logbooks`, `mahasiswa_profiles`, `reports`, `tutorials`. The consolidated migration file `2025_03_22_091458_add_soft_deletes_to_all_tables.php` can now be safely deleted.
+- **[2025-05-09 00:06:00] - Removed Internship Applicant 'show' page:** Based on user feedback, the dedicated 'show' page for internship applicants, its route, and associated frontend file were removed to simplify user flow. Test redirects in `tests/Feature/InternshipCrudTest.php` were updated accordingly.
+- **[2025-05-09 00:06:00] - Fixed `InternshipCrudTest.php`:** Resolved failing test `mahasiswa can update their own internship with valid data if editable` by correcting an incorrect redirect in `app/Http/Controllers/Front/InternshipApplicantController.php` from the (now removed) 'show' route to the 'index' route. All tests in `tests/Feature/InternshipCrudTest.php` are now passing.
+- **[2025-05-09] - Applied Soft Deletes to Individual Migrations:** Instead of a consolidated migration, `softDeletes()` and `dropSoftDeletes()` were added to the `up()` and `down()` methods respectively of the original creation migration for each of the following tables: `users`, `admin_profiles`, `dosen_profiles`, `faqs`, `global_variables`, `guidance_classes`, `internships`, `logbooks`, `mahasiswa_profiles`, `reports`, `tutorials`. The consolidated migration file `2025_03_22_091458_add_soft_deletes_to_all_tables.php` was deleted.
+- \*\*[2025-05-09 01:05:21] - Recent Changes: Created and debugged Pest tests for student report CRUD (`tests/Feature/Front/ReportCrudTest.php`). Ensured consistency with database schema, factories, requests, and other test files. Refactored test descriptions.
 
 ## Current Focus Area
 
-- **Task:** Updating Memory Bank files ([`memory-bank/progress.md`](memory-bank/progress.md:1), [`memory-bank/decisionLog.md`](memory-bank/decisionLog.md:1), [`memory-bank/activeContext.md`](memory-bank/activeContext.md:1), and others as needed) to reflect the removal of the Internship Applicant 'show' page and the fix for tests in [`tests/Feature/InternshipCrudTest.php`](tests/Feature/InternshipCrudTest.php:1).
-- **Task:** Finalizing the application of soft deletes to individual table migrations and documenting this change.
+- **Task:** Updating Memory Bank files (`memory-bank/progress.md`, `memory-bank/decisionLog.md`, `memory-bank/activeContext.md`, `memory-bank/techContext.md`, and others as needed) to reflect the current state of the application.
 
 ## Next Steps (After Documentation Update)
 
@@ -123,5 +123,3 @@ This is a comprehensive internship management system (Manajement Magang) built w
 - **Authorization Specificity:** Ensuring correct ID usage (e.g., `internship_id` for overall internship context vs. `logbook_id` for specific entries) in backend authorization queries is crucial for proper data access control. This was particularly relevant when fixing 'dosen' access to logbooks, where initial queries might have been too broad or used incorrect identifiers, leading to access issues.
 - **Modal Interactivity:** When implementing modals for actions like adding supervisor notes, ensure smooth data flow and state management between the modal and the parent page to reflect changes immediately.
 - **Component Reusability:** The back button and animation patterns can be abstracted into reusable components or hooks for consistency across different pages.
-
-[2025-05-09 01:05:21] - Recent Changes: Created and debugged Pest tests for student report CRUD (`tests/Feature/Front/ReportCrudTest.php`). Ensured consistency with database schema, factories, requests, and other test files. Refactored test descriptions.
