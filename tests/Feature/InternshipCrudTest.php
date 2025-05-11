@@ -35,6 +35,7 @@ beforeEach(function () {
     Event::fake(); // If you use events
 });
 
+// Helper functions
 function createUserWithRole(string $roleName): User
 {
     $user = User::factory()->create();
@@ -50,9 +51,11 @@ function createUserWithRole(string $roleName): User
     return $user;
 }
 
-// --- CREATE Internship (Mahasiswa Perspective) ---
+// ------------------------------------------------------------------------
+// CREATE INTERNSHIP (MAHASISWA PERSPECTIVE)
+// ------------------------------------------------------------------------
 
-test('mahasiswa can view the internship application form', function () {
+test('[mahasiswa] can view the internship application form', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
 
     $this->actingAs($mahasiswa)
@@ -64,7 +67,7 @@ test('mahasiswa can view the internship application form', function () {
         );
 });
 
-test('mahasiswa can submit a valid internship application', function () {
+test('[mahasiswa] can submit a valid internship application', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     $adminToNotify = $this->adminUser; // Use the admin created in beforeEach
 
@@ -101,7 +104,7 @@ test('mahasiswa can submit a valid internship application', function () {
     // Notification::assertSentTo($adminToNotify, InternshipSubmittedNotification::class); // Placeholder
 });
 
-test('mahasiswa cannot submit an internship application with invalid data', function () {
+test('[mahasiswa] cannot submit an internship application with invalid data', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
 
     // Prepare valid base data and then make 'type' invalid
@@ -122,34 +125,35 @@ test('mahasiswa cannot submit an internship application with invalid data', func
         ->assertRedirect(); // Or assert status 302
 });
 
-test('unauthenticated users are redirected from the internship application form', function () {
+test('[unauthenticated] users are redirected from the internship application form', function () {
     $this->get(route('front.internships.applicants.create')) // Corrected route name
         ->assertRedirect(route('login'));
 });
 
-test('unauthenticated users cannot submit an internship application', function () {
+test('[unauthenticated] users cannot submit an internship application', function () {
     $this->post(route('front.internships.applicants.store'), []) // Corrected route name
         ->assertRedirect(route('login'));
 });
 
-test('admin users cannot access the student internship creation form', function () {
+test('[admin] users cannot access the student internship creation form', function () {
     $admin = createUserWithRole('admin');
     $this->actingAs($admin)
         ->get(route('front.internships.applicants.create')) // Corrected route name
         ->assertForbidden(); // Or assertRedirect to admin dashboard
 });
 
-test('dosen users cannot access the student internship creation form', function () {
+test('[dosen] users cannot access the student internship creation form', function () {
     $dosen = createUserWithRole('dosen');
     $this->actingAs($dosen)
         ->get(route('front.internships.applicants.create')) // Corrected route name
         ->assertForbidden(); // Or assertRedirect to dosen dashboard
 });
 
-// --- READ Internships ---
+// ------------------------------------------------------------------------
+// READ INTERNSHIPS
+// ------------------------------------------------------------------------
 
-// Index Page
-test('mahasiswa can view a list of their own internships', function () {
+test('[mahasiswa] can view a list of their own internships', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     Internship::factory()->count(3)->for($mahasiswa)->create();
     Internship::factory()->count(2)->create(); // Other internships
@@ -164,7 +168,7 @@ test('mahasiswa can view a list of their own internships', function () {
         );
 });
 
-test('admin can view a list of all internships', function () {
+test('[admin] can view a list of all internships', function () {
     $admin = createUserWithRole('admin');
     Internship::factory()->count(5)->create();
 
@@ -178,55 +182,11 @@ test('admin can view a list of all internships', function () {
         );
 });
 
-// test('dosen can view a list of relevant internships', function () {
-//     // This test depends on how "relevant" is defined (e.g., advisees)
-//     // For now, let's assume a dosen can see all, or a specific subset
-//     $dosen = createUserWithRole('dosen');
-//     Internship::factory()->count(5)->create(); // Create some internships
+// ------------------------------------------------------------------------
+// UPDATE INTERNSHIP
+// ------------------------------------------------------------------------
 
-//     // Example: Dosen sees all internships for simplicity here
-//     // In a real scenario, you'd set up relationships (e.g., dosen as supervisor)
-//     $this->actingAs($dosen)
-//         ->get(route('dosen.internships.index')) // Assuming a dosen-specific route or a general one with filtering
-//         ->assertOk()
-//         ->assertInertia(fn (Assert $page) => $page
-//             ->component('Dosen/Internships/Index') // Assuming component
-//             ->has('internships.data') // Check for presence of internships
-//         );
-// });
-
-// test('admin can view the details of any internship', function () {
-//     $admin = createUserWithRole('admin');
-//     $internship = Internship::factory()->create();
-
-//     $this->actingAs($admin)
-//         ->get(route('admin.internships.show', $internship)) // Assuming admin route
-//         ->assertOk()
-//         ->assertInertia(fn (Assert $page) => $page
-//             ->component('Admin/Internships/Show')
-//             ->has('internship')
-//             ->where('internship.id', $internship->id)
-//         );
-// });
-
-// test('dosen can view details of relevant internships show page', function () {
-//     $dosen = createUserWithRole('dosen');
-//     $internship = Internship::factory()->create(); // Assume this is relevant
-
-//     $this->actingAs($dosen)
-//         ->get(route('dosen.internships.show', $internship)) // Assuming dosen route
-//         ->assertOk()
-//         ->assertInertia(fn (Assert $page) => $page
-//             ->component('Dosen/Internships/Show')
-//             ->has('internship')
-//             ->where('internship.id', $internship->id)
-//         );
-// });
-
-// --- UPDATE Internship ---
-
-// Mahasiswa Editing Own Application
-test('mahasiswa can view the edit form for their own internship if editable', function () {
+test('[mahasiswa] can view the edit form for their own internship if editable', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = Internship::factory()->for($mahasiswa)->create(['status' => 'waiting']); // Changed 'draft' to 'waiting'
 
@@ -241,7 +201,7 @@ test('mahasiswa can view the edit form for their own internship if editable', fu
         );
 });
 
-test('mahasiswa can view but cannot update internship if already accepted', function () {
+test('[mahasiswa] can view but cannot update internship if already accepted', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     // Create internship with 'accepted' status
     $internship = Internship::factory()->for($mahasiswa)->create(['status' => 'accepted']);
@@ -266,7 +226,7 @@ test('mahasiswa can view but cannot update internship if already accepted', func
         ->assertForbidden(); // The request is denied by the form request's authorize() method
 });
 
-test('mahasiswa can update their own internship with valid data if editable', function () {
+test('[mahasiswa] can update their own internship with valid data if editable', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = Internship::factory()->for($mahasiswa)->create(['status' => 'waiting', 'company_name' => 'Old Company']);
 
@@ -308,7 +268,7 @@ test('mahasiswa can update their own internship with valid data if editable', fu
     ]);
 });
 
-test('mahasiswa cannot update their internship with invalid data', function () {
+test('[mahasiswa] cannot update their internship with invalid data', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = Internship::factory()->for($mahasiswa)->create(['status' => 'waiting']);
 
@@ -326,8 +286,7 @@ test('mahasiswa cannot update their internship with invalid data', function () {
         ->assertSessionHasErrors('company_name');
 });
 
-// Admin Changing Status/Details
-test('admin can update an internship status', function () {
+test('[admin] can update an internship status', function () {
     $admin = createUserWithRole('admin');
     $internship = Internship::factory()->create(['status' => 'waiting']); // Changed 'submitted' to 'waiting'
     $updateData = ['status' => 'accepted']; // Changed 'approved' to 'accepted'
@@ -344,7 +303,7 @@ test('admin can update an internship status', function () {
     // Notification::assertSentTo($internship->user, InternshipStatusUpdatedNotification::class); // Placeholder
 });
 
-test('unauthorized users cannot update internships', function () {
+test('[unauthorized] users cannot update internships', function () {
     $user = createUserWithRole('mahasiswa'); // A mahasiswa
     $otherMahasiswa = createUserWithRole('mahasiswa');
     $internshipOfOther = Internship::factory()->for($otherMahasiswa)->create(['status' => 'waiting']); // Changed 'draft' to 'waiting'
@@ -358,9 +317,11 @@ test('unauthorized users cannot update internships', function () {
         ->assertStatus(403); // Changed to 403 as per actual response
 });
 
-// --- DELETE Internship (Consider Soft Deletes) ---
+// ------------------------------------------------------------------------
+// DELETE INTERNSHIP
+// ------------------------------------------------------------------------
 
-test('mahasiswa can delete their own internship if in editable state', function () {
+test('[mahasiswa] can delete their own internship if in editable state', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = Internship::factory()->for($mahasiswa)->create(['status' => 'waiting']); // Changed 'draft' to 'waiting'
 
@@ -371,7 +332,7 @@ test('mahasiswa can delete their own internship if in editable state', function 
     $this->assertSoftDeleted('internships', ['id' => $internship->id]);
 });
 
-test('mahasiswa cannot delete their internship if not in editable state', function () {
+test('[mahasiswa] cannot delete their internship if not in editable state', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = Internship::factory()->for($mahasiswa)->create(['status' => 'accepted']); // Changed to 'accepted' as per controller logic for non-deletable
 
@@ -383,7 +344,7 @@ test('mahasiswa cannot delete their internship if not in editable state', functi
     $this->assertNotSoftDeleted('internships', ['id' => $internship->id]);
 });
 
-test('admin can delete an internship', function () {
+test('[admin] can delete an internship', function () {
     $admin = createUserWithRole('admin');
     $internship = Internship::factory()->create();
 
@@ -394,7 +355,7 @@ test('admin can delete an internship', function () {
     $this->assertSoftDeleted('internships', ['id' => $internship->id]);
 });
 
-test('unauthorized users cannot delete internships', function () {
+test('[unauthorized] users cannot delete internships', function () {
     $user = createUserWithRole('mahasiswa');
     $otherMahasiswa = createUserWithRole('mahasiswa');
     $internshipOfOther = Internship::factory()->for($otherMahasiswa)->create();
@@ -407,8 +368,11 @@ test('unauthorized users cannot delete internships', function () {
         ->assertStatus(403); // Changed to 403 as per actual response
 });
 
-// --- FILE UPLOADS ---
-test('mahasiswa can submit an internship application with a file upload', function () {
+// ------------------------------------------------------------------------
+// FILE UPLOADS
+// ------------------------------------------------------------------------
+
+test('[mahasiswa] can submit an internship application with a file upload', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     $adminToNotify = $this->adminUser;
 

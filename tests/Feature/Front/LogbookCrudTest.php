@@ -31,6 +31,7 @@ beforeEach(function () {
     Event::fake(); // If you use events related to logbooks
 });
 
+// Helper functions
 function createUserWithRole(string $roleName): User
 {
     $user = User::factory()->create();
@@ -54,9 +55,11 @@ function createActiveInternshipForMahasiswa(User $mahasiswa): Internship
     return Internship::factory()->for($mahasiswa)->create(['status' => 'accepted']);
 }
 
-// --- CREATE Logbook (Mahasiswa Perspective) ---
+// ------------------------------------------------------------------------
+// CREATE LOGBOOK (MAHASISWA PERSPECTIVE)
+// ------------------------------------------------------------------------
 
-test('mahasiswa can view the logbook creation form for their active internship', function () {
+test('[mahasiswa] can view the logbook creation form for their active internship', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = createActiveInternshipForMahasiswa($mahasiswa);
 
@@ -71,7 +74,7 @@ test('mahasiswa can view the logbook creation form for their active internship',
         );
 });
 
-test('mahasiswa can create a new logbook entry for their active internship', function () {
+test('[mahasiswa] can create a new logbook entry for their active internship', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = createActiveInternshipForMahasiswa($mahasiswa);
 
@@ -96,7 +99,7 @@ test('mahasiswa can create a new logbook entry for their active internship', fun
     ]);
 });
 
-test('mahasiswa cannot create a logbook entry with invalid data', function () {
+test('[mahasiswa] cannot create a logbook entry with invalid data', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = createActiveInternshipForMahasiswa($mahasiswa);
 
@@ -115,7 +118,7 @@ test('mahasiswa cannot create a logbook entry with invalid data', function () {
         ->assertRedirect();
 });
 
-test('mahasiswa cannot create a logbook for an internship not belonging to them', function () {
+test('[mahasiswa] cannot create a logbook for an internship not belonging to them', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     $otherMahasiswa = createUserWithRole('mahasiswa');
     $otherInternship = createActiveInternshipForMahasiswa($otherMahasiswa);
@@ -130,9 +133,11 @@ test('mahasiswa cannot create a logbook for an internship not belonging to them'
         ->assertForbidden(); // Or appropriate error status
 });
 
-// --- READ Logbooks (Mahasiswa Perspective) ---
+// ------------------------------------------------------------------------
+// READ LOGBOOKS (MAHASISWA PERSPECTIVE)
+// ------------------------------------------------------------------------
 
-test('mahasiswa can view a list of their own logbook entries for an internship', function () {
+test('[mahasiswa] can view a list of their own logbook entries for an internship', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = createActiveInternshipForMahasiswa($mahasiswa);
     Logbook::factory()->count(3)->for($internship)->for($mahasiswa, 'user')->create();
@@ -155,27 +160,7 @@ test('mahasiswa can view a list of their own logbook entries for an internship',
         );
 });
 
-// test('mahasiswa can view the details of one of their own logbook entries', function () {
-//     $mahasiswa = createUserWithRole('mahasiswa');
-//     $internship = createActiveInternshipForMahasiswa($mahasiswa);
-//     $logbook = Logbook::factory()->for($internship)->for($mahasiswa, 'user')->create();
-//
-//     // Assuming a show route exists, or details are part of edit/index.
-//     // If no dedicated show route, this test might need to target the edit view or assert data in index.
-//     // For now, assuming a show route: front.internships.logbooks.show
-//     $this->actingAs($mahasiswa)
-//         ->get(route('front.internships.logbooks.show', ['internship' => $internship, 'logbook' => $logbook]))
-//         ->assertOk()
-//         ->assertInertia(
-//             fn(Assert $page) => $page
-//                 // ->component('front/internships/logbooks/show') // Adjust component name if exists
-//                 ->has('logbook')
-//                 ->where('logbook.id', $logbook->id)
-//                 ->where('logbook.kegiatan', $logbook->kegiatan)
-//         );
-// });
-
-test('mahasiswa cannot view logbook entries of other students via index', function () {
+test('[mahasiswa] cannot view logbook entries of other students via index', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     // Own internship, but no logbooks for it yet.
     $ownInternship = createActiveInternshipForMahasiswa($mahasiswa);
@@ -192,22 +177,11 @@ test('mahasiswa cannot view logbook entries of other students via index', functi
         ->assertForbidden(); // Or assert that logbooks count is 0 if the page loads but shows no data.
 });
 
-// test('mahasiswa cannot view details of a logbook entry not belonging to them', function () {
-//     $mahasiswa = createUserWithRole('mahasiswa');
-//     $ownInternship = createActiveInternshipForMahasiswa($mahasiswa); // Student has an internship
-//
-//     $otherMahasiswa = createUserWithRole('mahasiswa');
-//     $otherInternship = createActiveInternshipForMahasiswa($otherMahasiswa);
-//     $otherLogbook = Logbook::factory()->for($otherInternship)->for($otherMahasiswa, 'user')->create();
-//
-//     $this->actingAs($mahasiswa)
-//         ->get(route('front.internships.logbooks.show', ['internship' => $otherInternship, 'logbook' => $otherLogbook]))
-//         ->assertForbidden();
-// });
+// ------------------------------------------------------------------------
+// UPDATE LOGBOOK (MAHASISWA PERSPECTIVE)
+// ------------------------------------------------------------------------
 
-// --- UPDATE Logbook (Mahasiswa Perspective) ---
-
-test('mahasiswa can view the edit form for their own logbook entry', function () {
+test('[mahasiswa] can view the edit form for their own logbook entry', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = createActiveInternshipForMahasiswa($mahasiswa);
     $logbook = Logbook::factory()->for($internship)->for($mahasiswa, 'user')->create();
@@ -225,7 +199,7 @@ test('mahasiswa can view the edit form for their own logbook entry', function ()
         );
 });
 
-test('mahasiswa can update their own logbook entry', function () {
+test('[mahasiswa] can update their own logbook entry', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = createActiveInternshipForMahasiswa($mahasiswa);
     $logbook = Logbook::factory()->for($internship)->for($mahasiswa, 'user')->create(['activities' => 'Kegiatan Lama']);
@@ -253,7 +227,7 @@ test('mahasiswa can update their own logbook entry', function () {
     ]);
 });
 
-test('mahasiswa cannot update their logbook entry with invalid data', function () {
+test('[mahasiswa] cannot update their logbook entry with invalid data', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = createActiveInternshipForMahasiswa($mahasiswa);
     $logbook = Logbook::factory()->for($internship)->for($mahasiswa, 'user')->create();
@@ -274,7 +248,7 @@ test('mahasiswa cannot update their logbook entry with invalid data', function (
         ->assertRedirect();
 });
 
-test('mahasiswa cannot update a logbook entry not belonging to them', function () {
+test('[mahasiswa] cannot update a logbook entry not belonging to them', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     $ownInternship = createActiveInternshipForMahasiswa($mahasiswa); // Student has an internship
 
@@ -289,9 +263,11 @@ test('mahasiswa cannot update a logbook entry not belonging to them', function (
         ->assertForbidden();
 });
 
-// --- DELETE Logbook (Mahasiswa Perspective) ---
+// ------------------------------------------------------------------------
+// DELETE LOGBOOK (MAHASISWA PERSPECTIVE)
+// ------------------------------------------------------------------------
 
-test('mahasiswa can delete their own logbook entry', function () {
+test('[mahasiswa] can delete their own logbook entry', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = createActiveInternshipForMahasiswa($mahasiswa);
     $logbook = Logbook::factory()->for($internship)->for($mahasiswa, 'user')->create();
@@ -303,7 +279,7 @@ test('mahasiswa can delete their own logbook entry', function () {
     $this->assertSoftDeleted('logbooks', ['id' => $logbook->id]); // Changed to assertSoftDeleted
 });
 
-test('mahasiswa cannot delete a logbook entry not belonging to them', function () {
+test('[mahasiswa] cannot delete a logbook entry not belonging to them', function () {
     $mahasiswa = createUserWithRole('mahasiswa');
     $ownInternship = createActiveInternshipForMahasiswa($mahasiswa);
 
@@ -323,8 +299,11 @@ test('mahasiswa cannot delete a logbook entry not belonging to them', function (
     $this->assertDatabaseHas('logbooks', ['id' => $otherLogbook->id]);
 });
 
-// --- Authentication/Authorization ---
-test('unauthenticated users are redirected from logbook pages', function () {
+// ------------------------------------------------------------------------
+// AUTHENTICATION/AUTHORIZATION
+// ------------------------------------------------------------------------
+
+test('[unauthenticated] users are redirected from logbook pages', function () {
     $mahasiswa = createUserWithRole('mahasiswa'); // Create user to get an internship and logbook ID
     $internship = createActiveInternshipForMahasiswa($mahasiswa);
     $logbook = Logbook::factory()->for($internship)->for($mahasiswa, 'user')->create();
@@ -338,7 +317,7 @@ test('unauthenticated users are redirected from logbook pages', function () {
     // $this->get(route('front.internships.logbooks.show', ['internship' => $internship, 'logbook' => $logbook]))->assertRedirect(route('login'));
 });
 
-test('admin users cannot access student logbook creation form via student routes', function () {
+test('[admin] users cannot access student logbook creation form via student routes', function () {
     $admin = createUserWithRole('admin');
     // Need an internship to pass to the route, even if it's not used by admin for this specific action.
     // Create a dummy one, or one associated with a mahasiswa.
@@ -350,7 +329,7 @@ test('admin users cannot access student logbook creation form via student routes
         ->assertForbidden(); // Or assertRedirect to admin dashboard
 });
 
-test('dosen users cannot access student logbook creation form via student routes', function () {
+test('[dosen] users cannot access student logbook creation form via student routes', function () {
     $dosen = createUserWithRole('dosen');
     $mahasiswa = createUserWithRole('mahasiswa');
     $internship = createActiveInternshipForMahasiswa($mahasiswa);
@@ -359,8 +338,3 @@ test('dosen users cannot access student logbook creation form via student routes
         ->get(route('front.internships.logbooks.create', $internship))
         ->assertForbidden(); // Or assertRedirect to dosen dashboard
 });
-
-// Consider adding tests for "editable period" or other application-specific rules if they exist for logbooks.
-// For example, if logbooks can only be edited/deleted within 24 hours of creation.
-// test('mahasiswa cannot edit a logbook entry after the editable period', function () { ... });
-// test('mahasiswa cannot delete a logbook entry after the editable period', function () { ... });

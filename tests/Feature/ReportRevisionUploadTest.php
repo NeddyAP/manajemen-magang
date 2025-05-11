@@ -13,257 +13,224 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
-use Tests\TestCase;
 
-class ReportRevisionUploadTest extends TestCase
+uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    Storage::fake('public');
+    Notification::fake();
+
+    // Create roles
+    Role::create(['name' => 'dosen', 'guard_name' => 'web']);
+    Role::create(['name' => 'mahasiswa', 'guard_name' => 'web']);
+
+    // Create Dosen user
+    $this->dosenUser = User::factory()->create();
+    $this->dosenUser->assignRole('dosen');
+    DosenProfile::factory()->create(['user_id' => $this->dosenUser->id]);
+
+    // Create Mahasiswa user
+    $this->mahasiswaUser = User::factory()->create();
+    $this->mahasiswaUser->assignRole('mahasiswa');
+    MahasiswaProfile::factory()->create(['user_id' => $this->mahasiswaUser->id, 'advisor_id' => $this->dosenUser->id]);
+
+    // Create Internship
+    $this->internship = Internship::factory()->create(['user_id' => $this->mahasiswaUser->id]);
+
+    // Create a report (default to approved status)
+    $this->report = Report::factory()->create([
+        'internship_id' => $this->internship->id,
+        'user_id' => $this->mahasiswaUser->id,
+        'status' => 'approved',
+    ]);
+});
+
+// Helper function to make upload revision request
+function uploadRevision($user, $internship, $report, $file = null)
 {
-    use RefreshDatabase;
-
-    private User $dosenUser;
-
-    private User $mahasiswaUser;
-
-    private Internship $internship;
-
-    private Report $report;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Storage::fake('public');
-        Notification::fake();
-
-        // Create roles
-        Role::create(['name' => 'dosen', 'guard_name' => 'web']);
-        Role::create(['name' => 'mahasiswa', 'guard_name' => 'web']);
-
-        // Create Dosen user
-        $this->dosenUser = User::factory()->create();
-        $this->dosenUser->assignRole('dosen');
-        DosenProfile::factory()->create(['user_id' => $this->dosenUser->id]);
-
-        // Create Mahasiswa user
-        $this->mahasiswaUser = User::factory()->create();
-        $this->mahasiswaUser->assignRole('mahasiswa');
-        MahasiswaProfile::factory()->create(['user_id' => $this->mahasiswaUser->id, 'advisor_id' => $this->dosenUser->id]);
-
-        // Create Internship
-        $this->internship = Internship::factory()->create(['user_id' => $this->mahasiswaUser->id]);
-
-        // Create a report
-        $this->report = Report::factory()->create([
-            'internship_id' => $this->internship->id,
-            'user_id' => $this->mahasiswaUser->id,
-            'status' => 'approved', // Default to approved for most tests
+    return test()->actingAs($user)
+        ->post(route('front.internships.reports.uploadRevision', [
+            'internship' => $internship->id,
+            'report' => $report->id,
+        ]), [
+            'revised_file' => $file ?? UploadedFile::fake()->create('revision.pdf', 1000, 'application/pdf'),
         ]);
-    }
+}
 
-    public function test_dosen_can_upload_revision_for_approved_report()
-    {
-        $this->actingAs($this->dosenUser);
+// ------------------------------------------------------------------------
+// SUCCESSFUL REVISION UPLOADS
+// ------------------------------------------------------------------------
 
-        $file = UploadedFile::fake()->create('revised_report.pdf', 1000, 'application/pdf');
+test('[dosen] can upload revision for approved report', function () {
+    $file = UploadedFile::fake()->create('revised_report.pdf', 1000, 'application/pdf');
 
-        $response = $this->post(route('front.internships.reports.uploadRevision', [
+    $response = uploadRevision($this->dosenUser, $this->internship, $this->report, $file);
+
+    $response->assertRedirect();
+    $response->assertSessionHasNoErrors();
+
+    $this->report->refresh();
+
+    Storage::disk('public')->assertExists($this->report->revised_file_path);
+    expect($this->report->revised_file_path)->not->toBeNull();
+    expect($this->report->revision_uploaded_at)->not->toBeNull();
+
+    Notification::assertSentTo(
+        $this->mahasiswaUser,
+        ReportRevisionUploaded::class,
+        function ($notification) {
+            return $notification->report->id === $this->report->id;
+        }
+    );
+});
+
+test('[dosen] can upload revision for rejected report', function () {
+    $this->report->update(['status' => 'rejected']);
+
+    $file = UploadedFile::fake()->create('revised_report_rejected.pdf', 1000, 'application/pdf');
+
+    $response = uploadRevision($this->dosenUser, $this->internship, $this->report, $file);
+
+    $response->assertRedirect();
+    $response->assertSessionHasNoErrors();
+
+    $this->report->refresh();
+    Storage::disk('public')->assertExists($this->report->revised_file_path);
+    expect($this->report->revised_file_path)->not->toBeNull();
+
+    Notification::assertSentTo($this->mahasiswaUser, ReportRevisionUploaded::class);
+});
+
+test('previous revision file is deleted when new one is uploaded', function () {
+    // Upload first revision
+    $oldFile = UploadedFile::fake()->create('old_revision.pdf', 500);
+    uploadRevision($this->dosenUser, $this->internship, $this->report, $oldFile);
+
+    $this->report->refresh();
+    $oldFilePath = $this->report->revised_file_path;
+    Storage::disk('public')->assertExists($oldFilePath);
+
+    // Upload new revision
+    $newFile = UploadedFile::fake()->create('new_revision.pdf', 600);
+    uploadRevision($this->dosenUser, $this->internship, $this->report, $newFile);
+
+    $this->report->refresh();
+    $newFilePath = $this->report->revised_file_path;
+
+    Storage::disk('public')->assertMissing($oldFilePath);
+    Storage::disk('public')->assertExists($newFilePath);
+    expect($oldFilePath)->not->toEqual($newFilePath);
+});
+
+// ------------------------------------------------------------------------
+// AUTHORIZATION TESTS
+// ------------------------------------------------------------------------
+
+test('[mahasiswa] cannot upload revision', function () {
+    $file = UploadedFile::fake()->create('mahasiswa_attempt.pdf', 100);
+
+    $response = uploadRevision($this->mahasiswaUser, $this->internship, $this->report, $file);
+
+    $response->assertStatus(403); // Forbidden
+
+    $this->report->refresh();
+    expect($this->report->revised_file_path)->toBeNull();
+
+    Notification::assertNotSentTo($this->mahasiswaUser, ReportRevisionUploaded::class);
+});
+
+test('[dosen] cannot upload revision for pending report', function () {
+    $this->report->update(['status' => 'pending']);
+
+    $file = UploadedFile::fake()->create('pending_revision_attempt.pdf', 100);
+
+    $response = uploadRevision($this->dosenUser, $this->internship, $this->report, $file);
+
+    $response->assertRedirect();
+    $response->assertSessionHas('error', 'Tidak dapat mengunggah revisi untuk laporan yang masih pending.');
+
+    $this->report->refresh();
+    expect($this->report->revised_file_path)->toBeNull();
+
+    Notification::assertNotSentTo($this->mahasiswaUser, ReportRevisionUploaded::class);
+});
+
+// ------------------------------------------------------------------------
+// VALIDATION TESTS
+// ------------------------------------------------------------------------
+
+test('revised file is required', function () {
+    $response = test()->actingAs($this->dosenUser)
+        ->post(route('front.internships.reports.uploadRevision', [
             'internship' => $this->internship->id,
             'report' => $this->report->id,
         ]), [
-            'revised_file' => $file,
+            // 'revised_file' missing
         ]);
 
-        $response->assertRedirect();
-        $response->assertSessionHasNoErrors();
+    $response->assertSessionHasErrors('revised_file');
 
-        $this->report->refresh();
+    $this->report->refresh();
+    expect($this->report->revised_file_path)->toBeNull();
+});
 
-        Storage::disk('public')->assertExists($this->report->revised_file_path);
-        $this->assertNotNull($this->report->revised_file_path);
-        $this->assertNotNull($this->report->revision_uploaded_at);
+test('revised file must be a valid file type', function () {
+    $file = UploadedFile::fake()->create('invalid_type.txt', 100, 'text/plain');
 
-        Notification::assertSentTo(
-            $this->mahasiswaUser,
-            ReportRevisionUploaded::class,
-            function ($notification, $channels) {
-                return $notification->report->id === $this->report->id;
-            }
-        );
-    }
+    $response = uploadRevision($this->dosenUser, $this->internship, $this->report, $file);
 
-    public function test_dosen_can_upload_revision_for_rejected_report()
-    {
-        $this->actingAs($this->dosenUser);
-        $this->report->update(['status' => 'rejected']);
+    $response->assertSessionHasErrors('revised_file');
 
-        $file = UploadedFile::fake()->create('revised_report_rejected.pdf', 1000, 'application/pdf');
+    $this->report->refresh();
+    expect($this->report->revised_file_path)->toBeNull();
+});
 
-        $response = $this->post(route('front.internships.reports.uploadRevision', [
-            'internship' => $this->internship->id,
-            'report' => $this->report->id,
-        ]), [
-            'revised_file' => $file,
-        ]);
+test('revised file must not exceed max size', function () {
+    // Max size is 5MB (5120 KB)
+    $file = UploadedFile::fake()->create('too_large_file.pdf', 6000, 'application/pdf'); // 6MB
 
-        $response->assertRedirect();
-        $response->assertSessionHasNoErrors();
-        $this->report->refresh();
-        Storage::disk('public')->assertExists($this->report->revised_file_path);
-        $this->assertNotNull($this->report->revised_file_path);
-        Notification::assertSentTo($this->mahasiswaUser, ReportRevisionUploaded::class);
-    }
+    $response = uploadRevision($this->dosenUser, $this->internship, $this->report, $file);
 
-    public function test_previous_revision_file_is_deleted_when_new_one_is_uploaded()
-    {
-        $this->actingAs($this->dosenUser);
+    $response->assertSessionHasErrors('revised_file');
 
-        // Upload first revision
-        $oldFile = UploadedFile::fake()->create('old_revision.pdf', 500);
-        $this->post(route('front.internships.reports.uploadRevision', [$this->internship, $this->report]), [
-            'revised_file' => $oldFile,
-        ]);
-        $this->report->refresh();
-        $oldFilePath = $this->report->revised_file_path;
-        Storage::disk('public')->assertExists($oldFilePath);
+    $this->report->refresh();
+    expect($this->report->revised_file_path)->toBeNull();
+});
 
-        // Upload new revision
-        $newFile = UploadedFile::fake()->create('new_revision.pdf', 600);
-        $this->post(route('front.internships.reports.uploadRevision', [$this->internship, $this->report]), [
-            'revised_file' => $newFile,
-        ]);
-        $this->report->refresh();
-        $newFilePath = $this->report->revised_file_path;
+// ------------------------------------------------------------------------
+// EDGE CASES
+// ------------------------------------------------------------------------
 
-        Storage::disk('public')->assertMissing($oldFilePath);
-        Storage::disk('public')->assertExists($newFilePath);
-        $this->assertNotEquals($oldFilePath, $newFilePath);
-    }
+test('upload revision to non-existent report returns 404', function () {
+    $file = UploadedFile::fake()->create('report.pdf', 100);
 
-    public function test_mahasiswa_cannot_upload_revision()
-    {
-        $this->actingAs($this->mahasiswaUser);
-
-        $file = UploadedFile::fake()->create('mahasiswa_attempt.pdf', 100);
-
-        $response = $this->post(route('front.internships.reports.uploadRevision', [
-            'internship' => $this->internship->id,
-            'report' => $this->report->id,
-        ]), [
-            'revised_file' => $file,
-        ]);
-
-        $response->assertStatus(403); // Forbidden
-        $this->report->refresh();
-        $this->assertNull($this->report->revised_file_path);
-        Notification::assertNotSentTo($this->mahasiswaUser, ReportRevisionUploaded::class);
-    }
-
-    public function test_dosen_cannot_upload_revision_for_pending_report()
-    {
-        $this->actingAs($this->dosenUser);
-        $this->report->update(['status' => 'pending']);
-
-        $file = UploadedFile::fake()->create('pending_revision_attempt.pdf', 100);
-
-        $response = $this->post(route('front.internships.reports.uploadRevision', [
-            'internship' => $this->internship->id,
-            'report' => $this->report->id,
-        ]), [
-            'revised_file' => $file,
-        ]);
-
-        $response->assertRedirect();
-        $response->assertSessionHas('error', 'Tidak dapat mengunggah revisi untuk laporan yang masih pending.');
-
-        $this->report->refresh();
-        $this->assertNull($this->report->revised_file_path);
-        Notification::assertNotSentTo($this->mahasiswaUser, ReportRevisionUploaded::class);
-    }
-
-    public function test_revised_file_is_required()
-    {
-        $this->actingAs($this->dosenUser);
-
-        $response = $this->post(route('front.internships.reports.uploadRevision', [
-            'internship' => $this->internship->id,
-            'report' => $this->report->id,
-        ]), [
-            // 'revised_file' => null, // Missing
-        ]);
-
-        $response->assertSessionHasErrors('revised_file');
-        $this->report->refresh();
-        $this->assertNull($this->report->revised_file_path);
-    }
-
-    public function test_revised_file_must_be_a_valid_file_type()
-    {
-        $this->actingAs($this->dosenUser);
-
-        $file = UploadedFile::fake()->create('invalid_type.txt', 100, 'text/plain');
-
-        $response = $this->post(route('front.internships.reports.uploadRevision', [
-            'internship' => $this->internship->id,
-            'report' => $this->report->id,
-        ]), [
-            'revised_file' => $file,
-        ]);
-
-        $response->assertSessionHasErrors('revised_file');
-        $this->report->refresh();
-        $this->assertNull($this->report->revised_file_path);
-    }
-
-    public function test_revised_file_must_not_exceed_max_size()
-    {
-        $this->actingAs($this->dosenUser);
-
-        // Max size is 5MB (5120 KB)
-        $file = UploadedFile::fake()->create('too_large_file.pdf', 6000, 'application/pdf'); // 6MB
-
-        $response = $this->post(route('front.internships.reports.uploadRevision', [
-            'internship' => $this->internship->id,
-            'report' => $this->report->id,
-        ]), [
-            'revised_file' => $file,
-        ]);
-
-        $response->assertSessionHasErrors('revised_file');
-        $this->report->refresh();
-        $this->assertNull($this->report->revised_file_path);
-    }
-
-    public function test_upload_revision_to_non_existent_report_returns_404()
-    {
-        $this->actingAs($this->dosenUser);
-        $file = UploadedFile::fake()->create('report.pdf', 100);
-
-        $response = $this->post(route('front.internships.reports.uploadRevision', [
+    $response = test()->actingAs($this->dosenUser)
+        ->post(route('front.internships.reports.uploadRevision', [
             'internship' => $this->internship->id,
             'report' => 999, // Non-existent report ID
         ]), [
             'revised_file' => $file,
         ]);
 
-        $response->assertNotFound();
-    }
+    $response->assertNotFound();
+});
 
-    public function test_upload_revision_to_report_not_belonging_to_internship_returns_404()
-    {
-        $this->actingAs($this->dosenUser);
-        $otherInternship = Internship::factory()->create(['user_id' => $this->mahasiswaUser->id]);
-        // Report belongs to $this->internship, not $otherInternship
-        $file = UploadedFile::fake()->create('report.pdf', 100);
+test('upload revision to report not belonging to internship returns 404', function () {
+    $otherInternship = Internship::factory()->create(['user_id' => $this->mahasiswaUser->id]);
+    // Report belongs to $this->internship, not $otherInternship
+    $file = UploadedFile::fake()->create('report.pdf', 100);
 
-        $response = $this->post(route('front.internships.reports.uploadRevision', [
+    $response = test()->actingAs($this->dosenUser)
+        ->post(route('front.internships.reports.uploadRevision', [
             'internship' => $otherInternship->id,
             'report' => $this->report->id,
         ]), [
             'revised_file' => $file,
         ]);
 
-        $response->assertNotFound();
-        // Ensure no file was saved for the original report
-        $this->report->refresh();
-        $this->assertNull($this->report->revised_file_path);
-    }
-}
+    $response->assertNotFound();
+
+    // Ensure no file was saved for the original report
+    $this->report->refresh();
+    expect($this->report->revised_file_path)->toBeNull();
+});
