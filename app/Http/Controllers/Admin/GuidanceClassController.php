@@ -110,27 +110,19 @@ class GuidanceClassController extends Controller
                 })
                 ->get();
 
-            $attendanceRecords = $eligibleStudents->map(function ($student) use ($guidanceClass) {
-                return [
+            // Directly using DB query to insert records rather than relying on model events or the attendance model
+            foreach ($eligibleStudents as $student) {
+                \DB::table('guidance_class_attendance')->insert([
                     'guidance_class_id' => $guidanceClass->id,
                     'user_id' => $student->id,
                     'created_at' => now(),
                     'updated_at' => now(),
-                ];
-            })->toArray();
-
-            if (! empty($attendanceRecords)) {
-                GuidanceClassAttendance::insert($attendanceRecords);
+                ]);
             }
 
             // Notify students after attaching them
-            // Re-fetch students through the relationship to ensure attendance records are loaded if needed later,
-            // although for notification purposes, the $eligibleStudents collection is sufficient.
-            // $studentsToNotify = $guidanceClass->students()->get(); // This would now work after insertion
-            $studentsToNotify = $eligibleStudents; // Use the collection we already have
-
-            if ($studentsToNotify->isNotEmpty()) {
-                Notification::send($studentsToNotify, new ClassScheduled($guidanceClass));
+            if ($eligibleStudents->isNotEmpty()) {
+                Notification::send($eligibleStudents, new ClassScheduled($guidanceClass));
             }
 
             return redirect()

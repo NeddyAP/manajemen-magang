@@ -29,13 +29,6 @@ class GuidanceClass extends Model
         'end_date' => 'datetime',
     ];
 
-    protected static function booted()
-    {
-        static::created(function ($guidanceClass): void {
-            $guidanceClass->generateAttendanceRecords();
-        });
-    }
-
     public function lecturer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'lecturer_id')
