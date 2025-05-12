@@ -349,4 +349,84 @@ class GuidanceClassCrudTest extends TestCase
 
         $response->assertStatus(404);
     }
+
+    // Mahasiswa QR code attendance test
+    public function test_mahasiswa_can_attend_using_qr_code_url(): void
+    {
+        $guidanceClass = GuidanceClass::factory()->for($this->dosenUser, 'lecturer')->create([
+            'qr_code' => route('guidance-classes.attend', ['token' => 'testtoken']),
+            'start_date' => now()->subHour(),
+            'end_date' => now()->addHour(),
+        ]);
+        // Ensure mahasiswa is eligible
+        $this->assertTrue($guidanceClass->isStudentEligible($this->mahasiswaUser));
+
+        $response = $this->actingAs($this->mahasiswaUser)
+            ->get(route('guidance-classes.attend', ['token' => 'testtoken']));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+        $this->assertDatabaseHas('guidance_class_attendance', [
+            'guidance_class_id' => $guidanceClass->id,
+            'user_id' => $this->mahasiswaUser->id,
+            'attendance_method' => 'qr_code',
+        ]);
+    }
+
+    public function test_mahasiswa_cannot_attend_twice_with_qr_code(): void
+    {
+        $guidanceClass = GuidanceClass::factory()->for($this->dosenUser, 'lecturer')->create([
+            'qr_code' => route('guidance-classes.attend', ['token' => 'testtoken2']),
+            'start_date' => now()->subHour(),
+            'end_date' => now()->addHour(),
+        ]);
+        // First attendance
+        $guidanceClass->students()->syncWithoutDetaching([
+            $this->mahasiswaUser->id => [
+                'attended_at' => now(),
+                'attendance_method' => 'qr_code',
+                'notes' => 'Test',
+            ],
+        ]);
+        $response = $this->actingAs($this->mahasiswaUser)
+            ->get(route('guidance-classes.attend', ['token' => 'testtoken2']));
+        $response->assertRedirect();
+        $response->assertSessionHas('error');
+    }
+
+    public function test_mahasiswa_cannot_attend_if_not_eligible(): void
+    {
+        $guidanceClass = GuidanceClass::factory()->for($this->dosenUser, 'lecturer')->create([
+            'qr_code' => route('guidance-classes.attend', ['token' => 'testtoken3']),
+            'start_date' => now()->subHour(),
+            'end_date' => now()->addHour(),
+        ]);
+        // Make mahasiswa not eligible (remove internship)
+        $this->mahasiswaUser->internships()->delete();
+        $response = $this->actingAs($this->mahasiswaUser)
+            ->get(route('guidance-classes.attend', ['token' => 'testtoken3']));
+        $response->assertRedirect();
+        $response->assertSessionHas('error');
+        $this->assertDatabaseMissing('guidance_class_attendance', [
+            'guidance_class_id' => $guidanceClass->id,
+            'user_id' => $this->mahasiswaUser->id,
+        ]);
+    }
+
+    public function test_mahasiswa_cannot_attend_if_class_not_ongoing(): void
+    {
+        $guidanceClass = GuidanceClass::factory()->for($this->dosenUser, 'lecturer')->create([
+            'qr_code' => route('guidance-classes.attend', ['token' => 'testtoken4']),
+            'start_date' => now()->subDays(2),
+            'end_date' => now()->subDay(),
+        ]);
+        $response = $this->actingAs($this->mahasiswaUser)
+            ->get(route('guidance-classes.attend', ['token' => 'testtoken4']));
+        $response->assertRedirect();
+        $response->assertSessionHas('error');
+        $this->assertDatabaseMissing('guidance_class_attendance', [
+            'guidance_class_id' => $guidanceClass->id,
+            'user_id' => $this->mahasiswaUser->id,
+        ]);
+    }
 }

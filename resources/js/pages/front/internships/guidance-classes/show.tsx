@@ -1,13 +1,15 @@
 import { DataTable } from '@/components/data-table/data-table';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import FrontLayout from '@/layouts/front-layout';
 import { type BreadcrumbItem } from '@/types';
 import { GuidanceClass, TableMeta } from '@/types/guidance-class';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { Clock, MapPin, User, Users } from 'lucide-react';
+import { Clock, MapPin, Scan, User, Users } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import { useState } from 'react';
 import ManageAttendance from './components/manage-attendance';
 import { userColumns } from './components/user-column';
 
@@ -43,6 +45,8 @@ export default function ShowGuidanceClass({ class: guidanceClass, meta, userRole
     const formatDate = (date: string) => {
         return format(new Date(date), 'dd MMMM yyyy HH:mm', { locale: id });
     };
+
+    const [isAttending, setIsAttending] = useState(false);
 
     return (
         <FrontLayout breadcrumbs={breadcrumbs}>
@@ -180,6 +184,53 @@ export default function ShowGuidanceClass({ class: guidanceClass, meta, userRole
                                                             <p className="text-muted-foreground mt-2 text-center text-sm">
                                                                 Scan QR code di atas dengan kamera ponsel Anda untuk merekam kehadiran
                                                             </p>
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                className="mt-4 flex items-center gap-2 p-6 text-base"
+                                                                disabled={isAttending || !guidanceClass.qr_code}
+                                                                onClick={async () => {
+                                                                    if (!guidanceClass.qr_code) return;
+                                                                    setIsAttending(true);
+                                                                    router.visit(guidanceClass.qr_code as string, {
+                                                                        method: 'get',
+                                                                        preserveScroll: true,
+                                                                        onFinish: () => setIsAttending(false),
+                                                                        onSuccess: () => router.reload({ only: ['class', 'isAttended'] }),
+                                                                    });
+                                                                }}
+                                                            >
+                                                                {isAttending ? (
+                                                                    <>
+                                                                        <svg
+                                                                            className="mr-2 h-5 w-5 animate-spin text-white"
+                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                            fill="none"
+                                                                            viewBox="0 0 24 24"
+                                                                        >
+                                                                            <circle
+                                                                                className="opacity-25"
+                                                                                cx="12"
+                                                                                cy="12"
+                                                                                r="10"
+                                                                                stroke="currentColor"
+                                                                                strokeWidth="4"
+                                                                            ></circle>
+                                                                            <path
+                                                                                className="opacity-75"
+                                                                                fill="currentColor"
+                                                                                d="M4 12a8 8 0 018-8v8z"
+                                                                            ></path>
+                                                                        </svg>
+                                                                        Memproses...
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <Scan className="h-5 w-5" />
+                                                                        Rekam Kehadiran
+                                                                    </>
+                                                                )}
+                                                            </Button>
                                                         </div>
                                                     ) : (
                                                         <div className="flex flex-col items-center justify-center p-4 text-center">
