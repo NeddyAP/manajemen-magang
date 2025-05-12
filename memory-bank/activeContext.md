@@ -27,7 +27,7 @@ This is a comprehensive internship management system (Manajement Magang) built w
 4.  **Report Management:**
     - Report submission (`reports` table) with file uploads.
     - Visibility for students, assigned Dosen, and Admins.
-    - Partial Dosen Feedback: `reviewer_notes` can be added when a report is rejected.
+    - Dosen Feedback: `reviewer_notes` can be added by Dosen, especially when a report is rejected or needs revisions. Dosen can also upload revised versions of reports.
 5.  **Guidance System:**
     - Class scheduling (`guidance_classes` table) by Admin/Dosen.
     - Student assignment to classes.
@@ -91,7 +91,7 @@ This is a comprehensive internship management system (Manajement Magang) built w
 - Implementation of User Settings pages (Profile, Password, Appearance).
 - Implementation of Admin Trash Management feature.
 - **Addition of Pest Feature tests for Authentication flows (Registration, Login, Password Reset, Email Verification).**
-- **[2025-05-08 18:55:02] - Confirmed partial implementation of Dosen feedback for reports (via rejection notes). General feedback feature remains a future enhancement.**
+- **[2025-05-08 18:55:02] - Confirmed Dosen feedback for reports: Dosen can add `reviewer_notes` (especially for rejections/revisions) and upload report revisions. General, non-status-related feedback feature remains a future enhancement.**
 - **[2025-05-08 19:02:28] - Guidance Class attendance feature (QR code via URL, manual Dosen check-in) confirmed as substantially implemented.**
 - **[2025-05-09 00:06:00] - Removed Internship Applicant 'show' page:** Based on user feedback, the dedicated 'show' page for internship applicants, its route, and associated frontend file were removed to simplify user flow. Test redirects in `tests/Feature/InternshipCrudTest.php` were updated accordingly.
 - **[2025-05-09 00:06:00] - Fixed `InternshipCrudTest.php`:** Resolved failing test `mahasiswa can update their own internship with valid data if editable` by correcting an incorrect redirect in `app/Http/Controllers/Front/InternshipApplicantController.php` from the (now removed) 'show' route to the 'index' route. All tests in `tests/Feature/InternshipCrudTest.php` are now passing.
@@ -120,7 +120,7 @@ This is a comprehensive internship management system (Manajement Magang) built w
 ## Next Steps (After Documentation Update)
 
 1.  **Testing:** Continue adding Pest tests for other core features (CRUD operations for Internships, Logbooks, Reports, Guidance Classes, FAQs, Tutorials, etc.). Aim for higher test coverage.
-2.  **Dosen Feedback (Reports):** Implement a general feedback mechanism for Dosen on Reports (beyond rejection notes). (Logbook feedback partially implemented via supervisor notes; Report rejection notes also provide a feedback channel).
+2.  **Dosen Feedback (Reports):** The existing `reviewer_notes` (for rejections/revisions) and revision upload capabilities cover key feedback aspects. A more general, non-status-tied feedback mechanism for Dosen on Reports remains a potential future enhancement. (Logbook feedback partially implemented via supervisor notes).
 3.  **Refinement:** Address any remaining `TODO` comments in the code. Improve UI/UX based on feedback. Optimize queries or backend logic where necessary.
 4.  **TypeScript:** Continue improving type safety, potentially defining more specific types for shared data structures (e.g., `NotificationData`).
 

@@ -58,7 +58,10 @@ sequenceDiagram
     System->>System: Creates Notification for Dosen/Admin (Laravel Notification)
     System->>Dosen / Admin: Receives In-App Notification (React Header/Page)
     Dosen / Admin->>System: Views/Downloads Report (React Page / Direct Download)
-    %% Admin->>System: Updates Status (Future Enhancement)
+    Dosen->>System: Adds `reviewer_notes` (if applicable, e.g., for rejection/revision)
+    Admin->>System: Updates Status (e.g., Approved, Rejected, Needs Revision)
+    System->>System: Creates Notification for Mahasiswa (including `reviewer_notes` if present)
+    System->>Mahasiswa: Receives In-App Notification
 ```
 
 ### 3.1. Report Revision Upload Flow (Dosen Upload)

@@ -19,7 +19,7 @@ This document outlines the business logic, user roles, features, and workflows o
 
 ### 2. Lecturer (Dosen)
 
-- **Responsibilities:** Supervise assigned students, review student internship applications, review logbook entries and provide feedback, evaluate student reports, **upload report revisions**, schedule and conduct guidance classes, manage own profile and settings.
+- **Responsibilities:** Supervise assigned students, review student internship applications, review logbook entries and provide feedback, evaluate student reports (including adding `reviewer_notes`, particularly if rejecting or requesting revisions), **upload report revisions**, schedule and conduct guidance classes, manage own profile and settings.
 - **Permissions:**
     - View internship applications of assigned advisees.
     - View logbook entries of assigned advisees and add notes/feedback.
@@ -75,9 +75,9 @@ This document outlines the business logic, user roles, features, and workflows o
 - **Flow:**
     1.  Student uploads their internship report (PDF, DOCX, etc.).
     2.  Report is visible to the student, assigned Dosen, and Admins.
-    3.  Dosen/Admin review the report.
-    4.  Status can be updated by Admin (e.g., `Needs Revision`, `Approved`). (Specific status flow TBD/simplified currently).
-    5.  Student is notified of status changes.
+    3.  Dosen/Admin review the report. Dosen can add `reviewer_notes` to the report, especially if recommending rejection or revisions.
+    4.  Admin updates the report status (e.g., `Needs Revision`, `Approved`, `Rejected`).
+    5.  Student is notified of status changes and any `reviewer_notes`.
     6.  **Dosen can upload a revised version of the student's report. This revised file is stored in addition to the original and does not replace it. This is typically done after a report has been `approved` or `rejected` and requires further Dosen input.**
     7.  **Student is notified when a Dosen uploads a report revision.**
 - **Versioning:** Student re-uploads/updates create new versions. Dosen-uploaded revisions are stored separately.
@@ -117,7 +117,7 @@ This document outlines the business logic, user roles, features, and workflows o
     - Internship Application Status Changed (Notifies Student)
     - Logbook Entry Submitted (Notifies Dosen)
     - Report Submitted (Notifies Dosen)
-    - Report Status Changed (Notifies Student)
+    - Report Status Changed (Notifies Student, includes `reviewer_notes` if present)
     - **Report Revision Uploaded by Dosen (Notifies Student)**
     - Guidance Class Scheduled/Updated (Notifies assigned Students)
 - **Out of Scope (Currently):** Email notifications, Real-time push notifications, System announcements via notifications.

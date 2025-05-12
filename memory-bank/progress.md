@@ -9,7 +9,7 @@ This document tracks the current status, progress, and evolution of the internsh
 - **User Management & Auth:** ✅ (Login, Register, PW Reset, Email Verify, Profiles, Roles/Permissions)
 - **Internship Management:** ✅ (Application CRUD, Status Tracking, File Upload) - _Applicant 'show' page removed_
 - **Logbook System:** ✅ (Student CRUD, Dosen Supervisor Notes via Modal, PDF/Word Export)
-- **Report Management:** ✅ (Student CRUD, File Upload, Dosen feedback via `reviewer_notes` on rejection, **Dosen revision upload for approved/rejected reports**)
+- **Report Management:** ✅ (Student CRUD, File Upload, Dosen can add `reviewer_notes`, Dosen revision upload for approved/rejected reports)
 - **Guidance System:** ✅ (Class CRUD, Student Assignment, QR Code & Manual Attendance Tracking)
 - **Support Features (Admin):** ✅ (FAQ CRUD, Tutorial CRUD, Global Variable CRUD)
 - **Notification System:** ✅ (In-App DB-driven, Header Dropdown, History Page, Mark Read/Unread, Delete)
@@ -80,6 +80,7 @@ This document tracks the current status, progress, and evolution of the internsh
 ## Recent Changes
 
 - **[2025-05-11] - Feature: Dosen Report Revision Upload.** Implemented backend (model, migration, controller, request, route, notification) and frontend (TypeScript type, UI in table, new modal) for Dosen to upload revised student reports. Added comprehensive Pest feature tests.
+- **[2025-05-11] - Clarified Dosen Report Feedback:** Updated Memory Bank to reflect that Dosen can add `reviewer_notes` to reports, in addition to uploading revisions. This is distinct from a more general feedback system which is a future consideration.
 - **[2025-05-11] - General Memory Bank Update:** Updated `activeContext.md`, `techContext.md`, `progress.md`, `decisionLog.md` to reflect the current application state.
 - **[2025-05-11 09:25:53] - Confirmed and updated backend functionality for logbook export to Word and PDF. Routes in `routes/web.php` were updated to match frontend naming conventions. Existing `LogbookController` methods for export were verified.**
 - **Logbook Enhancements:**
@@ -91,7 +92,7 @@ This document tracks the current status, progress, and evolution of the internsh
 - **Frontend:** Built UI for Notifications, Settings, Trash. Added analytics cards. Removed Internship Applicant 'show' page.
 - **Testing:** Added Pest Feature tests for Authentication, Logbooks (Student), Reports (Student), Internships (Student). Fixed tests related to Internship 'show' page removal.
 - **Documentation:** Ongoing Memory Bank updates.
-- **[2025-05-08 18:54:33] - Clarified Dosen report feedback: Partially implemented via rejection notes; general feedback pending.**
+- \*\*[2025-05-08 18:54:33] - Clarified Dosen report feedback: Dosen can add `reviewer_notes` (especially for rejections/revisions) and upload report revisions. General, non-status-related feedback feature remains a future enhancement.
 - **[2025-05-08 19:02:06] - Confirmed substantial implementation of Guidance Class attendance feature (QR code via URL and manual check-in).**
 - **[2025-05-09 00:06:00] - Removed Internship Applicant 'show' page and fixed related tests in `InternshipCrudTest.php`.**
 - **[2025-05-09 00:36:35] - Completed Logbook CRUD Pest Tests (Student Perspective) and refactored logbook field name from `kegiatan` to `activities`.**
