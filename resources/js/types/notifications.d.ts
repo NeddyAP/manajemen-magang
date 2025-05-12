@@ -2,7 +2,7 @@
 export interface NotificationDataBase {
     message: string;
     link?: string; // General link, some notifications might use 'url' or have specific link structures
-    url?: string;  // Alternative for link
+    url?: string; // Alternative for link
 }
 
 // Specific Notification Data Payloads

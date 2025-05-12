@@ -48,7 +48,8 @@ export interface User {
     [key: string]: unknown; // This allows for additional properties...
 }
 
-interface TableMeta {
+// Exporting TableMeta so it can be used by other modules
+export interface TableMeta {
     total: number;
     per_page: number;
     current_page: number;

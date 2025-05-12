@@ -15,7 +15,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import FrontLayout from '@/layouts/front-layout';
 import { cn } from '@/lib/utils';
-import { BreadcrumbItem, SharedData, DatabaseNotification as Notification, PaginatedNotifications } from '@/types'; // Updated imports
+import { BreadcrumbItem, DatabaseNotification as Notification, PaginatedNotifications, SharedData } from '@/types'; // Updated imports
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { MailOpen, Trash2 } from 'lucide-react';
@@ -38,7 +38,8 @@ export default function NotificationsIndex() {
         setLoadingAction(`unread-${notificationId}`);
         try {
             await axios.post(route('api.notifications.markAsUnread'), { ids: [notificationId] });
-            setNotificationsData((prevData: PaginatedNotifications) => ({ // Added type for prevData
+            setNotificationsData((prevData: PaginatedNotifications) => ({
+                // Added type for prevData
                 ...prevData,
                 data: prevData.data.map((n: Notification) => (n.id === notificationId ? { ...n, read_at: null } : n)), // Added type for n
             }));
@@ -55,7 +56,8 @@ export default function NotificationsIndex() {
         setLoadingAction(`delete-${notificationId}`);
         try {
             await axios.delete(route('api.notifications.destroy', notificationId));
-            setNotificationsData((prevData: PaginatedNotifications) => ({ // Added type for prevData
+            setNotificationsData((prevData: PaginatedNotifications) => ({
+                // Added type for prevData
                 ...prevData,
                 data: prevData.data.filter((n: Notification) => n.id !== notificationId), // Added type for n
                 total: prevData.total - 1,
@@ -74,7 +76,8 @@ export default function NotificationsIndex() {
             setLoadingAction(`read-${notification.id}`);
             try {
                 await axios.post(route('api.notifications.markAsRead'), { ids: [notification.id] });
-                setNotificationsData((prevData: PaginatedNotifications) => ({ // Added type for prevData
+                setNotificationsData((prevData: PaginatedNotifications) => ({
+                    // Added type for prevData
                     ...prevData,
                     data: prevData.data.map((n: Notification) => (n.id === notification.id ? { ...n, read_at: new Date().toISOString() } : n)), // Added type for n
                 }));
@@ -126,7 +129,10 @@ export default function NotificationsIndex() {
                                 >
                                     <CardContent className="flex items-center justify-between p-4">
                                         <div
-                                            className={cn('flex-1 space-y-1', (notification.data.link || notification.data.url) ? 'cursor-pointer' : 'cursor-default')}
+                                            className={cn(
+                                                'flex-1 space-y-1',
+                                                notification.data.link || notification.data.url ? 'cursor-pointer' : 'cursor-default',
+                                            )}
                                             onClick={() => (notification.data.link || notification.data.url) && handleNavigate(notification)}
                                         >
                                             <p className={cn('text-sm font-medium', !notification.read_at && 'font-semibold')}>
@@ -230,13 +236,18 @@ export default function NotificationsIndex() {
                                     </PaginationItem>
                                 )}
 
-                                {notificationsData.links.slice(1, -1).map((link: { url: string | null; label: string; active: boolean }, index: number) => ( // Added types for link and index
-                                    <PaginationItem key={index}>
-                                        <PaginationLink href={link.url || '#'} isActive={link.active}>
-                                            <span dangerouslySetInnerHTML={{ __html: link.label }} />
-                                        </PaginationLink>
-                                    </PaginationItem>
-                                ))}
+                                {notificationsData.links.slice(1, -1).map(
+                                    (
+                                        link: { url: string | null; label: string; active: boolean },
+                                        index: number, // Added types for link and index
+                                    ) => (
+                                        <PaginationItem key={index}>
+                                            <PaginationLink href={link.url || '#'} isActive={link.active}>
+                                                <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    ),
+                                )}
 
                                 {notificationsData.next_page_url && (
                                     <PaginationItem>
