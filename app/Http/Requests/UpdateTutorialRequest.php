@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\TutorialAccessLevelEnum; // Added import
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule; // Added import
 
 class UpdateTutorialRequest extends FormRequest
 {
@@ -26,7 +28,7 @@ class UpdateTutorialRequest extends FormRequest
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'file_name' => 'required|string|max:255',
-            'file_path' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,zip,rar|max:10240',
+            'file_path' => 'nullable|file|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,zip,rar|max:10240', // 10MB
             'access_level' => ['required', 'string', Rule::in(array_column(TutorialAccessLevelEnum::cases(), 'value'))],
             'is_active' => 'boolean',
         ];

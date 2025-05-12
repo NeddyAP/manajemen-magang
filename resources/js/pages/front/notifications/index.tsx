@@ -15,53 +15,21 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import FrontLayout from '@/layouts/front-layout';
 import { cn } from '@/lib/utils';
-import { BreadcrumbItem, SharedData } from '@/types';
+import { BreadcrumbItem, SharedData, DatabaseNotification as Notification, PaginatedNotifications } from '@/types'; // Updated imports
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { MailOpen, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-// Define Notification type matching backend structure
-interface NotificationData {
-    message: string;
-    link: string | null; // Link can be null
-    [key: string]: unknown; // Allow other properties, use unknown instead of any
-}
-
-interface Notification {
-    id: string;
-    type: string;
-    data: NotificationData;
-    read_at: string | null;
-    created_at: string;
-}
-
-// Define PaginatedResponse type based on Laravel structure
-interface PaginatedResponse<T> {
-    current_page: number;
-    data: T[];
-    first_page_url: string;
-    from: number;
-    last_page: number;
-    last_page_url: string;
-    links: { url: string | null; label: string; active: boolean }[];
-    next_page_url: string | null;
-    path: string;
-    per_page: number;
-    prev_page_url: string | null;
-    to: number;
-    total: number;
-}
-
 // Update PageProps to extend SharedData
 interface NotificationsPageProps extends SharedData {
-    notifications: PaginatedResponse<Notification>;
+    notifications: PaginatedNotifications; // Use non-generic PaginatedNotifications
 }
 
 export default function NotificationsIndex() {
     const { notifications: initialNotifications } = usePage<NotificationsPageProps>().props;
-    const [notificationsData, setNotificationsData] = useState<PaginatedResponse<Notification>>(initialNotifications);
+    const [notificationsData, setNotificationsData] = useState<PaginatedNotifications>(initialNotifications); // Use non-generic PaginatedNotifications
     const [loadingAction, setLoadingAction] = useState<string | null>(null);
 
     // --- Action Handlers ---
@@ -70,9 +38,9 @@ export default function NotificationsIndex() {
         setLoadingAction(`unread-${notificationId}`);
         try {
             await axios.post(route('api.notifications.markAsUnread'), { ids: [notificationId] });
-            setNotificationsData((prevData) => ({
+            setNotificationsData((prevData: PaginatedNotifications) => ({ // Added type for prevData
                 ...prevData,
-                data: prevData.data.map((n) => (n.id === notificationId ? { ...n, read_at: null } : n)),
+                data: prevData.data.map((n: Notification) => (n.id === notificationId ? { ...n, read_at: null } : n)), // Added type for n
             }));
             toast.success('Notifikasi ditandai belum dibaca.');
         } catch (error) {
@@ -87,9 +55,9 @@ export default function NotificationsIndex() {
         setLoadingAction(`delete-${notificationId}`);
         try {
             await axios.delete(route('api.notifications.destroy', notificationId));
-            setNotificationsData((prevData) => ({
+            setNotificationsData((prevData: PaginatedNotifications) => ({ // Added type for prevData
                 ...prevData,
-                data: prevData.data.filter((n) => n.id !== notificationId),
+                data: prevData.data.filter((n: Notification) => n.id !== notificationId), // Added type for n
                 total: prevData.total - 1,
             }));
             toast.success('Notifikasi dihapus.');
@@ -106,9 +74,9 @@ export default function NotificationsIndex() {
             setLoadingAction(`read-${notification.id}`);
             try {
                 await axios.post(route('api.notifications.markAsRead'), { ids: [notification.id] });
-                setNotificationsData((prevData) => ({
+                setNotificationsData((prevData: PaginatedNotifications) => ({ // Added type for prevData
                     ...prevData,
-                    data: prevData.data.map((n) => (n.id === notification.id ? { ...n, read_at: new Date().toISOString() } : n)),
+                    data: prevData.data.map((n: Notification) => (n.id === notification.id ? { ...n, read_at: new Date().toISOString() } : n)), // Added type for n
                 }));
             } catch (error) {
                 console.error('Error marking notification as read:', error);
@@ -118,8 +86,9 @@ export default function NotificationsIndex() {
             }
         }
 
-        if (notification.data.link) {
-            router.visit(notification.data.link);
+        const targetLink = notification.data.link || notification.data.url;
+        if (targetLink) {
+            router.visit(targetLink);
         }
     };
 
@@ -157,8 +126,8 @@ export default function NotificationsIndex() {
                                 >
                                     <CardContent className="flex items-center justify-between p-4">
                                         <div
-                                            className={cn('flex-1 space-y-1', notification.data.link ? 'cursor-pointer' : 'cursor-default')}
-                                            onClick={() => notification.data.link && handleNavigate(notification)}
+                                            className={cn('flex-1 space-y-1', (notification.data.link || notification.data.url) ? 'cursor-pointer' : 'cursor-default')}
+                                            onClick={() => (notification.data.link || notification.data.url) && handleNavigate(notification)}
                                         >
                                             <p className={cn('text-sm font-medium', !notification.read_at && 'font-semibold')}>
                                                 {notification.data.message}
@@ -261,7 +230,7 @@ export default function NotificationsIndex() {
                                     </PaginationItem>
                                 )}
 
-                                {notificationsData.links.slice(1, -1).map((link, index) => (
+                                {notificationsData.links.slice(1, -1).map((link: { url: string | null; label: string; active: boolean }, index: number) => ( // Added types for link and index
                                     <PaginationItem key={index}>
                                         <PaginationLink href={link.url || '#'} isActive={link.active}>
                                             <span dangerouslySetInnerHTML={{ __html: link.label }} />

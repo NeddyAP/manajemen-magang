@@ -9,30 +9,17 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
-import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
-import { Link, router, usePage } from '@inertiajs/react'; // Import router
-import axios from 'axios'; // Import axios
-import { Bell, BookOpen, GraduationCap, LayoutDashboard, LayoutGrid, Menu, Search } from 'lucide-react'; // Import Bell
-import { useEffect, useState } from 'react'; // Import useState, useEffect
+import { type BreadcrumbItem, type NavItem, type SharedData, DatabaseNotification as Notification, NotificationIndexResponse } from '@/types'; // Updated imports
+import { Link, router, usePage } from '@inertiajs/react';
+import axios from 'axios';
+import { Bell, BookOpen, GraduationCap, LayoutDashboard, LayoutGrid, Menu, Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
-import { Badge } from './ui/badge'; // Import Badge
-import { DropdownMenuItem, DropdownMenuSeparator } from './ui/dropdown-menu'; // Import DropdownMenuItem, DropdownMenuSeparator
+import { Badge } from './ui/badge';
+import { DropdownMenuItem, DropdownMenuSeparator } from './ui/dropdown-menu';
 
-// Define Notification type (adjust based on actual data structure)
-interface NotificationData {
-    message: string;
-    link: string;
-    [key: string]: unknown; // Allow other properties, use unknown instead of any
-}
-
-interface Notification {
-    id: string;
-    type: string;
-    data: NotificationData;
-    read_at: string | null;
-    created_at: string;
-}
+// Removed local Notification types, using imported ones.
 
 const mainNavItems: NavItem[] = [
     {
@@ -64,32 +51,28 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const getInitials = useInitials();
 
     // Notification State
-    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [notifications, setNotifications] = useState<Notification[]>([]); // Uses imported Notification (aliased DatabaseNotification)
     const [unreadCount, setUnreadCount] = useState<number>(0);
     const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
-    const [loading, setLoading] = useState<boolean>(true); // Loading state
+    const [loading, setLoading] = useState<boolean>(true);
 
-    // Fetch notifications on mount
     useEffect(() => {
         if (auth.user) {
             fetchNotifications();
-            // Optional: Set up polling or WebSocket listener here for real-time updates
-            // const interval = setInterval(fetchNotifications, 30000); // Poll every 30 seconds
-            // return () => clearInterval(interval); // Cleanup interval on unmount
         } else {
             setLoading(false);
         }
-    }, [auth.user]); // Re-fetch if auth status changes
+    }, [auth.user]);
 
     const fetchNotifications = async () => {
         setLoading(true);
         try {
-            const response = await axios.get<{ unread: Notification[]; unread_count: number }>(route('api.notifications.index'));
+            // Use NotificationIndexResponse for the expected response type
+            const response = await axios.get<NotificationIndexResponse>(route('api.notifications.index'));
             setNotifications(response.data.unread);
             setUnreadCount(response.data.unread_count);
         } catch (error) {
             console.error('Error fetching notifications:', error);
-            // Handle error appropriately, e.g., show a toast message
         } finally {
             setLoading(false);
         }
@@ -98,7 +81,6 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const handleMarkAsRead = async (notificationId: string) => {
         try {
             await axios.post(route('api.notifications.markAsRead'), { ids: [notificationId] });
-            // Optimistically update UI or re-fetch
             setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
             setUnreadCount((prev) => Math.max(0, prev - 1));
         } catch (error) {
@@ -111,30 +93,25 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
             await axios.post(route('api.notifications.markAllAsRead'));
             setNotifications([]);
             setUnreadCount(0);
-            setIsDropdownOpen(false); // Close dropdown after marking all
+            setIsDropdownOpen(false);
         } catch (error) {
             console.error('Error marking all notifications as read:', error);
         }
     };
 
     const handleNotificationClick = (notification: Notification) => {
-        // Mark as read first
         handleMarkAsRead(notification.id);
-        // Then navigate
-        if (notification.data.link) {
-            router.visit(notification.data.link);
+        // Accessing link or url from notification.data (which is SpecificNotificationData | NotificationDataBase)
+        const targetLink = notification.data.link || notification.data.url;
+        if (targetLink) {
+            router.visit(targetLink);
         }
-        setIsDropdownOpen(false); // Close dropdown after click
+        setIsDropdownOpen(false);
     };
 
-    // Function to check if current URL starts with the item's href
     const isActive = (href: string) => {
-        // Convert both URLs to lowercase for case-insensitive comparison
         const currentUrl = page.url.toLowerCase();
         const itemHref = href.toLowerCase();
-
-        // Check if current URL starts with the item's href
-        // Also make sure it's a complete path match
         return (
             currentUrl === itemHref ||
             (currentUrl.startsWith(itemHref) &&
@@ -142,7 +119,6 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
         );
     };
 
-    // Compute dashboard link based on role if user exists
     const computedRightNavItems: NavItem[] = [];
     if (auth?.role) {
         const roleName = auth.role;
@@ -151,7 +127,6 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
         } else if (roleName && ['mahasiswa', 'dosen'].includes(roleName)) {
             computedRightNavItems.push({ title: 'Dashboard', href: '/internships', icon: LayoutDashboard });
         }
-        // Always add Panduan
         computedRightNavItems.push({ title: 'Panduan', href: '/buku-panduan', icon: BookOpen });
     }
     return (
@@ -280,8 +255,8 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                             <Bell className="!size-5" />
                                             {unreadCount > 0 && (
                                                 <Badge
-                                                    variant="destructive" // Or another variant that provides contrast
-                                                    className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full p-0 text-[10px] font-medium text-white" // Remove p-0.5, ensure text-white, add font-medium
+                                                    variant="destructive"
+                                                    className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full p-0 text-[10px] font-medium text-white"
                                                 >
                                                     {unreadCount}
                                                 </Badge>
@@ -314,7 +289,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                     <DropdownMenuItem
                                                         key={notification.id}
                                                         className="cursor-pointer"
-                                                        onSelect={(e) => e.preventDefault()} // Prevent closing on select
+                                                        onSelect={(e) => e.preventDefault()}
                                                         onClick={() => handleNotificationClick(notification)}
                                                     >
                                                         <div className="flex flex-col">
@@ -330,9 +305,9 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem
                                             className="cursor-pointer justify-center text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                                            onSelect={(e) => e.preventDefault()} // Prevent closing on select
+                                            onSelect={(e) => e.preventDefault()}
                                             onClick={() => {
-                                                router.visit(route('notifications.index')); // Use named route
+                                                router.visit(route('notifications.index'));
                                                 setIsDropdownOpen(false);
                                             }}
                                         >

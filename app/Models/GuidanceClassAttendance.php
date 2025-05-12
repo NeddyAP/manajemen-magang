@@ -3,12 +3,15 @@
 namespace App\Models;
 
 use Exception;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Facades\DB;
 
 class GuidanceClassAttendance extends Pivot
 {
+    use HasFactory;
+
     protected $table = 'guidance_class_attendance';
 
     protected $fillable = [
@@ -74,7 +77,7 @@ class GuidanceClassAttendance extends Pivot
 
         // Make case-insensitive check for 'active' status
         $isActive = strtolower($this->user->mahasiswaProfile->academic_status) === 'active' ||
-                   strtolower($this->user->mahasiswaProfile->academic_status) === 'aktif';
+            strtolower($this->user->mahasiswaProfile->academic_status) === 'aktif';
 
         return $this->user->mahasiswaProfile->advisor_id === $this->guidanceClass->lecturer_id
             && $isActive

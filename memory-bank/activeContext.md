@@ -3,8 +3,8 @@
 _This file tracks the current work focus, recent changes, immediate next steps, active decisions, important patterns/preferences discovered, and project insights._
 
 **Status:** Active Development
-**Last Reviewed:** May 11, 2025
-**Current Task:** General Memory Bank update.
+**Last Reviewed:** May 12, 2025
+**Current Task:** Fixing `GuidanceClassCrudTest` failure.
 
 ## Project Overview
 
@@ -30,7 +30,7 @@ This is a comprehensive internship management system (Manajement Magang) built w
     - Dosen Feedback: `reviewer_notes` can be added by Dosen, especially when a report is rejected or needs revisions. Dosen can also upload revised versions of reports.
 5.  **Guidance System:**
     - Class scheduling (`guidance_classes` table) by Admin/Dosen.
-    - Student assignment to classes.
+    - Student assignment to classes (including automatic attachment of eligible students on creation).
     - Attendance tracking (`guidance_class_attendance` table - QR code via URL & manual check-in implemented).
 6.  **Support & Content Management (Admin):**
     - FAQs (`faqs` table).
@@ -61,6 +61,7 @@ This is a comprehensive internship management system (Manajement Magang) built w
 - **Testing:** Pest PHP
 - **Key PHP Packages:** `inertiajs/inertia-laravel`, `spatie/laravel-permission`, `tightenco/ziggy`, `laravel/pint`
 - **Key JS Packages:** `react`, `@inertiajs/react`, `tailwindcss`, `typescript`, `@vitejs/plugin-react`
+- **Other:** `sonner` (toasts), `html5-qrcode` (QR scanning), `qrcode.react` (QR generation), `date-fns` (date utilities), `recharts` (charting)
 
 ## Active Patterns & Preferences
 
@@ -83,11 +84,35 @@ This is a comprehensive internship management system (Manajement Magang) built w
 
 ## Recent Changes
 
+- **[2025-05-12] - Fix: Guidance Class Student Attachment.** Updated `GuidanceClassController@store` to automatically find and attach eligible students (creating `guidance_class_attendance` records) when a new guidance class is created. This addresses a failing test in `GuidanceClassCrudTest`.
+- **[2025-05-12] - Memory Bank Review:** Reviewed all core memory bank files (`projectbrief.md`, `productContext.md`, `activeContext.md`, `systemPatterns.md`, `techContext.md`, `progress.md`) as requested by the user. No significant content updates were required based on the immediate preceding conversation (context condensation).
+- **[2025-05-11] - Feature: Dosen Report Revision Upload.** Implemented backend (model, migration, controller, request, route, notification) and frontend (TypeScript type, UI in table, new modal) for Dosen to upload revised student reports. Added comprehensive Pest feature tests.
+- **[2025-05-11] - Clarified Dosen Report Feedback:** Updated Memory Bank to reflect that Dosen can add `reviewer_notes` to reports, in addition to uploading revisions. This is distinct from a more general feedback system which is a future consideration.
+- **[2025-05-11] - General Memory Bank Update:** Updated `activeContext.md`, `techContext.md`, `progress.md`, `decisionLog.md` to reflect the current application state.
+- **[2025-05-11 09:25:53] - Confirmed and updated backend functionality for logbook export to Word and PDF. Routes in `routes/web.php` were updated to match frontend naming conventions.**
+- **Logbook Enhancements:**
+    - Enabled 'dosen' users to add supervisor notes to logbooks via a modal.
+    - Optimized logbook pages: added back button, incorporated Tailwind CSS animations for better UX.
+    - Resolved backend authorization issues for 'dosen' access to logbooks, ensuring correct student data visibility.
+- **Features:** Implemented Notification System, User Settings, Admin Trash Management.
+- **Backend:** Added Notification controllers/API, refined Dosen access logic for other modules, added soft deletes to individual migrations and removed consolidated one.
+- **Frontend:** Built UI for Notifications, Settings, Trash. Added analytics cards. Removed Internship Applicant 'show' page.
+- **Testing:** Added Pest Feature tests for Authentication, Logbooks (Student), Reports (Student), Internships (Student). Fixed tests related to Internship 'show' page removal.
+- **Documentation:** Ongoing Memory Bank updates.
+- \*\*[2025-05-08 18:54:33] - Clarified Dosen report feedback: Dosen can add `reviewer_notes` (especially for rejections/revisions) and upload report revisions. General, non-status-related feedback feature remains a future enhancement.
+- **[2025-05-08 19:02:06] - Confirmed substantial implementation of Guidance Class attendance feature (QR code via URL and manual check-in).**
+- **[2025-05-09 00:06:00] - Removed Internship Applicant 'show' page and fixed related tests in `InternshipCrudTest.php`.**
+- **[2025-05-09 00:36:35] - Completed Logbook CRUD Pest Tests (Student Perspective) and refactored logbook field name from `kegiatan` to `activities`.**
+- **[2025-05-09 01:04:37] - Completed Report CRUD Pest Tests (Student Perspective).**
+
 ## Current Focus Area
+
+Fixing `GuidanceClassCrudTest` failure.
 
 ## Next Steps (After Documentation Update)
 
-1.  **Testing:** Continue adding Pest tests for other core features (CRUD operations for Internships, Logbooks, Reports, Guidance Classes, FAQs, Tutorials, etc.). Aim for higher test coverage.
+1.  **Testing:** Verify the fix for `GuidanceClassCrudTest`.
+2.  **Testing:** Continue adding Pest tests for other core features (CRUD operations for Guidance, FAQs, Tutorials, Users, Settings, Admin functions).
 3.  **Refinement:** Address any remaining `TODO` comments in the code. Improve UI/UX based on feedback. Optimize queries or backend logic where necessary.
 4.  **TypeScript:** Continue improving type safety, potentially defining more specific types for shared data structures (e.g., `NotificationData`).
 
@@ -102,6 +127,7 @@ This is a comprehensive internship management system (Manajement Magang) built w
 
 ## Insights & Learnings
 
+- **Test-Driven Development:** Test failures often point directly to missing or incorrect business logic in controllers or services.
 - **Authorization Specificity:** Ensuring correct ID usage (e.g., `internship_id` for overall internship context vs. `logbook_id` for specific entries) in backend authorization queries is crucial for proper data access control. This was particularly relevant when fixing 'dosen' access to logbooks, where initial queries might have been too broad or used incorrect identifiers, leading to access issues.
 - **Modal Interactivity:** When implementing modals for actions like adding supervisor notes, ensure smooth data flow and state management between the modal and the parent page to reflect changes immediately.
 - **Component Reusability:** The back button and animation patterns can be abstracted into reusable components or hooks for consistency across different pages.

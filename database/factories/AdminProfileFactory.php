@@ -32,9 +32,9 @@ class AdminProfileFactory extends Factory
             'position' => $this->faker->word(),
             'employment_status' => $this->faker->randomElement(['Tetap', 'Kontrak', 'Magang']),
             'join_date' => $this->faker->date(),
-            'phone_number' => $this->faker->optional()->phoneNumber(),
-            'address' => $this->faker->optional()->address(),
-            'supervisor_name' => $this->faker->optional()->name(),
+            'phone_number' => $this->faker->phoneNumber(), // Removed optional()
+            'address' => $this->faker->address(),
+            'supervisor_name' => $this->faker->name(),
             'work_location' => $this->faker->city(),
         ];
     }

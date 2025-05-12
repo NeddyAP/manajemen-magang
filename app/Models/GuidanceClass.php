@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class GuidanceClass extends Model
 {
+    use HasFactory;
     use SoftDeletes;
 
     protected $fillable = [
@@ -29,15 +31,11 @@ class GuidanceClass extends Model
 
     protected static function booted()
     {
-        // After a guidance class is created, generate attendance records
         static::created(function ($guidanceClass): void {
             $guidanceClass->generateAttendanceRecords();
         });
     }
 
-    /**
-     * Get the lecturer that owns the guidance class.
-     */
     public function lecturer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'lecturer_id')
@@ -45,15 +43,15 @@ class GuidanceClass extends Model
             ->with('dosenProfile');
     }
 
-    /**
-     * Get the students attending this guidance class.
-     */
     public function students(): BelongsToMany
     {
+        // Capture lecturer_id to ensure it's correctly scoped in the closure
+        $lecturerId = $this->lecturer_id;
+
         return $this->belongsToMany(User::class, 'guidance_class_attendance')
             ->whereHas('roles', fn ($query) => $query->where('name', 'mahasiswa'))
-            ->whereHas('mahasiswaProfile', function ($query): void {
-                $query->where('advisor_id', $this->lecturer_id)
+            ->whereHas('mahasiswaProfile', function ($query) use ($lecturerId): void {
+                $query->where('advisor_id', $lecturerId)
                     ->where('academic_status', 'Aktif');
             })
             ->whereHas('internships', function ($query): void {
@@ -67,14 +65,13 @@ class GuidanceClass extends Model
             ->withTimestamps();
     }
 
-    /**
-     * Get all eligible students for this guidance class.
-     */
     public function getEligibleStudents()
     {
+        $lecturerId = $this->lecturer_id; // Capture lecturer_id
+
         return User::role('mahasiswa')
-            ->whereHas('mahasiswaProfile', function ($query): void {
-                $query->where('advisor_id', $this->lecturer_id)
+            ->whereHas('mahasiswaProfile', function ($query) use ($lecturerId): void { // Use captured variable
+                $query->where('advisor_id', $lecturerId)
                     ->where('academic_status', 'Aktif');
             })
             ->whereHas('internships', function ($query): void {
@@ -83,9 +80,6 @@ class GuidanceClass extends Model
             ->get();
     }
 
-    /**
-     * Generate attendance records for all eligible students.
-     */
     public function generateAttendanceRecords()
     {
         $eligibleStudents = $this->getEligibleStudents();
@@ -104,9 +98,6 @@ class GuidanceClass extends Model
         }
     }
 
-    /**
-     * Check if a student is eligible to attend this class.
-     */
     public function isStudentEligible(User $student): bool
     {
         return $student->hasRole('mahasiswa')
@@ -118,17 +109,11 @@ class GuidanceClass extends Model
                 ->exists();
     }
 
-    /**
-     * Get students who have attended the class.
-     */
     public function attendedStudents(): BelongsToMany
     {
         return $this->students()->whereNotNull('guidance_class_attendance.attended_at');
     }
 
-    /**
-     * Generate QR code for attendance.
-     */
     public function generateQrCode(): void
     {
         // TODO: Implement QR code generation
@@ -136,17 +121,11 @@ class GuidanceClass extends Model
         $this->save();
     }
 
-    /**
-     * Check if class has available spots.
-     */
     public function hasAvailableSpots(): bool
     {
-        return true; // Class always has available spots
+        return true;
     }
 
-    /**
-     * Check if class is ongoing.
-     */
     public function isOngoing(): bool
     {
         $now = now();
@@ -154,17 +133,11 @@ class GuidanceClass extends Model
         return $this->start_date <= $now && (! $this->end_date || $this->end_date >= $now);
     }
 
-    /**
-     * Get attendance statistics for this class.
-     */
     public function getAttendanceStats()
     {
         return GuidanceClassAttendance::getClassStats($this->id);
     }
 
-    /**
-     * Update attendance records when new eligible students are added.
-     */
     public function refreshAttendanceRecords()
     {
         $existingStudentIds = DB::table('guidance_class_attendance')
@@ -190,9 +163,6 @@ class GuidanceClass extends Model
         return $newEligibleStudents->count();
     }
 
-    /**
-     * Get all classes for a specific student.
-     */
     public static function getStudentClasses($studentId)
     {
         return static::whereHas('students', function ($query) use ($studentId): void {

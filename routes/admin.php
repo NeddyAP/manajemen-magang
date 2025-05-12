@@ -42,7 +42,7 @@ Route::middleware(['auth', 'role:superadmin|admin'])->prefix('admin')->name('adm
 
     // Users
     Route::resource('users', UserController::class);
-    Route::delete('users/bulk-destroy', [UserController::class, 'bulkDestroy'])->name('users.destroy.bulk');
+    Route::post('users/bulk-destroy', [UserController::class, 'bulkDestroy'])->name('users.destroy.bulk');
 
     // FAQS
     Route::resource('faqs', FaqController::class)->except(['show']);

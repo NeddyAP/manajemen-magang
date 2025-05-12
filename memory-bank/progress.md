@@ -2,7 +2,7 @@
 
 This document tracks the current status, progress, and evolution of the internship management system (Manajement Magang).
 
-## Current Status (As of May 11, 2025)
+## Current Status (As of May 12, 2025)
 
 ### Core Features Status
 
@@ -10,7 +10,7 @@ This document tracks the current status, progress, and evolution of the internsh
 - **Internship Management:** ✅ (Application CRUD, Status Tracking, File Upload) - _Applicant 'show' page removed_
 - **Logbook System:** ✅ (Student CRUD, Dosen Supervisor Notes via Modal, PDF/Word Export)
 - **Report Management:** ✅ (Student CRUD, File Upload, Dosen can add `reviewer_notes`, Dosen revision upload for approved/rejected reports)
-- **Guidance System:** ✅ (Class CRUD, Student Assignment, QR Code & Manual Attendance Tracking)
+- **Guidance System:** ✅ (Class CRUD, Student Assignment including auto-attachment, QR Code & Manual Attendance Tracking)
 - **Support Features (Admin):** ✅ (FAQ CRUD, Tutorial CRUD, Global Variable CRUD)
 - **Notification System:** ✅ (In-App DB-driven, Header Dropdown, History Page, Mark Read/Unread, Delete)
 - **User Settings:** ✅ (Profile, Password, Appearance)
@@ -21,6 +21,7 @@ This document tracks the current status, progress, and evolution of the internsh
 - **Testing (Report - Student):** ✅ (Pest Feature Tests for CRUD operations)
 - **Testing (Report - Dosen Revision Upload):** ✅ (Pest Feature Tests for revision upload functionality)
 - **Testing (Internship - Student):** ✅ (Pest Feature Tests for CRUD, including fixes for removed 'show' page logic)
+- **Testing (Guidance Class - Admin):** ⏳ (CRUD tests in progress, student attachment logic fixed)
 
 ### Database Schema Status
 
@@ -48,6 +49,7 @@ This document tracks the current status, progress, and evolution of the internsh
 - ✅ Logbook field `kegiatan` refactored to `activities` across relevant files.
 - ✅ Logbook export to Word and PDF functionality confirmed and routes updated.
 - ✅ **Report Revision Upload:** Added `revised_file_path`, `revision_uploaded_at` to `Report` model/migration. New controller method, request, route, and notification for Dosen revision uploads.
+- ✅ **Guidance Class Student Attachment:** Updated `GuidanceClassController@store` to automatically attach eligible students and create attendance records upon class creation.
 
 #### Frontend (React 18+ / TypeScript / Vite)
 
@@ -76,13 +78,16 @@ This document tracks the current status, progress, and evolution of the internsh
 - ✅ Feature tests for Report CRUD (Student perspective) (`tests/Feature/Front/ReportCrudTest.php`)
 - ✅ Feature tests for Internship CRUD (Student perspective) (`tests/Feature/InternshipCrudTest.php`), including fixes related to removed 'show' page.
 - ✅ **Feature tests for Dosen Report Revision Upload (`tests/Feature/ReportRevisionUploadTest.php`).**
+- ✅ **Guidance Class CRUD Test:** Fixed issue with student auto-attachment in `test_students_are_attached_and_notified_on_guidance_class_creation`.
 
 ## Recent Changes
 
+- **[2025-05-12] - Fix: Guidance Class Student Attachment.** Updated `GuidanceClassController@store` to automatically find and attach eligible students (creating `guidance_class_attendance` records) when a new guidance class is created. This addresses a failing test in `GuidanceClassCrudTest`.
+- **[2025-05-12] - Memory Bank Review:** Reviewed all core memory bank files (`projectbrief.md`, `productContext.md`, `activeContext.md`, `systemPatterns.md`, `techContext.md`, `progress.md`) as requested by the user. No significant content updates were required based on the immediate preceding conversation (context condensation).
 - **[2025-05-11] - Feature: Dosen Report Revision Upload.** Implemented backend (model, migration, controller, request, route, notification) and frontend (TypeScript type, UI in table, new modal) for Dosen to upload revised student reports. Added comprehensive Pest feature tests.
 - **[2025-05-11] - Clarified Dosen Report Feedback:** Updated Memory Bank to reflect that Dosen can add `reviewer_notes` to reports, in addition to uploading revisions. This is distinct from a more general feedback system which is a future consideration.
 - **[2025-05-11] - General Memory Bank Update:** Updated `activeContext.md`, `techContext.md`, `progress.md`, `decisionLog.md` to reflect the current application state.
-- **[2025-05-11 09:25:53] - Confirmed and updated backend functionality for logbook export to Word and PDF. Routes in `routes/web.php` were updated to match frontend naming conventions. Existing `LogbookController` methods for export were verified.**
+- **[2025-05-11 09:25:53] - Confirmed and updated backend functionality for logbook export to Word and PDF. Routes in `routes/web.php` were updated to match frontend naming conventions.**
 - **Logbook Enhancements:**
     - Enabled 'dosen' users to add supervisor notes to logbooks via a modal.
     - Optimized logbook pages: added back button, incorporated Tailwind CSS animations for better UX.
@@ -121,7 +126,7 @@ This document tracks the current status, progress, and evolution of the internsh
 
 ### Immediate Tasks (Post-Documentation)
 
-1.  **Testing:** Write Pest tests for Guidance Class CRUD operations.
+1.  **Testing:** Verify the fix for `GuidanceClassCrudTest`.
 2.  **Testing:** Write Pest tests for FAQ CRUD operations (Admin).
 3.  **Testing:** Write Pest tests for Tutorial CRUD operations (Admin).
 
@@ -159,5 +164,5 @@ This document tracks the current status, progress, and evolution of the internsh
 ## Roadmap Status
 
 - **Phase 1 (Core Features):** Mostly Complete ✅
-- **Phase 2 (Refinement & Testing):** In Progress ⏳ (Notifications, Settings, Trash, Logbook Dosen Notes & UI enhancements, Logbook/Report/Internship CRUD tests (Student) completed. Logbook field name refactored. Soft Deletes strategy implemented. Internship 'show' page removed. Testing ongoing. Documentation updated.)
+- **Phase 2 (Refinement & Testing):** In Progress ⏳ (Notifications, Settings, Trash, Logbook Dosen Notes & UI enhancements, Logbook/Report/Internship CRUD tests (Student) completed. Logbook field name refactored. Soft Deletes strategy implemented. Internship 'show' page removed. Testing ongoing. Documentation updated. Guidance Class student auto-attachment fixed.)
 - **Phase 3 (Advanced Features):** Planned 📋

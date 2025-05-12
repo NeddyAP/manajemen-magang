@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\AdminProfile; // Added import
+use App\Models\DosenProfile; // Added import
 use App\Models\MahasiswaProfile;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -30,7 +32,7 @@ class UserFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('a'),
+            'password' => static::$password ??= Hash::make('a'), // Default password 'a' for simplicity in tests
             'remember_token' => Str::random(10),
         ];
     }
@@ -67,8 +69,7 @@ class UserFactory extends Factory
             // Ensure 'admin' role exists
             $role = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
             $user->assignRole($role);
-            // Assuming AdminProfile exists and has a factory
-            // \App\Models\AdminProfile::factory()->for($user)->create();
+            AdminProfile::factory()->for($user)->create(); // Uncommented and corrected
         });
     }
 
@@ -81,8 +82,7 @@ class UserFactory extends Factory
             // Ensure 'dosen' role exists
             $role = Role::firstOrCreate(['name' => 'dosen', 'guard_name' => 'web']);
             $user->assignRole($role);
-            // Assuming DosenProfile exists and has a factory
-            // \App\Models\DosenProfile::factory()->for($user)->create();
+            DosenProfile::factory()->for($user)->create(); // Uncommented and corrected
         });
     }
 }

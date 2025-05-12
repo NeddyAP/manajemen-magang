@@ -57,3 +57,6 @@ interface TableMeta {
 
 // Define the generic PageProps
 export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & SharedData;
+
+// Export notification types
+export * from './notifications';

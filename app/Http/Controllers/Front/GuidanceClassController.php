@@ -468,11 +468,23 @@ class GuidanceClassController extends Controller
         $notes = $request->input('notes', 'Ditandai secara manual oleh dosen.');
 
         try {
-            // When dosen manually marks attendance, directly update the record
-            $attendance->attended_at = now();
-            $attendance->attendance_method = 'manual';
-            $attendance->notes = $notes;
-            $attendance->save();
+            // When dosen manually marks attendance, use syncWithoutDetaching to ensure pivot data is saved properly
+            if ($attendance->id) {
+                // Update existing record
+                $attendance->attended_at = now();
+                $attendance->attendance_method = 'manual';
+                $attendance->notes = $notes;
+                $attendance->save();
+            } else {
+                // Create a new record via sync
+                $guidanceClass->students()->syncWithoutDetaching([
+                    $studentId => [
+                        'attended_at' => now(),
+                        'attendance_method' => 'manual',
+                        'notes' => $notes,
+                    ],
+                ]);
+            }
 
             return back()->with('success', 'Kehadiran mahasiswa berhasil dicatat.'); // Revert to redirect
         } catch (Exception $e) {

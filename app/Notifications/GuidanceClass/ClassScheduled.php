@@ -39,8 +39,8 @@ class ClassScheduled extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
-        $className = $this->guidanceClass->name;
-        $classDateTime = $this->guidanceClass->date_time->format('d M Y H:i'); // Format date and time
+        $className = $this->guidanceClass->title;
+        $classDateTime = $this->guidanceClass->start_date->format('d M Y H:i'); // Format date and time
 
         return [
             'message' => "Anda dijadwalkan untuk kelas bimbingan '{$className}' pada {$classDateTime}.", // Indonesian text

@@ -13,6 +13,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
+use Log;
 
 class GuidanceClassController extends Controller
 {
@@ -98,7 +99,7 @@ class GuidanceClassController extends Controller
             $guidanceClass->qr_code = route('guidance-classes.attend', ['token' => $token]);
             $guidanceClass->save();
 
-            // Get all eligible students for this lecturer
+            // Find eligible students and attach them to the guidance class
             $eligibleStudents = User::role('mahasiswa')
                 ->whereHas('mahasiswaProfile', function ($query) use ($guidanceClass): void {
                     $query->where('advisor_id', $guidanceClass->lecturer_id)
@@ -107,19 +108,27 @@ class GuidanceClassController extends Controller
                 ->whereHas('internships', function ($query): void {
                     $query->where('status', 'accepted');
                 })
-                ->pluck('id')
-                ->all();
+                ->get();
 
-            // Create attendance records for all eligible students
-            foreach ($eligibleStudents as $studentId) {
-                $guidanceClass->students()->attach($studentId, [
+            $attendanceRecords = $eligibleStudents->map(function ($student) use ($guidanceClass) {
+                return [
+                    'guidance_class_id' => $guidanceClass->id,
+                    'user_id' => $student->id,
                     'created_at' => now(),
                     'updated_at' => now(),
-                ]);
+                ];
+            })->toArray();
+
+            if (! empty($attendanceRecords)) {
+                GuidanceClassAttendance::insert($attendanceRecords);
             }
 
             // Notify students after attaching them
-            $studentsToNotify = $guidanceClass->students()->get();
+            // Re-fetch students through the relationship to ensure attendance records are loaded if needed later,
+            // although for notification purposes, the $eligibleStudents collection is sufficient.
+            // $studentsToNotify = $guidanceClass->students()->get(); // This would now work after insertion
+            $studentsToNotify = $eligibleStudents; // Use the collection we already have
+
             if ($studentsToNotify->isNotEmpty()) {
                 Notification::send($studentsToNotify, new ClassScheduled($guidanceClass));
             }
@@ -128,6 +137,9 @@ class GuidanceClassController extends Controller
                 ->route('admin.guidance-classes.index')
                 ->with('success', 'Kelas bimbingan berhasil dibuat dan presensi mahasiswa telah disiapkan.');
         } catch (Exception $e) {
+            // Log the exception for debugging
+            Log::error('Error creating guidance class: '.$e->getMessage(), ['exception' => $e]);
+
             return redirect()
                 ->route('admin.guidance-classes.index')
                 ->with('error', 'Terjadi kesalahan saat membuat kelas bimbingan.');

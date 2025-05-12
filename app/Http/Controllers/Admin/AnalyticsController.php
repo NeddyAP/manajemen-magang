@@ -23,7 +23,6 @@ class AnalyticsController extends Controller
      */
     public function getInternshipStats(Request $request): JsonResponse
     {
-        // TODO: Implement logic to fetch and calculate internship statistics
         // Example: Count by status, type, duration etc.
 
         $total = Internship::count();

@@ -390,7 +390,7 @@ class UserController extends Controller
 
             DB::commit();
 
-            return back()->with('success', count($userIds).' pengguna berhasil dihapus.');
+            return redirect()->route('admin.users.index')->with('success', count($userIds).' pengguna berhasil dihapus.');
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Bulk user deletion failed: '.$e->getMessage());

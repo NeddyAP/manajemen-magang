@@ -197,12 +197,12 @@ class LogbookController extends Controller
             }
         }
 
-        $filename = 'Logbook_Table_' . str_replace([' ', '/'], '_', $studentName) . '_' . $internship->id . '.docx';
+        $filename = 'Logbook_Table_'.str_replace([' ', '/'], '_', $studentName).'_'.$internship->id.'.docx';
 
         ob_clean(); // Clean output buffer before sending headers
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Content-Disposition: attachment;filename="'.$filename.'"');
         header('Cache-Control: max-age=0');
 
         $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
@@ -221,23 +221,23 @@ class LogbookController extends Controller
             'internship' => $internship,
             'logbooks' => $logbooks,
             'studentName' => $studentName,
-            'title' => 'Logbook Magang - ' . $studentName,
+            'title' => 'Logbook Magang - '.$studentName,
         ];
 
         // The view 'pdf.logbook_export' needs to be created in resources/views/pdf/
         // Example content for the view is provided in the thought process.
         try {
             $pdf = Pdf::loadView('pdf.logbook_export', $data);
-            $filename = 'Logbook_' . str_replace([' ', '/'], '_', $studentName) . '_' . $internship->id . '.pdf';
+            $filename = 'Logbook_'.str_replace([' ', '/'], '_', $studentName).'_'.$internship->id.'.pdf';
 
             return $pdf->download($filename);
         } catch (Exception $e) {
             // Log the error for debugging
-            Log::error('PDF Export Error: ' . $e->getMessage() . ' for internship ' . $internship->id);
+            Log::error('PDF Export Error: '.$e->getMessage().' for internship '.$internship->id);
 
             // Return a user-friendly error response
             // Consider a redirect back with an error message or an error view
-            return response('Gagal membuat PDF. Silakan coba lagi nanti atau hubungi administrator. Error: ' . $e->getMessage(), 500);
+            return response('Gagal membuat PDF. Silakan coba lagi nanti atau hubungi administrator. Error: '.$e->getMessage(), 500);
         }
     }
 
