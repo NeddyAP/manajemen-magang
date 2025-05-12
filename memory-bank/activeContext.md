@@ -19,7 +19,7 @@ This is a comprehensive internship management system (Manajement Magang) built w
     - Authorization using `spatie/laravel-permission`.
 2.  **Internship Management:**
     - Application submission (`internships` table) with PDF uploads.
-    - Status tracking (`Submitted`, `Approved`, `Rejected`).
+    - Status tracking (`waiting`, `accepted`, `rejected`).
 3.  **Activity Tracking (Logbooks):**
     - Daily logbook entries (`logbooks` table) by students.
     - Visibility for students and assigned Dosen.
@@ -43,18 +43,17 @@ This is a comprehensive internship management system (Manajement Magang) built w
 8.  **User Settings:**
     - Profile updates.
     - Password changes.
-    - Appearance (Light/Dark mode).
+    - Appearance (Light/Dark/Green mode).
 9.  **Trash Management (Admin):**
     - View, Restore, Force Delete soft-deleted records.
 10. **Testing:**
     - Using Pest PHP framework.
-    - Feature tests for Authentication flows implemented (`tests/Feature/Auth/`).
     - Utilizes SQLite in-memory database for testing.
 
 ## Technical Stack
 
 - **Backend:** Laravel 12.x
-- **Frontend:** React 18+ with TypeScript
+- **Frontend:** React 19+ with TypeScript
 - **UI Framework:** Tailwind CSS with Shadcn UI components
 - **API/Integration:** Inertia.js
 - **Database:** MySQL/MariaDB (Development/Production), SQLite `:memory:` (Testing)
@@ -84,43 +83,11 @@ This is a comprehensive internship management system (Manajement Magang) built w
 
 ## Recent Changes
 
-- **Logbook Enhancements:** Enabled 'dosen' users to add supervisor notes to logbooks via a modal. Optimized logbook pages for performance and user experience, including adding a back button and incorporating Tailwind CSS animations. Resolved backend authorization issues ensuring 'dosen' can correctly access and manage logbooks for their assigned students.
-- Implementation of Notification system (backend logic, API endpoints, frontend UI/actions).
-- Refinement of Dosen access controls for viewing advisee data (Internships, Reports).
-- Addition of analytics/summary cards to various index pages.
-- Implementation of User Settings pages (Profile, Password, Appearance).
-- Implementation of Admin Trash Management feature.
-- **Addition of Pest Feature tests for Authentication flows (Registration, Login, Password Reset, Email Verification).**
-- **[2025-05-08 18:55:02] - Confirmed Dosen feedback for reports: Dosen can add `reviewer_notes` (especially for rejections/revisions) and upload report revisions. General, non-status-related feedback feature remains a future enhancement.**
-- **[2025-05-08 19:02:28] - Guidance Class attendance feature (QR code via URL, manual Dosen check-in) confirmed as substantially implemented.**
-- **[2025-05-09 00:06:00] - Removed Internship Applicant 'show' page:** Based on user feedback, the dedicated 'show' page for internship applicants, its route, and associated frontend file were removed to simplify user flow. Test redirects in `tests/Feature/InternshipCrudTest.php` were updated accordingly.
-- **[2025-05-09 00:06:00] - Fixed `InternshipCrudTest.php`:** Resolved failing test `mahasiswa can update their own internship with valid data if editable` by correcting an incorrect redirect in `app/Http/Controllers/Front/InternshipApplicantController.php` from the (now removed) 'show' route to the 'index' route. All tests in `tests/Feature/InternshipCrudTest.php` are now passing.
-- **[2025-05-09] - Applied Soft Deletes to Individual Migrations:** Instead of a consolidated migration, `softDeletes()` and `dropSoftDeletes()` were added to the `up()` and `down()` methods respectively of the original creation migration for each of the following tables: `users`, `admin_profiles`, `dosen_profiles`, `faqs`, `global_variables`, `guidance_classes`, `internships`, `logbooks`, `mahasiswa_profiles`, `reports`, `tutorials`. The consolidated migration file `2025_03_22_091458_add_soft_deletes_to_all_tables.php` was deleted.
-- \*\*[2025-05-09 01:05:21] - Recent Changes: Created and debugged Pest tests for student report CRUD (`tests/Feature/Front/ReportCrudTest.php`). Ensured consistency with database schema, factories, requests, and other test files. Refactored test descriptions.
-- **[2025-05-11] - Feature: Dosen Report Revision Upload.**
-    - **Backend:**
-        - Added `revised_file_path` and `revision_uploaded_at` to `reports` table migration and `Report` model.
-        - Created `StoreReportRevisionRequest` for validation (Indonesian messages).
-        - Added `uploadRevision` method to `ReportController` to handle file storage, old revision deletion, model update, and notification dispatch.
-        - Added route for `uploadRevision`.
-        - Created `ReportRevisionUploaded` notification.
-    - **Frontend:**
-        - Updated `Report` TypeScript interface.
-        - Modified `column.tsx` in report views to display links to original and revised files, and added an "Unggah Revisi" (Upload Revision) button/modal for Dosen.
-        - Created `UploadRevisionModal.tsx` component.
-    - **Testing:**
-        - Created `ReportRevisionUploadTest.php` with feature tests for various scenarios.
-        - Fixed failing tests related to report ownership and status checks in the controller.
-- **[2025-05-11] - General Memory Bank Update:** Updated `activeContext.md`, `techContext.md`, `progress.md`, `decisionLog.md` to reflect the current application state.
-
 ## Current Focus Area
-
-- **Task:** Updating Memory Bank files (`memory-bank/progress.md`, `memory-bank/decisionLog.md`, `memory-bank/activeContext.md`, `memory-bank/techContext.md`, and others as needed) to reflect the current state of the application.
 
 ## Next Steps (After Documentation Update)
 
 1.  **Testing:** Continue adding Pest tests for other core features (CRUD operations for Internships, Logbooks, Reports, Guidance Classes, FAQs, Tutorials, etc.). Aim for higher test coverage.
-2.  **Dosen Feedback (Reports):** The existing `reviewer_notes` (for rejections/revisions) and revision upload capabilities cover key feedback aspects. A more general, non-status-tied feedback mechanism for Dosen on Reports remains a potential future enhancement. (Logbook feedback partially implemented via supervisor notes).
 3.  **Refinement:** Address any remaining `TODO` comments in the code. Improve UI/UX based on feedback. Optimize queries or backend logic where necessary.
 4.  **TypeScript:** Continue improving type safety, potentially defining more specific types for shared data structures (e.g., `NotificationData`).
 

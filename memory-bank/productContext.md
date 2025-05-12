@@ -24,7 +24,7 @@ This document outlines the business logic, user roles, features, and workflows o
     - View internship applications of assigned advisees.
     - View logbook entries of assigned advisees and add notes/feedback.
     - View reports submitted by assigned advisees.
-    - **Upload revised versions of student reports (for approved/rejected reports).**
+    - **Upload revised versions of student reports (for accepted/rejected reports).**
     - Create, manage, and view attendance for own guidance classes.
     - Assign students to guidance classes.
     - Access general tutorials and FAQs.
@@ -54,11 +54,11 @@ This document outlines the business logic, user roles, features, and workflows o
 
 - **Flow:**
     1.  Student creates and submits an application with required details and PDF document uploads.
-    2.  Application status becomes `Submitted`.
+    2.  Application status becomes `waiting`.
     3.  Admin reviews the application.
-    4.  Admin changes status to `Approved` or `Rejected`.
+    4.  Admin changes status to `accepted` or `rejected`.
     5.  Student and relevant Admin/Dosen are notified of status changes via In-App Notifications.
-- **Statuses:** `Draft` (Implicit), `Submitted`, `Approved`, `Rejected`.
+- **Statuses:** `Draft` (Implicit), `waiting`, `accepted`, `rejected`.
 - **Requirements:** Valid student profile, completed form fields, required PDF document uploads.
 
 ### 2. Logbook Management
@@ -76,9 +76,9 @@ This document outlines the business logic, user roles, features, and workflows o
     1.  Student uploads their internship report (PDF, DOCX, etc.).
     2.  Report is visible to the student, assigned Dosen, and Admins.
     3.  Dosen/Admin review the report. Dosen can add `reviewer_notes` to the report, especially if recommending rejection or revisions.
-    4.  Admin updates the report status (e.g., `Needs Revision`, `Approved`, `Rejected`).
+    4.  Admin updates the report status (e.g., `pending`, `approved`, `rejected`).
     5.  Student is notified of status changes and any `reviewer_notes`.
-    6.  **Dosen can upload a revised version of the student's report. This revised file is stored in addition to the original and does not replace it. This is typically done after a report has been `approved` or `rejected` and requires further Dosen input.**
+    6.  **Dosen can upload a revised version of the student's report. This revised file is stored in addition to the original and does not replace it. This is typically done after a report has been `accepted` or `rejected` and requires further Dosen input.**
     7.  **Student is notified when a Dosen uploads a report revision.**
 - **Versioning:** Student re-uploads/updates create new versions. Dosen-uploaded revisions are stored separately.
 - **Requirements:** Standard report format (as defined by institution), file upload. UI text in Indonesian.
