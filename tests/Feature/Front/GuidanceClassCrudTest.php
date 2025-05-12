@@ -32,10 +32,14 @@ class GuidanceClassCrudTest extends TestCase
         $this->otherDosenUser = User::factory()->dosen()->create(); // Ensures DosenProfile is created
 
         $this->mahasiswaUser = User::factory()
-            ->has(MahasiswaProfile::factory()->state(['advisor_id' => $this->dosenUser->id]))
+            ->has(MahasiswaProfile::factory()->state([
+                'advisor_id' => $this->dosenUser->id,
+                'academic_status' => 'Aktif',
+            ]))
             ->has(Internship::factory()->state(['status' => 'accepted']))
             ->create();
         $this->mahasiswaUser->assignRole('mahasiswa');
+        $this->mahasiswaUser->refresh();
     }
 
     // Dosen Tests
@@ -359,6 +363,7 @@ class GuidanceClassCrudTest extends TestCase
             'end_date' => now()->addHour(),
         ]);
         // Ensure mahasiswa is eligible
+        $this->mahasiswaUser->refresh();
         $this->assertTrue($guidanceClass->isStudentEligible($this->mahasiswaUser));
 
         $response = $this->actingAs($this->mahasiswaUser)
