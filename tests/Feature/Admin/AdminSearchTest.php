@@ -9,11 +9,16 @@ use App\Models\Report;
 use App\Models\Tutorial;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase; // Add this line
+use Tests\TestCase;
 
 class AdminSearchTest extends TestCase
 {
     use RefreshDatabase;
+
+    /**
+     * @var \App\Models\User
+     */
+    protected $admin;
 
     protected function setUp(): void
     {
@@ -219,6 +224,7 @@ class AdminSearchTest extends TestCase
     public function test_can_search_front_reports_for_a_student()
     {
         // Arrange
+        /** @var \App\Models\User $student */
         $student = User::factory()->create();
         $student->assignRole('mahasiswa');
 
@@ -238,7 +244,7 @@ class AdminSearchTest extends TestCase
 
         // Act & Assert
         $this->actingAs($student);
-        $response = $this->get('/internships/reports/'.$internship->id.'?search=Weekly'); // Changed 'resource' to 'reports'
+        $response = $this->get('/internships/reports/' . $internship->id . '?search=Weekly'); // Changed 'resource' to 'reports'
         $response->assertStatus(200);
         $response->assertSee('Weekly Summary');
     }
@@ -246,6 +252,7 @@ class AdminSearchTest extends TestCase
     public function test_can_search_front_logbooks_for_a_student()
     {
         // Arrange
+        /** @var \App\Models\User $student */
         $student = User::factory()->create();
         $student->assignRole('mahasiswa');
 
@@ -264,7 +271,7 @@ class AdminSearchTest extends TestCase
 
         // Act & Assert
         $this->actingAs($student);
-        $response = $this->get('/internships/logbooks/'.$internship->id.'?search=design'); // Changed 'resource' to 'logbooks'
+        $response = $this->get('/internships/logbooks/' . $internship->id . '?search=design'); // Changed 'resource' to 'logbooks'
         $response->assertStatus(200);
         $response->assertSee('Worked on project design');
     }
