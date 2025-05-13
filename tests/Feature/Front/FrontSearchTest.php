@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Feature\Front;
+
 use App\Models\Internship;
 use App\Models\Logbook;
 use App\Models\Report;

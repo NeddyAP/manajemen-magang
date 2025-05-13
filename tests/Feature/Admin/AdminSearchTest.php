@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Feature\Admin;
+
 use App\Models\Faq;
 use App\Models\GlobalVariable;
 use App\Models\GuidanceClass;
@@ -244,7 +246,7 @@ class AdminSearchTest extends TestCase
 
         // Act & Assert
         $this->actingAs($student);
-        $response = $this->get('/internships/reports/'.$internship->id.'?search=Weekly'); // Changed 'resource' to 'reports'
+        $response = $this->get('/internships/reports/' . $internship->id . '?search=Weekly'); // Changed 'resource' to 'reports'
         $response->assertStatus(200);
         $response->assertSee('Weekly Summary');
     }
@@ -271,7 +273,7 @@ class AdminSearchTest extends TestCase
 
         // Act & Assert
         $this->actingAs($student);
-        $response = $this->get('/internships/logbooks/'.$internship->id.'?search=design'); // Changed 'resource' to 'logbooks'
+        $response = $this->get('/internships/logbooks/' . $internship->id . '?search=design'); // Changed 'resource' to 'logbooks'
         $response->assertStatus(200);
         $response->assertSee('Worked on project design');
     }
