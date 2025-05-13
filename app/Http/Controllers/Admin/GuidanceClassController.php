@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreGuidanceClassRequest;
 use App\Http\Requests\UpdateGuidanceClassRequest;
@@ -10,6 +9,7 @@ use App\Models\GuidanceClass;
 use App\Models\GuidanceClassAttendance;
 use App\Models\User;
 use App\Notifications\GuidanceClass\ClassScheduled;
+use DB;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;

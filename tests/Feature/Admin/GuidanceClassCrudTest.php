@@ -2,13 +2,13 @@
 
 namespace Tests\Feature\Admin;
 
-use DB;
 use App\Models\GuidanceClass;
 use App\Models\Internship;
 use App\Models\MahasiswaProfile;
 use App\Models\User;
 use App\Notifications\GuidanceClass\ClassScheduled;
 use Database\Seeders\RolePermissionSeeder;
+use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;

@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\Front;
 
-use Carbon\Carbon;
-use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Controllers\Controller;
 use App\Models\GuidanceClass;
 use App\Models\GuidanceClassAttendance;
 use App\Models\User;
 use App\Notifications\GuidanceClass\ClassScheduled;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
