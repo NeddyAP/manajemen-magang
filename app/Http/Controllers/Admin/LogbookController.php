@@ -20,20 +20,63 @@ class LogbookController extends Controller
             'internship.user.mahasiswaProfile',
         ]);
 
-        if ($request->has('search')) {
-            $searchTerm = $request->search;
-            $query->whereHas('internship.user', function ($q) use ($searchTerm): void {
-                $q->where('name', 'like', "{$searchTerm}%")
-                    ->orWhere('email', 'like', "{$searchTerm}%");
+        // Handle search with more comprehensive capabilities
+        if ($request->has('search') && ! empty($request->search)) {
+            $searchTerm = trim($request->search);
+
+            $query->where(function ($q) use ($searchTerm): void {
+                // Search in logbook content
+                $q->where('date', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('activities', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('supervisor_notes', 'LIKE', "%{$searchTerm}%");
+
+                // Search in related user data
+                $q->orWhereHas('internship.user', function ($userQuery) use ($searchTerm): void {
+                    $userQuery->where('name', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('email', 'LIKE', "%{$searchTerm}%");
+                });
+
+                // Search in related internship data for company name
+                $q->orWhereHas('internship', function ($internshipQuery) use ($searchTerm): void {
+                    $internshipQuery->where('company_name', 'LIKE', "%{$searchTerm}%");
+                });
+
+                // Search by date if the search term is a valid date format
+                if (preg_match('/^\d{4}(-\d{2})?$/', $searchTerm)) {
+                    if (strlen($searchTerm) === 4) { // Year only
+                        $q->orWhereRaw('YEAR(date) = ?', [$searchTerm]);
+                    } else { // Year-month
+                        $q->orWhereRaw("DATE_FORMAT(date, '%Y-%m') = ?", [$searchTerm]);
+                    }
+                }
             });
         }
 
-        // Handle sorting
+        // Handle general filters
+        if ($request->has('filter')) {
+            foreach ($request->filter as $column => $value) {
+                if (! empty($value)) {
+                    $query->where($column, 'like', "%{$value}%");
+                }
+            }
+        }
+
+        // Handle sorting with advanced options
         if ($request->has('sort_field')) {
+            $sortField = $request->sort_field;
             $direction = $request->input('sort_direction', 'asc');
-            $query->orderBy($request->sort_field, $direction);
+
+            // Special handling for related fields
+            if ($sortField === 'user') {
+                $query->join('internships', 'logbooks.internship_id', '=', 'internships.id')
+                    ->join('users', 'internships.user_id', '=', 'users.id')
+                    ->orderBy('users.name', $direction)
+                    ->select('logbooks.*');
+            } else {
+                $query->orderBy($sortField, $direction);
+            }
         } else {
-            $query->latest();
+            $query->latest('created_at');
         }
 
         // Paginate the results
@@ -89,11 +132,15 @@ class LogbookController extends Controller
     /**
      * Remove multiple resources from storage.
      */
-    public function bulkDestroy()
+    public function bulkDestroy(Request $request)
     {
-        $ids = request()->input('ids');
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:logbooks,id',
+        ]);
+
         try {
-            Logbook::destroy($ids);
+            Logbook::whereIn('id', $validated['ids'])->delete();
 
             return redirect()->route('admin.logbooks.index')->with('success', 'Logbook berhasil dihapus.');
         } catch (Exception $e) {

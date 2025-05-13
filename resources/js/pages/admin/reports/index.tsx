@@ -6,7 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import { TableMeta, type BreadcrumbItem } from '@/types';
 import { Report } from '@/types/internship';
 import { Head, router } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { columns, initialColumnVisibility } from './components/column';
 import { StatusFilter } from './components/filters';
 
@@ -24,6 +24,7 @@ interface ReportsProps {
 
 export default function Reports({ reports, meta }: ReportsProps) {
     const [selectedStatus, setSelectedStatus] = useState<string>('');
+    const pendingRequestRef = useRef<NodeJS.Timeout | null>(null);
 
     // Initialize filters from URL on mount
     useEffect(() => {
@@ -37,17 +38,52 @@ export default function Reports({ reports, meta }: ReportsProps) {
 
     const handleStatusChange = (status: string) => {
         setSelectedStatus(status);
-
-        // Build query object
-        const query: Record<string, string> = {};
-        if (status) query.status = status;
-
-        router.get(route('admin.reports.index'), query, {
-            preserveState: true,
-            preserveScroll: true,
-            replace: true,
-        });
+        updateFilters(status);
     };
+
+    const updateFilters = (status: string) => {
+        // Cancel any pending requests
+        if (pendingRequestRef.current) {
+            clearTimeout(pendingRequestRef.current);
+            pendingRequestRef.current = null;
+        }
+
+        // Build query object with only non-empty values
+        const query: Record<string, string> = {};
+
+        // Preserve existing search term if present
+        const url = new URL(window.location.href);
+        const search = url.searchParams.get('search');
+        if (search) {
+            query.search = search;
+        }
+
+        // Add status filter if set
+        if (status) {
+            query.status = status;
+        }
+
+        // Navigate with updated filters after a small delay
+        pendingRequestRef.current = setTimeout(() => {
+            router.get(route('admin.reports.index'), query, {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+                only: ['reports', 'meta', 'errors'],
+            });
+            pendingRequestRef.current = null;
+        }, 100);
+    };
+
+    // Clean up on unmount
+    useEffect(() => {
+        return () => {
+            if (pendingRequestRef.current) {
+                clearTimeout(pendingRequestRef.current);
+                pendingRequestRef.current = null;
+            }
+        };
+    }, []);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -70,6 +106,7 @@ export default function Reports({ reports, meta }: ReportsProps) {
                         meta={meta}
                         deleteRoute={route('admin.reports.destroy.bulk')}
                         initialColumnVisibility={initialColumnVisibility}
+                        searchPlaceholder="Cari laporan berdasarkan judul, mahasiswa, perusahaan..."
                     />
                 </div>
             </div>

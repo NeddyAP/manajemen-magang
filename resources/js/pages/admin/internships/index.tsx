@@ -6,7 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import { TableMeta, type BreadcrumbItem } from '@/types';
 import { Internship } from '@/types/internship';
 import { Head, router } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { columns, initialColumnVisibility } from './components/column';
 import { StatusFilter, TypeFilter } from './components/filters';
 
@@ -25,6 +25,7 @@ interface InternshipsProps {
 export default function Internships({ internships, meta }: InternshipsProps) {
     const [selectedStatus, setSelectedStatus] = useState<string>('');
     const [selectedType, setSelectedType] = useState<string>('');
+    const pendingRequestRef = useRef<NodeJS.Timeout | null>(null);
 
     // Initialize filters from URL on mount
     useEffect(() => {
@@ -42,33 +43,59 @@ export default function Internships({ internships, meta }: InternshipsProps) {
 
     const handleStatusChange = (status: string) => {
         setSelectedStatus(status);
-
-        // Build query object
-        const query: Record<string, string> = {};
-        if (status) query.status = status;
-        if (selectedType) query.type = selectedType;
-
-        router.get(route('admin.internships.index'), query, {
-            preserveState: true,
-            preserveScroll: true,
-            replace: true,
-        });
+        updateFilters({ status, type: selectedType });
     };
 
     const handleTypeChange = (type: string) => {
         setSelectedType(type);
-
-        // Build query object
-        const query: Record<string, string> = {};
-        if (selectedStatus) query.status = selectedStatus;
-        if (type) query.type = type;
-
-        router.get(route('admin.internships.index'), query, {
-            preserveState: true,
-            preserveScroll: true,
-            replace: true,
-        });
+        updateFilters({ status: selectedStatus, type });
     };
+
+    const updateFilters = (filters: Record<string, string>) => {
+        // Cancel any pending requests
+        if (pendingRequestRef.current) {
+            clearTimeout(pendingRequestRef.current);
+            pendingRequestRef.current = null;
+        }
+
+        // Build query object with only non-empty values
+        const query: Record<string, string> = {};
+
+        // Preserve existing search term if present
+        const url = new URL(window.location.href);
+        const search = url.searchParams.get('search');
+        if (search) {
+            query.search = search;
+        }
+
+        // Add selected filters
+        Object.entries(filters).forEach(([key, value]) => {
+            if (value) {
+                query[key] = value;
+            }
+        });
+
+        // Navigate with the updated filters after a small delay
+        pendingRequestRef.current = setTimeout(() => {
+            router.get(route('admin.internships.index'), query, {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+                only: ['internships', 'meta', 'errors'],
+            });
+            pendingRequestRef.current = null;
+        }, 100);
+    };
+
+    // Clean up on unmount
+    useEffect(() => {
+        return () => {
+            if (pendingRequestRef.current) {
+                clearTimeout(pendingRequestRef.current);
+                pendingRequestRef.current = null;
+            }
+        };
+    }, []);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -81,7 +108,7 @@ export default function Internships({ internships, meta }: InternshipsProps) {
                 </div>
                 <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 overflow-hidden rounded-xl md:min-h-min">
                     <div className="mb-4 flex items-center justify-between">
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
                             <StatusFilter value={selectedStatus} onChange={handleStatusChange} />
                             <TypeFilter value={selectedType} onChange={handleTypeChange} />
                         </div>
@@ -97,6 +124,7 @@ export default function Internships({ internships, meta }: InternshipsProps) {
                         meta={meta}
                         deleteRoute={route('admin.internships.destroy.bulk')}
                         initialColumnVisibility={initialColumnVisibility}
+                        searchPlaceholder="Cari nama, perusahaan, email, status, dll..."
                     />
                 </div>
             </div>

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Admin;
 
+use DB;
 use App\Models\GuidanceClass;
 use App\Models\Internship;
 use App\Models\MahasiswaProfile;
@@ -129,7 +130,7 @@ class GuidanceClassCrudTest extends TestCase
 
         // Manually insert attendance records for testing purposes
         // This is a workaround for the failing test
-        \DB::table('guidance_class_attendance')->insert([
+        DB::table('guidance_class_attendance')->insert([
             [
                 'guidance_class_id' => $createdClass->id,
                 'user_id' => $student1->id,

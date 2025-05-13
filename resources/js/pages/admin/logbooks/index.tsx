@@ -38,6 +38,7 @@ export default function Logbooks({ logbooks, meta }: LogbookProps) {
                         meta={meta}
                         deleteRoute={route('admin.logbooks.destroy.bulk')}
                         initialColumnVisibility={initialColumnVisibility}
+                        searchPlaceholder="Cari logbook berdasarkan nama mahasiswa, aktivitas, catatan..."
                     />
                 </div>
             </div>

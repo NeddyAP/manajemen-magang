@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreGuidanceClassRequest;
 use App\Http\Requests\UpdateGuidanceClassRequest;
@@ -24,15 +25,71 @@ class GuidanceClassController extends Controller
     {
         $query = GuidanceClass::with(['lecturer.dosenProfile'])
             ->latest();
-        // Add search functionality
-        if ($search = $request->input('search')) {
-            $query->where('title', 'like', "%{$search}%")
-                ->orWhereHas('lecturer', function ($q) use ($search): void {
-                    $q->where('name', 'like', "%{$search}%");
+
+        // Handle search with more comprehensive capabilities
+        if ($request->has('search') && ! empty($request->search)) {
+            $searchTerm = trim($request->search);
+
+            // Use a more efficient search with a cleaner approach
+            $query->where(function ($q) use ($searchTerm): void {
+                // Search in guidance class fields
+                $q->where('title', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('room', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('description', 'LIKE', "%{$searchTerm}%");
+
+                // Search in related lecturer data
+                $q->orWhereHas('lecturer', function ($userQuery) use ($searchTerm): void {
+                    $userQuery->where('name', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('email', 'LIKE', "%{$searchTerm}%")
+                        ->orWhereHas('dosenProfile', function ($profileQuery) use ($searchTerm): void {
+                            $profileQuery->where('employee_number', 'LIKE', "%{$searchTerm}%")
+                                ->orWhere('expertise', 'LIKE', "%{$searchTerm}%")
+                                ->orWhere('academic_position', 'LIKE', "%{$searchTerm}%");
+                        });
                 });
+
+                // Search by month/year in dates
+                if (preg_match('/^\d{4}(-\d{2})?$/', $searchTerm)) {
+                    if (strlen($searchTerm) === 4) { // Year only
+                        $q->orWhereRaw('YEAR(start_date) = ?', [$searchTerm])
+                            ->orWhereRaw('YEAR(end_date) = ?', [$searchTerm]);
+                    } else { // Year-month
+                        $q->orWhereRaw("DATE_FORMAT(start_date, '%Y-%m') = ?", [$searchTerm])
+                            ->orWhereRaw("DATE_FORMAT(end_date, '%Y-%m') = ?", [$searchTerm]);
+                    }
+                }
+            });
         }
 
-        $classes = $query->paginate(10)
+        // Handle filters if present
+        if ($request->has('filter')) {
+            foreach ($request->filter as $column => $value) {
+                if (! empty($value)) {
+                    $query->where($column, 'like', "%{$value}%");
+                }
+            }
+        }
+
+        // Handle sorting with advanced options
+        if ($request->has('sort_field')) {
+            $sortField = $request->sort_field;
+            $direction = $request->input('sort_direction', 'asc');
+
+            // Special handling for related fields
+            if ($sortField === 'lecturer') {
+                $query->join('users', 'guidance_classes.lecturer_id', '=', 'users.id')
+                    ->orderBy('users.name', $direction)
+                    ->select('guidance_classes.*');
+            } else {
+                $query->orderBy($sortField, $direction);
+            }
+        } else {
+            $query->latest('created_at');
+        }
+
+        // Paginate the results with user-defined page size
+        $perPage = $request->input('per_page', 10);
+        $classes = $query->paginate($perPage)
             ->withQueryString()
             ->through(fn ($class) => [
                 'id' => $class->id,
@@ -69,6 +126,8 @@ class GuidanceClassController extends Controller
                 'currentPage' => $classes->currentPage(),
                 'lastPage' => $classes->lastPage(),
                 'perPage' => $classes->perPage(),
+                'from' => $classes->firstItem(),
+                'to' => $classes->lastItem(),
             ],
         ]);
     }
@@ -112,7 +171,7 @@ class GuidanceClassController extends Controller
 
             // Directly using DB query to insert records rather than relying on model events or the attendance model
             foreach ($eligibleStudents as $student) {
-                \DB::table('guidance_class_attendance')->insert([
+                DB::table('guidance_class_attendance')->insert([
                     'guidance_class_id' => $guidanceClass->id,
                     'user_id' => $student->id,
                     'created_at' => now(),
@@ -160,13 +219,41 @@ class GuidanceClassController extends Controller
                 },
             ]);
 
-        // Add search functionality
+        // Add more comprehensive search functionality
         if ($search = $request->input('search')) {
-            $query->where(function ($q) use ($search): void {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhereHas('mahasiswaProfile', function ($q) use ($search): void {
-                        $q->where('student_number', 'like', "%{$search}%");
+            $searchTerm = trim($search);
+
+            $query->where(function ($q) use ($searchTerm): void {
+                // Search in user fields
+                $q->where('name', 'like', "%{$searchTerm}%")
+                    ->orWhere('email', 'like', "%{$searchTerm}%");
+
+                // Search in mahasiswaProfile fields
+                $q->orWhereHas('mahasiswaProfile', function ($profileQuery) use ($searchTerm): void {
+                    $profileQuery->where('student_number', 'like', "%{$searchTerm}%")
+                        ->orWhere('study_program', 'like', "%{$searchTerm}%")
+                        ->orWhere('semester', $searchTerm)
+                        ->orWhere('semester', 'like', "%{$searchTerm}%");
+                });
+
+                // Search in internship fields
+                $q->orWhereHas('internships', function ($internshipQuery) use ($searchTerm): void {
+                    $internshipQuery->where('company_name', 'like', "%{$searchTerm}%")
+                        ->orWhere('status', 'like', "%{$searchTerm}%");
+                });
+
+                // Search by attendance status
+                if (strtolower($searchTerm) === 'hadir' || strtolower($searchTerm) === 'present') {
+                    $q->orWhereHas('guidanceClassAttendance', function ($attendanceQuery) use ($guidanceClass): void {
+                        $attendanceQuery->where('guidance_class_id', $guidanceClass->id)
+                            ->whereNotNull('attended_at');
                     });
+                } elseif (strtolower($searchTerm) === 'tidak hadir' || strtolower($searchTerm) === 'absent') {
+                    $q->orWhereHas('guidanceClassAttendance', function ($attendanceQuery) use ($guidanceClass): void {
+                        $attendanceQuery->where('guidance_class_id', $guidanceClass->id)
+                            ->whereNull('attended_at');
+                    });
+                }
             });
         }
 

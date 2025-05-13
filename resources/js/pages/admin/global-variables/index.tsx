@@ -48,6 +48,7 @@ export default function GlobalVariables({ globalVariables, meta }: GlobalVariabl
                         meta={meta}
                         deleteRoute={route('admin.global-variables.destroy.bulk')}
                         initialColumnVisibility={initialColumnVisibility}
+                        searchPlaceholder="Cari variabel berdasarkan key, value, deskripsi..."
                     />
                 </div>
             </div>

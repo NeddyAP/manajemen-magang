@@ -13,7 +13,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Logbook',
         // Dynamically set href based on logbook data
-        href: '#', // Placeholder, will be set dynamically
+        href: '#',
     },
     {
         title: 'Edit Logbook',

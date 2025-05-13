@@ -8,7 +8,7 @@ import { Head, Link, router } from '@inertiajs/react'; // Correct inertia import
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { ArrowLeft, Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { columns, initialColumnVisibility } from './components/column';
 import { StatusFilter } from './components/filters';
 
@@ -36,25 +36,74 @@ interface PageProps {
 
 export default function ReportsIndex({ internship, reports, reportStats, meta }: PageProps) {
     const [selectedStatus, setSelectedStatus] = useState<string>('');
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const pendingRequestRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         const url = new URL(window.location.href);
         const status = url.searchParams.get('status');
+        const search = url.searchParams.get('search');
+
         if (status) {
             setSelectedStatus(status);
+        }
+
+        if (search) {
+            setSearchTerm(search);
         }
     }, []);
 
     const handleStatusChange = (status: string) => {
         setSelectedStatus(status);
-        const query = status ? { status } : {};
-        // Use route helper if available, otherwise keep string path
-        router.get(route('front.internships.reports.index', internship.id), query, {
-            preserveState: true,
-            preserveScroll: true,
-            replace: true,
-        });
+        updateFilters(status, searchTerm);
     };
+
+    const handleSearchChange = (search: string) => {
+        setSearchTerm(search);
+        updateFilters(selectedStatus, search);
+    };
+
+    const updateFilters = (status: string, search: string) => {
+        // Cancel any pending requests
+        if (pendingRequestRef.current) {
+            clearTimeout(pendingRequestRef.current);
+            pendingRequestRef.current = null;
+        }
+
+        // Build query object with only non-empty values
+        const query: Record<string, string> = {};
+
+        // Add search term if present
+        if (search) {
+            query.search = search;
+        }
+
+        // Add status filter if set
+        if (status) {
+            query.status = status;
+        }
+
+        // Navigate with updated filters after a small delay
+        pendingRequestRef.current = setTimeout(() => {
+            router.get(route('front.internships.reports.index', internship.id), query, {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+                only: ['reports', 'meta', 'errors'],
+            });
+            pendingRequestRef.current = null;
+        }, 100);
+    };
+
+    // Clean up on unmount
+    useEffect(() => {
+        return () => {
+            if (pendingRequestRef.current) {
+                clearTimeout(pendingRequestRef.current);
+                pendingRequestRef.current = null;
+            }
+        };
+    }, []);
 
     if (!internship.start_date || !internship.end_date) return 'Tanggal magang tidak valid';
 
@@ -136,7 +185,11 @@ export default function ReportsIndex({ internship, reports, reportStats, meta }:
                             columns={columns}
                             data={reports}
                             filter={<StatusFilter value={selectedStatus} onChange={handleStatusChange} />}
+                            filters={[{ id: 'status', value: selectedStatus }]}
                             initialColumnVisibility={initialColumnVisibility}
+                            searchPlaceholder="Cari laporan berdasarkan judul, versi, status..."
+                            initialSearchTerm={searchTerm}
+                            onSearchChange={handleSearchChange}
                         />
                     </div>
                 </div>

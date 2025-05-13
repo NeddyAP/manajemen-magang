@@ -81,7 +81,6 @@ export default function LogbooksIndex({ internship, logbooks, totalLogbookCount,
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem
                                             onClick={() => {
-                                                // Placeholder for actual backend endpoint
                                                 const exportUrl = route('front.internships.logbooks.export.word', { internship: internship.id });
                                                 window.open(exportUrl, '_blank');
                                                 toast.info('Memulai proses eksport ke Word...');
@@ -92,7 +91,6 @@ export default function LogbooksIndex({ internship, logbooks, totalLogbookCount,
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onClick={() => {
-                                                // Placeholder for actual backend endpoint
                                                 const exportUrl = route('front.internships.logbooks.export.pdf', { internship: internship.id });
                                                 window.open(exportUrl, '_blank');
                                                 toast.info('Memulai proses eksport ke PDF...');
@@ -120,7 +118,13 @@ export default function LogbooksIndex({ internship, logbooks, totalLogbookCount,
                         </div>
 
                         <div className="transition-all duration-300 ease-in-out hover:shadow-md">
-                            <DataTable meta={meta} columns={columns} data={logbooks} initialColumnVisibility={initialColumnVisibility} />
+                            <DataTable
+                                meta={meta}
+                                columns={columns}
+                                data={logbooks}
+                                initialColumnVisibility={initialColumnVisibility}
+                                searchPlaceholder="Cari logbook berdasarkan tanggal, aktivitas, catatan..."
+                            />
                         </div>
                     </div>
                 </div>

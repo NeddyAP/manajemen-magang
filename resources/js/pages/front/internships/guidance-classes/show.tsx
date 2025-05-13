@@ -254,7 +254,13 @@ export default function ShowGuidanceClass({ class: guidanceClass, meta, userRole
                                     </CardHeader>
                                     <CardContent>
                                         {guidanceClass.students && guidanceClass.students.length > 0 ? (
-                                            <DataTable meta={meta} columns={userColumns} data={guidanceClass.students} initialColumnVisibility={{}} />
+                                            <DataTable
+                                                meta={meta}
+                                                columns={userColumns}
+                                                data={guidanceClass.students}
+                                                initialColumnVisibility={{}}
+                                                searchPlaceholder="Cari mahasiswa berdasarkan nama, NIM, program studi..."
+                                            />
                                         ) : (
                                             <div className="text-muted-foreground py-4 text-center">Belum ada mahasiswa yang terdaftar.</div>
                                         )}

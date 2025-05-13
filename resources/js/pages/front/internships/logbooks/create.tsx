@@ -16,7 +16,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     // Breadcrumb href will be updated dynamically below
     {
         title: 'Logbook',
-        href: '#', // Placeholder, will be set dynamically
+        href: '#',
     },
     {
         title: 'Tambah Logbook',

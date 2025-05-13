@@ -48,6 +48,7 @@ export default function Tutorials({ tutorials, meta }: TutorialsProps) {
                         meta={meta}
                         deleteRoute={route('admin.tutorials.destroy.bulk')}
                         initialColumnVisibility={initialColumnVisibility}
+                        searchPlaceholder="Cari tutorial berdasarkan judul, konten..."
                     />
                 </div>
             </div>

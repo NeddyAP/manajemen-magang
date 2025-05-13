@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Front;
 
+use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 use App\Http\Controllers\Controller;
 use App\Models\GuidanceClass;
 use App\Models\GuidanceClassAttendance;
@@ -38,7 +40,7 @@ class GuidanceClassController extends Controller
         if ($userRole === 'dosen') {
             // Dosen melihat kelas yang mereka ampu
             $query = GuidanceClass::where('lecturer_id', $user->id)
-                ->with(['lecturer', 'students' => function ($query): void {
+                ->with(['lecturer.dosenProfile', 'students' => function ($query): void {
                     $query->with('internships', function ($query): void {
                         $query->where('status', 'accepted')
                             ->latest()
@@ -49,7 +51,7 @@ class GuidanceClassController extends Controller
             // Mahasiswa melihat kelas dari dosen pembimbing mereka
             if ($user->mahasiswaProfile && $user->mahasiswaProfile->advisor_id) {
                 $query = GuidanceClass::where('lecturer_id', $user->mahasiswaProfile->advisor_id)
-                    ->with(['lecturer', 'students' => function ($query) use ($user): void {
+                    ->with(['lecturer.dosenProfile', 'students' => function ($query) use ($user): void {
                         $query->where('users.id', $user->id)
                             ->with('internships', function ($query): void {
                                 $query->where('status', 'accepted')
@@ -67,20 +69,64 @@ class GuidanceClassController extends Controller
         // Clone the base query for analytics before applying filters/search
         $analyticsQuery = clone $query;
 
-        // Handle search
-        if ($request->has('search')) {
-            $searchTerm = $request->search;
-            $query->where(function ($q) use ($searchTerm): void {
+        // Handle search with more comprehensive capabilities
+        if ($request->has('search') && ! empty($request->search)) {
+            $searchTerm = trim($request->search);
+
+            // Use a more efficient search with a cleaner approach
+            $query->where(function ($q) use ($searchTerm, $userRole): void {
+                // Search in guidance class fields
                 $q->where('title', 'like', "%{$searchTerm}%")
                     ->orWhere('room', 'like', "%{$searchTerm}%")
-                    ->orWhere('description', 'like', "%{$searchTerm}%")
-                    ->orWhereHas('lecturer', function ($subQuery) use ($searchTerm): void {
-                        $subQuery->where('name', 'like', "%{$searchTerm}%");
+                    ->orWhere('description', 'like', "%{$searchTerm}%");
+
+                // Search in lecturer info
+                $q->orWhereHas('lecturer', function ($lecturerQuery) use ($searchTerm): void {
+                    $lecturerQuery->where('name', 'like', "%{$searchTerm}%")
+                        ->orWhere('email', 'like', "%{$searchTerm}%")
+                        ->orWhereHas('dosenProfile', function ($profileQuery) use ($searchTerm): void {
+                            $profileQuery->where('employee_number', 'like', "%{$searchTerm}%")
+                                ->orWhere('expertise', 'like', "%{$searchTerm}%")
+                                ->orWhere('academic_position', 'like', "%{$searchTerm}%");
+                        });
+                });
+
+                // Search by student name if the user is a dosen
+                if ($userRole === 'dosen') {
+                    $q->orWhereHas('students', function ($studentQuery) use ($searchTerm): void {
+                        $studentQuery->where('name', 'like', "%{$searchTerm}%")
+                            ->orWhere('email', 'like', "%{$searchTerm}%")
+                            ->orWhereHas('mahasiswaProfile', function ($profileQuery) use ($searchTerm): void {
+                                $profileQuery->where('student_number', 'like', "%{$searchTerm}%")
+                                    ->orWhere('study_program', 'like', "%{$searchTerm}%");
+                            });
                     });
+                }
+
+                // Search by date if the search term is a valid date format
+                if (preg_match('/^\d{4}(-\d{2})?$/', $searchTerm)) {
+                    if (strlen($searchTerm) === 4) { // Year only
+                        $q->orWhereRaw('YEAR(start_date) = ?', [$searchTerm])
+                            ->orWhereRaw('YEAR(end_date) = ?', [$searchTerm]);
+                    } else { // Year-month
+                        $q->orWhereRaw("DATE_FORMAT(start_date, '%Y-%m') = ?", [$searchTerm])
+                            ->orWhereRaw("DATE_FORMAT(end_date, '%Y-%m') = ?", [$searchTerm]);
+                    }
+                }
+
+                // Try to parse as a date string and search
+                try {
+                    $date = Carbon::parse($searchTerm);
+                    $formattedDate = $date->format('Y-m-d');
+                    $q->orWhereDate('start_date', $formattedDate)
+                        ->orWhereDate('end_date', $formattedDate);
+                } catch (Exception $e) {
+                    // Not a valid date format, skip this search condition
+                }
             });
         }
 
-        // Handle filters
+        // Handle filters with improved status handling
         if ($request->has('filter')) {
             $now = now();
             foreach ($request->filter as $column => $value) {
@@ -101,17 +147,56 @@ class GuidanceClassController extends Controller
                                 ->where('end_date', '<', $now);
                             break;
                     }
-                } elseif ($value) {
+                } elseif (! empty($value)) {
                     // Apply default 'like' filter for other columns
                     $query->where($column, 'like', "%{$value}%");
                 }
             }
+        } elseif ($request->has('status')) {
+            // Handle direct status parameter for simpler filtering
+            $now = now();
+            $status = $request->status;
+
+            switch ($status) {
+                case 'upcoming':
+                    $query->where('start_date', '>', $now);
+                    break;
+                case 'ongoing':
+                    $query->where('start_date', '<=', $now)
+                        ->where(function ($q) use ($now): void {
+                            $q->whereNull('end_date')
+                                ->orWhere('end_date', '>=', $now);
+                        });
+                    break;
+                case 'finished':
+                    $query->whereNotNull('end_date')
+                        ->where('end_date', '<', $now);
+                    break;
+            }
         }
 
-        // Handle sorting
+        // Handle sorting with improved field mapping
         if ($request->has('sort_field')) {
+            $sortField = $request->sort_field;
             $direction = $request->input('sort_direction', 'asc');
-            $query->orderBy($request->sort_field, $direction);
+
+            // Map frontend field names to database field names
+            $sortMapping = [
+                'title' => 'title',
+                'start_date' => 'start_date',
+                'end_date' => 'end_date',
+                'room' => 'room',
+                'lecturer' => 'lecturer_id',
+                'created_at' => 'created_at',
+                'updated_at' => 'updated_at',
+            ];
+
+            if (isset($sortMapping[$sortField])) {
+                $dbField = $sortMapping[$sortField];
+                $query->orderBy($dbField, $direction);
+            } else {
+                $query->latest();
+            }
         } else {
             $query->latest();
         }
@@ -128,7 +213,7 @@ class GuidanceClassController extends Controller
             )
             ->first();
 
-        // Paginate the results (using the potentially filtered/searched query)
+        // Paginate the results with user-defined page size
         $perPage = $request->input('per_page', 10);
         $classes = $query->paginate($perPage)->withQueryString();
 
@@ -144,6 +229,7 @@ class GuidanceClassController extends Controller
                 'to' => $classes->lastItem(),
                 'links' => $classes->linkCollection()->toArray(),
             ],
+            'filters' => $request->only(['search', 'filter', 'status', 'sort_field', 'sort_direction', 'per_page']),
         ]);
     }
 
@@ -222,7 +308,7 @@ class GuidanceClassController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function show($id)
+    public function show($id, Request $request)
     {
         $user = Auth::user()->load('roles');
         $userRole = $user->roles->first()->name === 'dosen' ? 'dosen' : 'mahasiswa';
@@ -257,32 +343,144 @@ class GuidanceClassController extends Controller
                     $query->where('status', 'accepted')
                         ->latest();
                 },
+                'guidanceClassAttendance' => function ($query) use ($guidanceClass): void { // Corrected from 'attendances'
+                    $query->where('guidance_class_id', $guidanceClass->id);
+                },
             ]);
 
-        $students = $query->get()->map(function ($student) use ($id) {
-            // Access relationships directly from User model
-            $attendance = GuidanceClassAttendance::where('guidance_class_id', $id)
-                ->where('user_id', $student->id)
-                ->first();
-            $internship = $student->internships->first();
+        // Enhanced search for students within the class
+        if ($request->has('search') && ! empty($request->search)) {
+            $searchTerm = trim($request->search);
 
-            return [
-                'id' => $student->id,
-                'name' => $student->name,
-                'student_number' => $student->mahasiswaProfile?->student_number,
-                'study_program' => $student->mahasiswaProfile?->study_program,
-                'semester' => $student->mahasiswaProfile?->semester,
-                'internship' => [
-                    'company_name' => $internship?->company_name,
-                    'status' => $internship?->status,
-                ],
-                'attendance' => [
-                    'attended_at' => $attendance?->attended_at,
-                    'attendance_method' => $attendance?->attendance_method,
-                    'notes' => $attendance?->notes,
-                ],
+            $query->where(function ($q) use ($searchTerm, $guidanceClass): void {
+                // Search in user fields
+                $q->where('name', 'like', "%{$searchTerm}%")
+                    ->orWhere('email', 'like', "%{$searchTerm}%");
+
+                // Search in mahasiswaProfile fields with more comprehensive options
+                $q->orWhereHas('mahasiswaProfile', function ($profileQuery) use ($searchTerm): void {
+                    $profileQuery->where('student_number', 'like', "%{$searchTerm}%")
+                        ->orWhere('study_program', 'like', "%{$searchTerm}%")
+                        ->orWhere('semester', 'like', "%{$searchTerm}%")
+                        ->orWhere('phone', 'like', "%{$searchTerm}%");
+                });
+
+                // Search in internships with more fields
+                $q->orWhereHas('internships', function ($internshipQuery) use ($searchTerm): void {
+                    $internshipQuery->where('company_name', 'like', "%{$searchTerm}%")
+                        ->orWhere('position', 'like', "%{$searchTerm}%")
+                        ->orWhere('department', 'like', "%{$searchTerm}%")
+                        ->orWhere('status', 'like', "%{$searchTerm}%");
+                });
+
+                // Search by attendance status with localized terms
+                if (strtolower($searchTerm) === 'hadir' || strtolower($searchTerm) === 'present') {
+                    $q->orWhereHas('guidanceClassAttendance', function ($attendanceQuery) use ($guidanceClass): void {
+                        $attendanceQuery->where('guidance_class_id', $guidanceClass->id)
+                            ->whereNotNull('attended_at');
+                    });
+                } elseif (
+                    strtolower($searchTerm) === 'tidak hadir' || strtolower($searchTerm) === 'absent' ||
+                    strtolower($searchTerm) === 'belum hadir' || strtolower($searchTerm) === 'not present'
+                ) {
+                    $q->orWhereHas('guidanceClassAttendance', function ($attendanceQuery) use ($guidanceClass): void {
+                        $attendanceQuery->where('guidance_class_id', $guidanceClass->id)
+                            ->whereNull('attended_at');
+                    });
+                }
+            });
+        }
+
+        // Handle filters
+        if ($request->has('filter')) {
+            foreach ($request->filter as $field => $value) {
+                if (! empty($value)) {
+                    if ($field === 'attendance.status') {
+                        if ($value === 'present') {
+                            $query->whereHas('guidanceClassAttendance', function ($q) use ($guidanceClass): void {
+                                $q->where('guidance_class_id', $guidanceClass->id)
+                                    ->whereNotNull('attended_at');
+                            });
+                        } elseif ($value === 'absent') {
+                            $query->whereHas('guidanceClassAttendance', function ($q) use ($guidanceClass): void {
+                                $q->where('guidance_class_id', $guidanceClass->id)
+                                    ->whereNull('attended_at');
+                            });
+                        }
+                    } elseif (strpos($field, '.') !== false) {
+                        // Handle related fields like 'mahasiswaProfile.study_program'
+                        [$relation, $column] = explode('.', $field);
+                        $query->whereHas($relation, function ($q) use ($column, $value): void {
+                            $q->where($column, 'like', "%{$value}%");
+                        });
+                    } else {
+                        $query->where($field, 'like', "%{$value}%");
+                    }
+                }
+            }
+        }
+
+        // Handle sorting
+        if ($request->has('sort_field')) {
+            $sortField = $request->input('sort_field');
+            $sortDirection = $request->input('sort_direction', 'asc');
+
+            // Map frontend field names to database field names
+            $sortMapping = [
+                'name' => 'name',
+                'email' => 'email',
+                'student_number' => 'mahasiswaProfile.student_number',
+                'study_program' => 'mahasiswaProfile.study_program',
+                'semester' => 'mahasiswaProfile.semester',
+                'created_at' => 'created_at',
+                'updated_at' => 'updated_at',
             ];
-        });
+
+            if (isset($sortMapping[$sortField])) {
+                if (strpos($sortMapping[$sortField], '.') !== false) {
+                    // Handle sorting for related fields
+                    [$relation, $column] = explode('.', $sortMapping[$sortField]);
+
+                    if ($relation === 'mahasiswaProfile') {
+                        $query->join('mahasiswa_profiles', 'users.id', '=', 'mahasiswa_profiles.user_id')
+                            ->orderBy("mahasiswa_profiles.{$column}", $sortDirection)
+                            ->select('users.*'); // Ensure we only get users table
+                    }
+                } else {
+                    $query->orderBy($sortField, $sortDirection);
+                }
+            } else {
+                $query->orderBy('name', 'asc');
+            }
+        } else {
+            $query->orderBy('name', 'asc');
+        }
+
+        // Apply pagination if requested, otherwise get all students
+        if ($request->has('per_page')) {
+            $perPage = $request->input('per_page', 10);
+            $studentsData = $query->paginate($perPage);
+            $students = $studentsData->through(function ($student) use ($id) {
+                return $this->formatStudentData($student, $id);
+            });
+
+            $meta = [
+                'total' => $studentsData->total(),
+                'current_page' => $studentsData->currentPage(),
+                'last_page' => $studentsData->lastPage(),
+                'per_page' => $studentsData->perPage(),
+                'from' => $studentsData->firstItem(),
+                'to' => $studentsData->lastItem(),
+            ];
+        } else {
+            // Get all students for non-paginated view
+            $studentsCollection = $query->get();
+            $students = $studentsCollection->map(function ($student) use ($id) {
+                return $this->formatStudentData($student, $id);
+            });
+
+            $meta = null;
+        }
 
         // Check if student has attended
         $isAttended = false;
@@ -310,14 +508,50 @@ class GuidanceClassController extends Controller
                 'expertise' => $guidanceClass->lecturer->dosenProfile->expertise ?? null,
                 'academic_position' => $guidanceClass->lecturer->dosenProfile->academic_position ?? null,
             ],
-            'students' => $students, // Pass the full collection
+            'students' => $students instanceof LengthAwarePaginator
+                ? $students->items()
+                : $students, // Handle both paginated and non-paginated results
         ];
 
         return Inertia::render('front/internships/guidance-classes/show', [
             'class' => $classData,
             'userRole' => $userRole,
             'isAttended' => $isAttended,
+            'meta' => $meta,
+            'filters' => $request->only(['search', 'filter', 'sort_field', 'sort_direction', 'per_page']),
         ]);
+    }
+
+    /**
+     * Format student data for response
+     */
+    private function formatStudentData(User $student, int $guidanceClassId): array
+    {
+        // Access attendance record with specific guidance class ID
+        $attendance = GuidanceClassAttendance::where('guidance_class_id', $guidanceClassId)
+            ->where('user_id', $student->id)
+            ->first();
+        $internship = $student->internships->first();
+
+        return [
+            'id' => $student->id,
+            'name' => $student->name,
+            'email' => $student->email,
+            'student_number' => $student->mahasiswaProfile?->student_number,
+            'study_program' => $student->mahasiswaProfile?->study_program,
+            'semester' => $student->mahasiswaProfile?->semester,
+            'internship' => [
+                'company_name' => $internship?->company_name,
+                'position' => $internship?->position,
+                'department' => $internship?->department,
+                'status' => $internship?->status,
+            ],
+            'attendance' => [
+                'attended_at' => $attendance?->attended_at,
+                'attendance_method' => $attendance?->attendance_method,
+                'notes' => $attendance?->notes,
+            ],
+        ];
     }
 
     /**

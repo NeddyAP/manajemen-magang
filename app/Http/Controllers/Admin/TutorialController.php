@@ -23,8 +23,8 @@ class TutorialController extends Controller
         if ($request->has('search')) {
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm): void {
-                $q->where('title', 'like', "{$searchTerm}%")
-                    ->orWhere('content', 'like', "{$searchTerm}%");
+                $q->where('title', 'like', "%{$searchTerm}%")
+                    ->orWhere('content', 'like', "%{$searchTerm}%");
             });
         }
 

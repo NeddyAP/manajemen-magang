@@ -6,7 +6,7 @@ import { SharedData, type BreadcrumbItem } from '@/types';
 import { GuidanceClass, GuidanceClassStats, TableMeta } from '@/types/guidance-class'; // Import GuidanceClassStats
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { CalendarCheck, CalendarClock, CalendarOff, CalendarPlus, Plus } from 'lucide-react'; // Import more icons
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { columns, initialColumnVisibility } from './components/column';
 import { StatusFilter } from './components/filters';
 
@@ -30,6 +30,7 @@ interface PageProps {
 export default function GuidanceClassIndex({ classes, guidanceClassStats, meta }: PageProps) {
     const { auth } = usePage<SharedData>().props;
     const [selectedStatus, setSelectedStatus] = useState<string>('');
+    const pendingRequestRef = useRef<NodeJS.Timeout | null>(null);
 
     // Initialize filters from URL on mount
     useEffect(() => {
@@ -43,17 +44,52 @@ export default function GuidanceClassIndex({ classes, guidanceClassStats, meta }
 
     const handleStatusChange = (status: string) => {
         setSelectedStatus(status);
-
-        // Build query object
-        const query: Record<string, string> = {};
-        if (status) query.status = status;
-
-        router.get(route('front.internships.guidance-classes.index'), query, {
-            preserveState: true,
-            preserveScroll: true,
-            replace: true,
-        });
+        updateFilters(status);
     };
+
+    const updateFilters = (status: string) => {
+        // Cancel any pending requests
+        if (pendingRequestRef.current) {
+            clearTimeout(pendingRequestRef.current);
+            pendingRequestRef.current = null;
+        }
+
+        // Build query object with only non-empty values
+        const query: Record<string, string> = {};
+
+        // Preserve existing search term if present
+        const url = new URL(window.location.href);
+        const search = url.searchParams.get('search');
+        if (search) {
+            query.search = search;
+        }
+
+        // Add status filter if set
+        if (status) {
+            query.status = status;
+        }
+
+        // Navigate with updated filters after a small delay
+        pendingRequestRef.current = setTimeout(() => {
+            router.get(route('front.internships.guidance-classes.index'), query, {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+                only: ['classes', 'meta', 'errors'],
+            });
+            pendingRequestRef.current = null;
+        }, 100);
+    };
+
+    // Clean up on unmount
+    useEffect(() => {
+        return () => {
+            if (pendingRequestRef.current) {
+                clearTimeout(pendingRequestRef.current);
+                pendingRequestRef.current = null;
+            }
+        };
+    }, []);
 
     const isDosen = auth.role === 'dosen';
     return (
@@ -128,6 +164,7 @@ export default function GuidanceClassIndex({ classes, guidanceClassStats, meta }
                             data={classes}
                             filters={[{ id: 'status', value: selectedStatus }]}
                             initialColumnVisibility={initialColumnVisibility}
+                            searchPlaceholder="Cari kelas berdasarkan judul, dosen, ruangan..."
                         />
                     </div>
                 </div>

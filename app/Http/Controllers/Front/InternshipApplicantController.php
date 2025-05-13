@@ -52,20 +52,57 @@ class InternshipApplicantController extends Controller
         // Clone the query for analytics *after* initial role-based filtering
         $analyticsQuery = clone $query;
 
-        // Handle search
+        // Enhanced search functionality
         if ($request->has('search') && ! empty($request->search)) {
-            $searchTerm = $request->search;
+            $searchTerm = trim($request->search);
+
             $query->where(function ($q) use ($searchTerm): void {
+                // Search in primary internship fields
                 $q->where('company_name', 'like', "%{$searchTerm}%")
                     ->orWhere('company_address', 'like', "%{$searchTerm}%")
                     ->orWhere('type', 'like', "%{$searchTerm}%")
                     ->orWhere('status', 'like', "%{$searchTerm}%");
+
+                // Search by date ranges if the term looks like a date
+                if (preg_match('/^\d{4}(-\d{2})?$/', $searchTerm)) {
+                    if (strlen($searchTerm) === 4) { // Year only
+                        $q->orWhereRaw('YEAR(start_date) = ? OR YEAR(end_date) = ?', [$searchTerm, $searchTerm]);
+                    } else { // Year-month
+                        $q->orWhereRaw('DATE_FORMAT(start_date, "%Y-%m") = ? OR DATE_FORMAT(end_date, "%Y-%m") = ?',
+                            [$searchTerm, $searchTerm]);
+                    }
+                }
+
+                // If user is dosen, also search by student name
+                if (Auth::user()->hasRole('dosen')) {
+                    $q->orWhereHas('user', function ($userQuery) use ($searchTerm): void {
+                        $userQuery->where('name', 'like', "%{$searchTerm}%");
+                    });
+
+                    // Search by student number
+                    $q->orWhereHas('user.mahasiswaProfile', function ($profileQuery) use ($searchTerm): void {
+                        $profileQuery->where('student_number', 'like', "%{$searchTerm}%");
+                    });
+                }
             });
         }
 
-        // Handle status filter
+        // Handle status filter with enhanced functionality
         if ($request->has('status') && ! empty($request->status)) {
-            $query->where('status', $request->status);
+            $status = $request->status;
+
+            // Handle special combined status queries
+            if ($status === 'not_waiting') {
+                $query->whereNotIn('status', ['waiting']);
+            } elseif ($status === 'completed') {
+                $query->where('progress', 100);
+            } elseif ($status === 'in_progress') {
+                $query->where('status', 'accepted')
+                    ->where('progress', '<', 100);
+            } else {
+                // Regular status filter
+                $query->where('status', $status);
+            }
         }
 
         // Handle type filter
@@ -73,12 +110,33 @@ class InternshipApplicantController extends Controller
             $query->where('type', $request->type);
         }
 
-        // Handle sorting
+        // Advanced date range filtering
+        if ($request->has('date_from') && ! empty($request->date_from)) {
+            $query->where('start_date', '>=', $request->date_from);
+        }
+
+        if ($request->has('date_to') && ! empty($request->date_to)) {
+            $query->where('end_date', '<=', $request->date_to);
+        }
+
+        // Handle sorting with advanced options
         if ($request->has('sort_field') && ! empty($request->sort_field)) {
+            $sortField = $request->sort_field;
             $direction = $request->sort_direction === 'desc' ? 'desc' : 'asc';
-            $query->orderBy($request->sort_field, $direction);
+
+            // Special handling for related fields
+            if ($sortField === 'student_name') {
+                $query->join('users', 'internships.user_id', '=', 'users.id')
+                    ->orderBy('users.name', $direction)
+                    ->select('internships.*'); // To avoid field collision
+            } elseif ($sortField === 'duration') {
+                // Sort by internship duration
+                $query->orderByRaw('DATEDIFF(end_date, start_date) '.$direction);
+            } else {
+                $query->orderBy($sortField, $direction);
+            }
         } else {
-            $query->latest();
+            $query->latest('created_at');
         }
 
         // Eager load user and their profile relationship before pagination
@@ -86,7 +144,7 @@ class InternshipApplicantController extends Controller
 
         // Paginate the results
         $perPage = $request->per_page ?? 10;
-        $internshipsPagination = $query->paginate($perPage);
+        $internshipsPagination = $query->paginate($perPage)->withQueryString();
 
         // Transform data to include mahasiswa_name and mahasiswa_nim
         $internships = $internshipsPagination->through(function ($internship) {

@@ -48,6 +48,7 @@ export default function Faqs({ faqs, meta }: FaqsProps) {
                         meta={meta}
                         deleteRoute={route('admin.faqs.destroy.bulk')}
                         initialColumnVisibility={initialColumnVisibility}
+                        searchPlaceholder="Cari FAQ berdasarkan pertanyaan, jawaban..."
                     />
                 </div>
             </div>

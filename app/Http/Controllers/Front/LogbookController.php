@@ -15,6 +15,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use PhpOffice\PhpWord\IOFactory;
@@ -29,25 +30,110 @@ class LogbookController extends Controller
 
         $query = $internship->logbooks();
 
-        // Handle search
+        // Handle search with comprehensive capabilities
         if ($request->has('search') && ! empty($request->search)) {
-            $searchTerm = $request->search;
+            $searchTerm = trim($request->search);
+
             $query->where(function ($q) use ($searchTerm): void {
+                // Search in logbook content fields
                 $q->where('activities', 'like', "%{$searchTerm}%")
-                    ->orWhere('date', 'like', "%{$searchTerm}%");
+                    ->orWhere('supervisor_notes', 'like', "%{$searchTerm}%");
+
+                // Search by date with multiple format support
+                if (preg_match('/^\d{4}(-\d{2})?$/', $searchTerm)) {
+                    if (strlen($searchTerm) === 4) { // Year only
+                        $q->orWhereRaw('YEAR(date) = ?', [$searchTerm])
+                            ->orWhereRaw('YEAR(created_at) = ?', [$searchTerm]);
+                    } else { // Year-month
+                        $q->orWhereRaw("DATE_FORMAT(date, '%Y-%m') = ?", [$searchTerm])
+                            ->orWhereRaw("DATE_FORMAT(created_at, '%Y-%m') = ?", [$searchTerm]);
+                    }
+                }
+
+                // Try to parse as a date string and search
+                try {
+                    $date = Carbon::parse($searchTerm);
+                    $formattedDate = $date->format('Y-m-d');
+                    $q->orWhereDate('date', $formattedDate)
+                        ->orWhereDate('created_at', $formattedDate);
+                } catch (Exception $e) {
+                    // Not a valid date format, skip this search condition
+                }
+
+                // Search by hours worked if numeric
+                if (is_numeric($searchTerm)) {
+                    $q->orWhere('hours_worked', $searchTerm);
+                }
             });
         }
 
-        // Handle sorting
+        // Handle filtering with enhanced options
+        if ($request->has('filter')) {
+            foreach ($request->filter as $column => $value) {
+                if (! empty($value)) {
+                    if ($column === 'date_range') {
+                        // Handle date range filtering if present in format 'start_date,end_date'
+                        $dates = explode(',', $value);
+                        if (count($dates) === 2) {
+                            if (! empty($dates[0])) {
+                                $query->whereDate('date', '>=', $dates[0]);
+                            }
+                            if (! empty($dates[1])) {
+                                $query->whereDate('date', '<=', $dates[1]);
+                            }
+                        }
+                    } elseif ($column === 'has_notes') {
+                        // Filter for entries with or without supervisor notes
+                        if ($value === 'true') {
+                            $query->whereNotNull('supervisor_notes')
+                                ->where('supervisor_notes', '!=', '');
+                        } elseif ($value === 'false') {
+                            $query->where(function ($q): void {
+                                $q->whereNull('supervisor_notes')
+                                    ->orWhere('supervisor_notes', '=', '');
+                            });
+                        }
+                    } else {
+                        // Default filtering
+                        $query->where($column, 'like', "%{$value}%");
+                    }
+                }
+            }
+        }
+
+        // Handle sorting with improved field mapping
         if ($request->has('sort_field') && ! empty($request->sort_field)) {
+            $sortField = $request->sort_field;
             $direction = $request->sort_direction === 'desc' ? 'desc' : 'asc';
-            $query->orderBy($request->sort_field, $direction);
+
+            // Map frontend field names to database field names
+            $sortMapping = [
+                'date' => 'date',
+                'activities' => 'activities',
+                'supervisor_notes' => 'supervisor_notes',
+                'created_at' => 'created_at',
+                'updated_at' => 'updated_at',
+            ];
+
+            if (isset($sortMapping[$sortField])) {
+                $query->orderBy($sortMapping[$sortField], $direction);
+            } else {
+                $query->latest('date'); // Default sort by date descending
+            }
         } else {
-            $query->latest();
+            $query->latest('date'); // Default sort by date descending
         }
 
         // Get total count before pagination/filtering for analytics
         $totalLogbookCount = $internship->logbooks()->count();
+
+        // Get analytics data including total hours worked
+        $analyticsData = $internship->logbooks()
+            ->select(
+                DB::raw('COUNT(*) as total_entries'),
+                DB::raw('COUNT(DISTINCT DATE(date)) as unique_days')
+            )
+            ->first();
 
         // Paginate the results
         $perPage = $request->per_page ?? 10;
@@ -57,12 +143,19 @@ class LogbookController extends Controller
             'internship' => $internship->load('user:id,name'), // Load user for context
             'logbooks' => $logbooks->items(),
             'totalLogbookCount' => $totalLogbookCount, // Pass total count
+            'analytics' => [
+                'totalEntries' => $analyticsData->total_entries ?? 0,
+                'totalHours' => $analyticsData->total_hours ?? 0,
+                'avgHoursPerEntry' => round($analyticsData->avg_hours_per_entry ?? 0, 1),
+                'uniqueDays' => $analyticsData->unique_days ?? 0,
+            ],
             'meta' => [
                 'total' => $logbooks->total(),
                 'per_page' => $logbooks->perPage(),
                 'current_page' => $logbooks->currentPage(),
                 'last_page' => $logbooks->lastPage(),
             ],
+            'filters' => $request->only(['search', 'filter', 'sort_field', 'sort_direction', 'per_page']),
         ]);
     }
 

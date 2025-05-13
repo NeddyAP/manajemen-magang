@@ -105,6 +105,6 @@ export const initialColumnVisibility = {
     id: false,
     email: true,
     role: true,
-    profile_specific_info: true, // Placeholder for role-specific info
+    profile_specific_info: true,
     actions: true,
 };

@@ -7,7 +7,7 @@ import { User, type BreadcrumbItem } from '@/types';
 import { Role } from '@/types/user';
 import { Head, Link, router } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { DataTable } from '../../../components/data-table/data-table';
 import { columns, initialColumnVisibility } from './components/column';
 import { RoleFilter } from './components/filters';
@@ -34,7 +34,9 @@ interface UsersProps {
 
 export default function Users({ users, meta }: UsersProps) {
     const [selectedRole, setSelectedRole] = useState<string>('');
+    const pendingRequestRef = useRef<NodeJS.Timeout | null>(null);
 
+    // Initialize filters from URL on mount
     useEffect(() => {
         const url = new URL(window.location.href);
         const role = url.searchParams.get('role');
@@ -45,13 +47,52 @@ export default function Users({ users, meta }: UsersProps) {
 
     const handleRoleChange = (role: string) => {
         setSelectedRole(role);
-        const query = role ? { role: role as string } : {};
-        router.get('/admin/users', query, {
-            preserveState: true,
-            preserveScroll: true,
-            replace: true,
-        });
+        updateFilters(role);
     };
+
+    const updateFilters = (role: string) => {
+        // Cancel any pending requests
+        if (pendingRequestRef.current) {
+            clearTimeout(pendingRequestRef.current);
+            pendingRequestRef.current = null;
+        }
+
+        // Build query with only non-empty values
+        const query: Record<string, string> = {};
+
+        // Preserve existing search term if present
+        const url = new URL(window.location.href);
+        const search = url.searchParams.get('search');
+        if (search) {
+            query.search = search;
+        }
+
+        // Add role filter if set
+        if (role) {
+            query.role = role;
+        }
+
+        // Navigate with updated filters after a small delay
+        pendingRequestRef.current = setTimeout(() => {
+            router.get(route('admin.users.index'), query, {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+                only: ['users', 'meta', 'errors'],
+            });
+            pendingRequestRef.current = null;
+        }, 100);
+    };
+
+    // Clean up on unmount
+    useEffect(() => {
+        return () => {
+            if (pendingRequestRef.current) {
+                clearTimeout(pendingRequestRef.current);
+                pendingRequestRef.current = null;
+            }
+        };
+    }, []);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -76,9 +117,11 @@ export default function Users({ users, meta }: UsersProps) {
                         columns={columns}
                         data={users}
                         meta={meta}
+                        filters={[{ id: 'role', value: selectedRole }]}
                         filter={<RoleFilter roles={meta.roles} value={selectedRole} onChange={handleRoleChange} />}
                         deleteRoute={route('admin.users.destroy.bulk')}
                         initialColumnVisibility={initialColumnVisibility}
+                        searchPlaceholder="Cari pengguna berdasarkan nama, email..."
                     />
                 </div>
             </div>

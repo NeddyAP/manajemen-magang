@@ -23,39 +23,87 @@ class InternshipController extends Controller
             'user.mahasiswaProfile.advisor.dosenProfile',
         ]);
 
-        // Handle search
-        if ($request->has('search')) {
-            $searchTerm = $request->search;
-            $query->where('company_name', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('company_address', 'LIKE', "%{$searchTerm}%")
-                ->orWhereHas('user', function ($query) use ($searchTerm): void {
-                    $query->where('name', 'LIKE', "%{$searchTerm}%");
+        // Handle search with more comprehensive capabilities
+        if ($request->has('search') && ! empty($request->search)) {
+            $searchTerm = trim($request->search);
+
+            // Use a more efficient search with a cleaner approach
+            $query->where(function ($q) use ($searchTerm): void {
+                // Search in internship fields
+                $q->where('company_name', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('company_address', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('type', 'LIKE', "%{$searchTerm}%");
+
+                // Search in related user data
+                $q->orWhereHas('user', function ($userQuery) use ($searchTerm): void {
+                    $userQuery->where('name', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('email', 'LIKE', "%{$searchTerm}%");
                 });
+
+                // Include advisor search
+                $q->orWhereHas('user.mahasiswaProfile.advisor', function ($advisorQuery) use ($searchTerm): void {
+                    $advisorQuery->where('name', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('email', 'LIKE', "%{$searchTerm}%");
+                });
+
+                // Search by progress percentage if the search term is numeric
+                if (is_numeric($searchTerm)) {
+                    $q->orWhere('progress', '=', (int) $searchTerm);
+                }
+
+                // Search by month/year in dates
+                if (preg_match('/^\d{4}(-\d{2})?$/', $searchTerm)) {
+                    if (strlen($searchTerm) === 4) { // Year only
+                        $q->orWhereRaw('YEAR(start_date) = ?', [$searchTerm])
+                            ->orWhereRaw('YEAR(end_date) = ?', [$searchTerm]);
+                    } else { // Year-month
+                        $q->orWhereRaw("DATE_FORMAT(start_date, '%Y-%m') = ?", [$searchTerm])
+                            ->orWhereRaw("DATE_FORMAT(end_date, '%Y-%m') = ?", [$searchTerm]);
+                    }
+                }
+            });
         }
 
         // Handle explicit status filter
         if ($request->has('status') && $request->status !== '') {
-            $query->where('status', $request->status); // Keep as is if request sends string value
+            $query->where('status', $request->status);
         }
 
         // Handle explicit type filter
         if ($request->has('type') && $request->type !== '') {
-            $query->where('type', $request->type); // Keep as is if request sends string value
+            $query->where('type', $request->type);
         }
 
         // Handle general filters
         if ($request->has('filter')) {
             foreach ($request->filter as $column => $value) {
-                $query->where($column, 'like', "%{$value}%");
+                if (! empty($value)) {
+                    $query->where($column, 'like', "%{$value}%");
+                }
             }
         }
 
-        // Handle sorting
+        // Handle sorting with advanced options
         if ($request->has('sort_field')) {
+            $sortField = $request->sort_field;
             $direction = $request->input('sort_direction', 'asc');
-            $query->orderBy($request->sort_field, $direction);
+
+            // Special handling for related fields
+            if ($sortField === 'user') {
+                $query->join('users', 'internships.user_id', '=', 'users.id')
+                    ->orderBy('users.name', $direction)
+                    ->select('internships.*');
+            } elseif ($sortField === 'lecturer') {
+                $query->join('users as students', 'internships.user_id', '=', 'students.id')
+                    ->join('mahasiswa_profiles', 'students.id', '=', 'mahasiswa_profiles.user_id')
+                    ->join('users as advisors', 'mahasiswa_profiles.advisor_id', '=', 'advisors.id')
+                    ->orderBy('advisors.name', $direction)
+                    ->select('internships.*');
+            } else {
+                $query->orderBy($sortField, $direction);
+            }
         } else {
-            $query->latest();
+            $query->latest('updated_at');
         }
 
         // Paginate the results
@@ -157,6 +205,33 @@ class InternshipController extends Controller
         }
 
         $internship->delete();
+
+        return redirect()->route('admin.internships.index')
+            ->with('success', 'Data magang berhasil dihapus!');
+    }
+
+    /**
+     * Bulk destroy the specified resources.
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:internships,id',
+        ]);
+
+        // Get internships with files
+        $internships = Internship::whereIn('id', $validated['ids'])->get();
+
+        // Delete application files if they exist
+        foreach ($internships as $internship) {
+            if ($internship->application_file) {
+                Storage::disk('public')->delete($internship->application_file);
+            }
+        }
+
+        // Delete all in a single query for efficiency
+        Internship::whereIn('id', $validated['ids'])->delete();
 
         return redirect()->route('admin.internships.index')
             ->with('success', 'Data magang berhasil dihapus!');

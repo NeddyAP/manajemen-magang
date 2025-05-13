@@ -26,7 +26,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         // href will be dynamically set if needed, or keep static for template
         // For a show page, it would typically be /admin/guidance-classes/[id]
         // Inertia automatically handles dynamic parts from controller routing, so a static one is fine here for the template.
-        href: '#', // Placeholder, actual link managed by Inertia
+        href: '#',
     },
 ];
 
@@ -133,6 +133,7 @@ export default function ShowGuidanceClass({ class: guidanceClass, meta }: Props)
                                 data={guidanceClass.students || []} // Ensure data is an array
                                 meta={meta} // Pass meta for pagination
                                 initialColumnVisibility={initialColumnVisibility} // Use visibility from new column defs
+                                searchPlaceholder="Cari mahasiswa berdasarkan nama, NIM, program studi..."
                                 // Removed filter prop for now
                             />
                         ) : (

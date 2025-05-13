@@ -7,7 +7,7 @@ use App\Models\DosenProfile;
 use App\Models\Internship;
 use App\Models\MahasiswaProfile;
 use App\Models\User;
-use DateTime; // Placeholder
+use DateTime;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
@@ -99,8 +99,6 @@ test('[mahasiswa] can submit a valid internship application', function (): void 
     $createdInternship = Internship::where('user_id', $mahasiswa->id)->where('company_name', $baseInternshipData['company_name'])->first();
     $this->assertNotNull($createdInternship->application_file);
     Storage::disk('public')->assertExists($createdInternship->application_file);
-
-    // Notification::assertSentTo($adminToNotify, InternshipSubmittedNotification::class); // Placeholder
 });
 
 test('[mahasiswa] cannot submit an internship application with invalid data', function (): void {
@@ -187,7 +185,7 @@ test('[admin] can view a list of all internships', function (): void {
 
 test('[mahasiswa] can view the edit form for their own internship if editable', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
-    $internship = Internship::factory()->for($mahasiswa)->create(['status' => 'waiting']); // Changed 'draft' to 'waiting'
+    $internship = Internship::factory()->for($mahasiswa)->create(['status' => 'waiting']);
 
     $this->actingAs($mahasiswa)
         ->get(route('front.internships.applicants.edit', $internship)) // Corrected route name
@@ -287,8 +285,8 @@ test('[mahasiswa] cannot update their internship with invalid data', function ()
 
 test('[admin] can update an internship status', function (): void {
     $admin = createUserWithRole('admin');
-    $internship = Internship::factory()->create(['status' => 'waiting']); // Changed 'submitted' to 'waiting'
-    $updateData = ['status' => 'accepted']; // Changed 'approved' to 'accepted'
+    $internship = Internship::factory()->create(['status' => 'waiting']);
+    $updateData = ['status' => 'accepted'];
 
     $this->actingAs($admin)
         ->put(route('admin.internships.update', $internship), $updateData) // Assuming admin route
@@ -297,15 +295,14 @@ test('[admin] can update an internship status', function (): void {
 
     $this->assertDatabaseHas('internships', [
         'id' => $internship->id,
-        'status' => 'accepted', // Changed 'approved' to 'accepted'
+        'status' => 'accepted',
     ]);
-    // Notification::assertSentTo($internship->user, InternshipStatusUpdatedNotification::class); // Placeholder
 });
 
 test('[unauthorized] users cannot update internships', function (): void {
     $user = createUserWithRole('mahasiswa'); // A mahasiswa
     $otherMahasiswa = createUserWithRole('mahasiswa');
-    $internshipOfOther = Internship::factory()->for($otherMahasiswa)->create(['status' => 'waiting']); // Changed 'draft' to 'waiting'
+    $internshipOfOther = Internship::factory()->for($otherMahasiswa)->create(['status' => 'waiting']);
 
     $this->actingAs($user)
         ->put(route('front.internships.applicants.update', $internshipOfOther), ['company_name' => 'Trying to update Company']) // Corrected route name
@@ -313,7 +310,7 @@ test('[unauthorized] users cannot update internships', function (): void {
 
     $unauthenticatedUser = User::factory()->make(); // Not saved, just for actingAs
     $this->put(route('front.internships.applicants.update', $internshipOfOther), ['company_name' => 'Trying to update Company'])
-        ->assertStatus(403); // Changed to 403 as per actual response
+        ->assertStatus(403);
 });
 
 // ------------------------------------------------------------------------
@@ -322,7 +319,7 @@ test('[unauthorized] users cannot update internships', function (): void {
 
 test('[mahasiswa] can delete their own internship if in editable state', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
-    $internship = Internship::factory()->for($mahasiswa)->create(['status' => 'waiting']); // Changed 'draft' to 'waiting'
+    $internship = Internship::factory()->for($mahasiswa)->create(['status' => 'waiting']);
 
     $this->actingAs($mahasiswa)
         ->delete(route('front.internships.applicants.destroy', $internship)) // Corrected route name
@@ -333,7 +330,7 @@ test('[mahasiswa] can delete their own internship if in editable state', functio
 
 test('[mahasiswa] cannot delete their internship if not in editable state', function (): void {
     $mahasiswa = createUserWithRole('mahasiswa');
-    $internship = Internship::factory()->for($mahasiswa)->create(['status' => 'accepted']); // Changed to 'accepted' as per controller logic for non-deletable
+    $internship = Internship::factory()->for($mahasiswa)->create(['status' => 'accepted']);
 
     $this->actingAs($mahasiswa)
         ->delete(route('front.internships.applicants.destroy', $internship))
@@ -364,7 +361,7 @@ test('[unauthorized] users cannot delete internships', function (): void {
         ->assertForbidden();
 
     $this->delete(route('front.internships.applicants.destroy', $internshipOfOther))
-        ->assertStatus(403); // Changed to 403 as per actual response
+        ->assertStatus(403);
 });
 
 // ------------------------------------------------------------------------
@@ -389,7 +386,7 @@ test('[mahasiswa] can submit an internship application with a file upload', func
 
     $postData = array_merge(
         $baseInternshipData,
-        ['application_file' => $file] // Changed 'application_document' to 'application_file'
+        ['application_file' => $file]
     );
 
     $this->actingAs($mahasiswa)
@@ -397,12 +394,10 @@ test('[mahasiswa] can submit an internship application with a file upload', func
         ->assertRedirect(route('front.internships.applicants.index'))
         ->assertSessionHasNoErrors();
 
-    $createdInternship = Internship::where('user_id', $mahasiswa->id)->where('company_name', $baseInternshipData['company_name'])->first(); // Use another field
+    $createdInternship = Internship::where('user_id', $mahasiswa->id)->where('company_name', $baseInternshipData['company_name'])->first();
     $this->assertNotNull($createdInternship);
-    $this->assertNotNull($createdInternship->application_file); // Changed to application_file
-    Storage::disk('public')->assertExists($createdInternship->application_file); // Changed to application_file
-
-    // Notification::assertSentTo($adminToNotify, InternshipSubmittedNotification::class);
+    $this->assertNotNull($createdInternship->application_file);
+    Storage::disk('public')->assertExists($createdInternship->application_file);
 });
 
 test('internship application fails if uploaded file is invalid', function (): void {
@@ -420,10 +415,10 @@ test('internship application fails if uploaded file is invalid', function (): vo
 
     $postData = array_merge(
         $baseInternshipData,
-        ['application_file' => $invalidFile] // Changed 'application_document' to 'application_file'
+        ['application_file' => $invalidFile]
     );
 
     $this->actingAs($mahasiswa)
         ->post(route('front.internships.applicants.store'), $postData)
-        ->assertSessionHasErrors('application_file'); // Changed to application_file
+        ->assertSessionHasErrors('application_file');
 });

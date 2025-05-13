@@ -55,6 +55,7 @@ export default function GuidanceClasses({ classes, meta }: Props) {
                         meta={meta}
                         deleteRoute={route('admin.guidance-classes.destroy.bulk')}
                         initialColumnVisibility={initialColumnVisibility}
+                        searchPlaceholder="Cari kelas berdasarkan judul, dosen, ruangan, tanggal..."
                     />
                 </div>
             </div>

@@ -67,7 +67,6 @@ This document tracks the current status, progress, and evolution of the internsh
 - ✅ Trash Management UI
 - ✅ TypeScript types for core models and props (ongoing refinement)
 - ✅ Logbook page optimizations (back button, animations, modal for supervisor notes)
-- ❌ Internship Applicant 'show' page removed.
 - ✅ **Report Revision Upload:** Updated `Report` type. Added UI elements in report table for Dosen to upload revisions and view revised files. New `UploadRevisionModal` component.
 
 #### Testing (Pest PHP / SQLite :memory:)
@@ -82,30 +81,77 @@ This document tracks the current status, progress, and evolution of the internsh
 - ✅ **Feature tests for Dosen Report Revision Upload (`tests/Feature/ReportRevisionUploadTest.php`).**
 - ✅ **Guidance Class CRUD Test:** Fixed issue with student auto-attachment in `test_students_are_attached_and_notified_on_guidance_class_creation` and verified the fix.
 
-## Recent Changes
+## Progress - May 13, 2025
 
-- **[2025-05-13] - Test Verification & Memory Bank Update:** Verified all tests are passing via `php artisan test` (including FAQ and Tutorial CRUD). Updated memory bank (`activeContext.md`, `progress.md`) to reflect this. Current focus shifted to User CRUD tests (Admin).
-- **[2025-05-13] - Memory Bank Update:** Reviewed and updated all core memory bank files. Confirmed `GuidanceClassCrudTest` fix. Current focus is writing Pest tests for FAQ CRUD operations.
-- **[2025-05-12] - Fix: Guidance Class Student Attachment.** Updated `GuidanceClassController@store` to automatically find and attach eligible students (creating `guidance_class_attendance` records) when a new guidance class is created. This addresses a failing test in `GuidanceClassCrudTest`.
-- **[2025-05-12] - Memory Bank Review:** Reviewed all core memory bank files (`projectbrief.md`, `productContext.md`, `activeContext.md`, `systemPatterns.md`, `techContext.md`, `progress.md`) as requested by the user. No significant content updates were required based on the immediate preceding conversation (context condensation).
-- **[2025-05-11] - Feature: Dosen Report Revision Upload.** Implemented backend (model, migration, controller, request, route, notification) and frontend (TypeScript type, UI in table, new modal) for Dosen to upload revised student reports. Added comprehensive Pest feature tests.
-- **[2025-05-11] - Clarified Dosen Report Feedback:** Updated Memory Bank to reflect that Dosen can add `reviewer_notes` to reports, in addition to uploading revisions. This is distinct from a more general feedback system which is a future consideration.
-- **[2025-05-11] - General Memory Bank Update:** Updated `activeContext.md`, `techContext.md`, `progress.md`, `decisionLog.md` to reflect the current application state.
-- **[2025-05-11 09:25:53] - Confirmed and updated backend functionality for logbook export to Word and PDF. Routes in `routes/web.php` were updated to match frontend naming conventions.**
-- **Logbook Enhancements:**
-    - Enabled 'dosen' users to add supervisor notes to logbooks via a modal.
-    - Optimized logbook pages: added back button, incorporated Tailwind CSS animations for better UX.
-    - Resolved backend authorization issues for 'dosen' access to logbooks, ensuring correct student data visibility.
-- **Features:** Implemented Notification System, User Settings, Admin Trash Management.
-- **Backend:** Added Notification controllers/API, refined Dosen access logic for other modules, added soft deletes to individual migrations and removed consolidated one.
-- **Frontend:** Built UI for Notifications, Settings, Trash. Added analytics cards. Removed Internship Applicant 'show' page.
-- **Testing:** Added Pest Feature tests for Authentication, Logbooks (Student), Reports (Student), Internships (Student). Fixed tests related to Internship 'show' page removal.
-- **Documentation:** Ongoing Memory Bank updates.
-- \*\*[2025-05-08 18:54:33] - Clarified Dosen report feedback: Dosen can add `reviewer_notes` (especially for rejections/revisions) and upload report revisions. General, non-status-related feedback feature remains a future enhancement.
-- **[2025-05-08 19:02:06] - Confirmed substantial implementation of Guidance Class attendance feature (QR code via URL and manual check-in).**
-- **[2025-05-09 00:06:00] - Removed Internship Applicant 'show' page and fixed related tests in `InternshipCrudTest.php`.**
-- **[2025-05-09 00:36:35] - Completed Logbook CRUD Pest Tests (Student Perspective) and refactored logbook field name from `kegiatan` to `activities`.**
-- **[2025-05-09 01:04:37] - Completed Report CRUD Pest Tests (Student Perspective).**
+### What Works
+
+- **Core Application Features**:
+    - User authentication (login, registration, logout).
+    - Internship management (CRUD for internships).
+    - Student features: applying for internships, submitting reports and logbooks.
+    - Company features: posting internships, managing applications.
+    - Admin features: managing users, companies, internships, and site settings.
+    - Search functionality for various resources (students, companies, internships, reports, logbooks) for both Admin and Front views.
+- **Testing**:
+    - All 192 PHPUnit/Pest tests are passing.
+    - `AdminSearchTest.php` is functional and tests admin search capabilities.
+    - `FrontSearchTest.php` is functional, testing front-end search capabilities, and has been successfully refactored from Pest to PHPUnit class-based structure.
+
+### What's Left to Build
+
+- **User CRUD Tests (Admin)**: As per `activeContext.md`, the next immediate task is to write Pest tests for User CRUD operations by an Admin.
+    - Test admin can view list of users.
+    - Test admin can view a single user.
+    - Test admin can create a new user (student, admin, dosen) with appropriate roles and profiles.
+    - Test admin can edit an existing user's details, roles, and profile.
+    - Test admin can delete a user.
+    - Test validation for user creation and updates.
+    - Test authorization checks.
+- **Further Feature Development**: (To be populated based on `projectbrief.md` and `productContext.md` if not already covered or if new features are planned).
+- **Refinements & Bug Fixes**: (Ongoing, based on testing and user feedback).
+
+### Current Status
+
+- **Development**: Actively working on enhancing test coverage. The recent focus was on refactoring and fixing search tests.
+- **Test Suite**: Stable and all tests passing.
+- **Deployment**: (Information about current deployment status, if any, would go here. e.g., Staging, Production environment details).
+
+### Known Issues
+
+- None currently identified. All previously noted test failures have been resolved.
+
+### Evolution of Project Decisions
+
+- **Test Structure for `FrontSearchTest.php`**: Initially implemented using Pest syntax. Due to persistent test failures that were difficult to debug with Pest's functional style in this specific case, the decision was made to refactor `FrontSearchTest.php` to a traditional PHPUnit class-based structure. This resolved the issues and brought it in line with other feature tests like `AdminSearchTest.php`. This indicates a pragmatic approach to test implementation, prioritizing stability and debuggability.
+- **URL Corrections in `AdminSearchTest.php`**: Identified and corrected incorrect URLs for report and logbook search tests, reinforcing the need for careful verification of test parameters against application routes.
+
+## Recent Changes (Consolidated Summary - Last ~Week)
+
+- **Test Suite Refinement & Verification (May 13, 2025):**
+    - Successfully refactored `FrontSearchTest.php` from Pest to a PHPUnit class-based structure to resolve test failures and improve clarity.
+    - Updated `AdminSearchTest.php` with class name changes, `use Tests\TestCase;`, and corrected URLs.
+    - Verified all 192 tests are passing.
+    - Completed and verified Pest feature tests for FAQ and Tutorial CRUD operations.
+- **Memory Bank Synchronization (May 13, 2025):**
+    - Updated `activeContext.md` and `progress.md` to reflect the latest test completions and refactoring.
+    - Conducted reviews of all core memory bank files to ensure consistency.
+- **Guidance System Enhancement (May 12, 2025):**
+    - Fixed an issue in `GuidanceClassController@store` to ensure automatic attachment of eligible students and creation of attendance records when a new guidance class is created. This resolved a failing test in `GuidanceClassCrudTest`.
+- **Reporting Feature Enhancement (May 11, 2025):**
+    - Implemented functionality for Dosen to upload revised student reports. This included backend (model, migration, controller, request, route, notification) and frontend (TypeScript type, UI updates, new modal) changes.
+    - Added comprehensive Pest feature tests for the report revision upload feature.
+    - Clarified in documentation that Dosen can add `reviewer_notes` to reports in addition to uploading revisions.
+- **Logbook Enhancements (Prior to May 11, 2025):**
+    - Enabled Dosen to add supervisor notes to logbooks via a modal.
+    - Confirmed and updated backend functionality for logbook export to Word and PDF.
+    - Optimized logbook pages with UI improvements (back button, animations).
+    - Resolved backend authorization issues for Dosen access to logbooks.
+- **Core Feature Implementation (Prior to May 11, 2025):**
+    - Implemented Notification System, User Settings, and Admin Trash Management features.
+    - Added soft deletes to individual migrations and removed a consolidated soft delete migration.
+- **Test Coverage Expansion (Ongoing, prior to May 11, 2025):**
+    - Completed Pest feature tests for Authentication, Logbooks (Student), Reports (Student), and Internships (Student).
+    - Refactored logbook field name from `kegiatan` to `activities` and updated relevant tests.
 
 ## Known Issues / Areas for Improvement
 

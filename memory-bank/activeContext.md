@@ -82,30 +82,70 @@ This is a comprehensive internship management system (Manajement Magang) built w
 7.  **Testing:** Pest PHP for Feature tests. Focus on testing behavior through HTTP requests. Use of `RefreshDatabase` trait with SQLite `:memory:`. Factory helpers for data setup.
 8.  **UI Text:** Use Indonesian language for user-facing labels, buttons, messages. Fallback to English if translation is awkward or unclear.
 
-## Recent Changes
+## Recent Changes (Consolidated - Reflecting last ~week, see progress.md for more detail)
 
-- **[2025-05-13] - Test Verification & Memory Bank Update:** Verified all tests are passing via `php artisan test`. Updated memory bank (`activeContext.md`, `progress.md`) to reflect completion of FAQ and Tutorial tests. Current focus shifted to User CRUD tests (Admin).
-- **[2025-05-13] - Memory Bank Update:** Reviewed and updated all core memory bank files to reflect the current application status. Confirmed `GuidanceClassCrudTest` fix and shifted focus to next testing tasks.
-- **[2025-05-12] - Fix: Guidance Class Student Attachment.** Updated `GuidanceClassController@store` to automatically find and attach eligible students (creating `guidance_class_attendance` records) when a new guidance class is created. This addresses a failing test in `GuidanceClassCrudTest`.
-- **[2025-05-12] - Memory Bank Review:** Reviewed all core memory bank files (`projectbrief.md`, `productContext.md`, `activeContext.md`, `systemPatterns.md`, `techContext.md`, `progress.md`) as requested by the user. No significant content updates were required based on the immediate preceding conversation (context condensation).
-- **[2025-05-11] - Feature: Dosen Report Revision Upload.** Implemented backend (model, migration, controller, request, route, notification) and frontend (TypeScript type, UI in table, new modal) for Dosen to upload revised student reports. Added comprehensive Pest feature tests.
-- **[2025-05-11] - Clarified Dosen Report Feedback:** Updated Memory Bank to reflect that Dosen can add `reviewer_notes` to reports, in addition to uploading revisions. This is distinct from a more general feedback system which is a future consideration.
-- **[2025-05-11] - General Memory Bank Update:** Updated `activeContext.md`, `techContext.md`, `progress.md`, `decisionLog.md` to reflect the current application state.
-- **[2025-05-11 09:25:53] - Confirmed and updated backend functionality for logbook export to Word and PDF. Routes in `routes/web.php` were updated to match frontend naming conventions.**
-- **Logbook Enhancements:**
-    - Enabled 'dosen' users to add supervisor notes to logbooks via a modal.
-    - Optimized logbook pages: added back button, incorporated Tailwind CSS animations for better UX.
-    - Resolved backend authorization issues for 'dosen' access to logbooks, ensuring correct student data visibility.
-- **Features:** Implemented Notification System, User Settings, Admin Trash Management.
-- **Backend:** Added Notification controllers/API, refined Dosen access logic for other modules, added soft deletes to individual migrations and removed consolidated one.
-- **Frontend:** Built UI for Notifications, Settings, Trash. Added analytics cards. Removed Internship Applicant 'show' page.
-- **Testing:** Added Pest Feature tests for Authentication, Logbooks (Student), Reports (Student), Internships (Student). Fixed tests related to Internship 'show' page removal.
-- **Documentation:** Ongoing Memory Bank updates.
-- \*\*[2025-05-08 18:54:33] - Clarified Dosen report feedback: Dosen can add `reviewer_notes` (especially for rejections/revisions) and upload report revisions. General, non-status-related feedback feature remains a future enhancement.
-- **[2025-05-08 19:02:06] - Confirmed substantial implementation of Guidance Class attendance feature (QR code via URL and manual check-in).**
-- **[2025-05-09 00:06:00] - Removed Internship Applicant 'show' page and fixed related tests in `InternshipCrudTest.php`.**
-- **[2025-05-09 00:36:35] - Completed Logbook CRUD Pest Tests (Student Perspective) and refactored logbook field name from `kegiatan` to `activities`.**
-- **[2025-05-09 01:04:37] - Completed Report CRUD Pest Tests (Student Perspective).**
+- **[2025-05-13] - Test Suite Refinement & Memory Bank Synchronization:**
+    - Successfully refactored `FrontSearchTest.php` from Pest to a PHPUnit class-based structure to resolve test failures and improve clarity.
+    - Updated `AdminSearchTest.php` with class name changes, `use Tests\TestCase;`, and corrected URLs.
+    - Verified all 192 tests are passing.
+    - Completed and verified Pest feature tests for FAQ and Tutorial CRUD operations.
+    - Updated `activeContext.md` and `progress.md` to reflect the latest test completions, refactoring, and consolidated recent changes.
+- **[2025-05-12] - Guidance System Enhancement:**
+    - Fixed an issue in `GuidanceClassController@store` to ensure automatic attachment of eligible students and creation of attendance records when a new guidance class is created.
+- **[2025-05-11] - Reporting Feature Enhancement:**
+    - Implemented functionality for Dosen to upload revised student reports.
+    - Added comprehensive Pest feature tests for the report revision upload feature.
+
+## Active Context - May 13, 2025
+
+### Current Work Focus
+
+1.  Reviewing and finalizing updates to all Memory Bank files to ensure consistency and reflect the latest project status.
+2.  Preparing to start the next development task: "Write Pest tests for User CRUD operations (Admin)".
+
+### Recent Changes (Specifically last 24-48 hours)
+
+- **Memory Bank Update (In Progress):**
+    - Consolidated "Recent Changes" in `progress.md`.
+    - Currently reviewing and updating all core memory bank files (`activeContext.md`, `projectbrief.md`, `productContext.md`, `systemPatterns.md`, `techContext.md`).
+- **Test Refactoring & Fixes (Completed just prior to this update):**
+    - **`AdminSearchTest.php`**:
+        - Updated class name to `AdminSearchTest`.
+        - Added `use Tests\TestCase;`.
+        - Corrected URLs in `test_can_search_front_reports_for_a_student` (to `/internships/reports/...`) and `test_can_search_front_logbooks_for_a_student` (to `/internships/logbooks/...`).
+    - **`FrontSearchTest.php`**:
+        - Updated class name to `FrontSearchTest`.
+        - Converted the test file from Pest syntax to a traditional PHPUnit class-based structure. This included:
+            - Adding `use Tests\TestCase;`.
+            - Changing `beforeEach(function () { ... });` to `protected function setUp(): void { parent::setUp(); ... }`.
+            - Converting Pest `test('description', function () { ... });` to PHPUnit `public function test_description() { ... }`.
+    - **Test Suite Status**: All 192 tests are confirmed passing after the modifications.
+
+### Next Steps
+
+- **Development Task**: Write Pest tests for User CRUD operations (Admin). This includes tests for:
+    - Admin can view list of users.
+    - Admin can view a single user.
+    - Admin can create a new user (student, admin, dosen) with appropriate roles and profiles.
+    - Admin can edit an existing user's details, roles, and profile.
+    - Admin can delete a user.
+    - Validation for user creation and updates.
+    - Authorization checks (only admin can perform these actions).
+
+### Active Decisions & Considerations
+
+- **Test Structure Standardization**: The conversion of `FrontSearchTest.php` to PHPUnit was done to resolve persistent test failures and to align its structure with other class-based feature tests like `AdminSearchTest.php`. This suggests a preference for PHPUnit's class-based approach for more complex feature tests if Pest syntax leads to issues.
+- **Memory Bank Update Discipline**: Ensuring the memory bank is updated after significant changes (like major test refactoring) is crucial for maintaining project context.
+
+### Learnings & Project Insights
+
+- **Robust Test Suite**: A comprehensive and consistently passing test suite is vital for confident refactoring and development. The recent fixes highlight the importance of this.
+- **Test Framework Flexibility**: While Pest offers a concise syntax, PHPUnit's traditional class structure provided a clearer path to resolving issues in `FrontSearchTest.php`. Being able to switch or adapt testing styles as needed is beneficial.
+- **URL Accuracy in Tests**: Incorrect URLs were a source of test failures in `AdminSearchTest.php`. Double-checking route names and parameters in tests is essential.
+
+### Open Questions & Blockers
+
+- None at present. The path is clear for the next development task.
 
 ## Current Focus Area
 
@@ -116,8 +156,8 @@ Expanding Pest test coverage, starting with User CRUD operations (Admin).
 1.  **Testing:** Write Pest tests for User CRUD operations (Admin).
 2.  **Testing:** Write Pest tests for Settings pages (all roles).
 3.  **Testing:** Continue adding Pest tests for other core features (e.g., Dosen-specific interactions, Mahasiswa view flows).
-3.  **Refinement:** Address any remaining `TODO` comments in the code. Improve UI/UX based on feedback. Optimize queries or backend logic where necessary.
-4.  **TypeScript:** Continue improving type safety, potentially defining more specific types for shared data structures (e.g., `NotificationData`).
+4.  **Refinement:** Address any remaining `TODO` comments in the code. Improve UI/UX based on feedback. Optimize queries or backend logic where necessary.
+5.  **TypeScript:** Continue improving type safety, potentially defining more specific types for shared data structures (e.g., `NotificationData`).
 
 ## Important Preferences
 
