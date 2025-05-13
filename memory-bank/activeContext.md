@@ -3,8 +3,8 @@
 _This file tracks the current work focus, recent changes, immediate next steps, active decisions, important patterns/preferences discovered, and project insights._
 
 **Status:** Active Development
-**Last Reviewed:** May 12, 2025
-**Current Task:** Fixing `GuidanceClassCrudTest` failure.
+**Last Reviewed:** May 13, 2025
+**Current Task:** Writing Pest tests for User CRUD operations (Admin).
 
 ## Project Overview
 
@@ -84,6 +84,8 @@ This is a comprehensive internship management system (Manajement Magang) built w
 
 ## Recent Changes
 
+- **[2025-05-13] - Test Verification & Memory Bank Update:** Verified all tests are passing via `php artisan test`. Updated memory bank (`activeContext.md`, `progress.md`) to reflect completion of FAQ and Tutorial tests. Current focus shifted to User CRUD tests (Admin).
+- **[2025-05-13] - Memory Bank Update:** Reviewed and updated all core memory bank files to reflect the current application status. Confirmed `GuidanceClassCrudTest` fix and shifted focus to next testing tasks.
 - **[2025-05-12] - Fix: Guidance Class Student Attachment.** Updated `GuidanceClassController@store` to automatically find and attach eligible students (creating `guidance_class_attendance` records) when a new guidance class is created. This addresses a failing test in `GuidanceClassCrudTest`.
 - **[2025-05-12] - Memory Bank Review:** Reviewed all core memory bank files (`projectbrief.md`, `productContext.md`, `activeContext.md`, `systemPatterns.md`, `techContext.md`, `progress.md`) as requested by the user. No significant content updates were required based on the immediate preceding conversation (context condensation).
 - **[2025-05-11] - Feature: Dosen Report Revision Upload.** Implemented backend (model, migration, controller, request, route, notification) and frontend (TypeScript type, UI in table, new modal) for Dosen to upload revised student reports. Added comprehensive Pest feature tests.
@@ -107,12 +109,13 @@ This is a comprehensive internship management system (Manajement Magang) built w
 
 ## Current Focus Area
 
-Fixing `GuidanceClassCrudTest` failure.
+Expanding Pest test coverage, starting with User CRUD operations (Admin).
 
 ## Next Steps (After Documentation Update)
 
-1.  **Testing:** Verify the fix for `GuidanceClassCrudTest`.
-2.  **Testing:** Continue adding Pest tests for other core features (CRUD operations for Guidance, FAQs, Tutorials, Users, Settings, Admin functions).
+1.  **Testing:** Write Pest tests for User CRUD operations (Admin).
+2.  **Testing:** Write Pest tests for Settings pages (all roles).
+3.  **Testing:** Continue adding Pest tests for other core features (e.g., Dosen-specific interactions, Mahasiswa view flows).
 3.  **Refinement:** Address any remaining `TODO` comments in the code. Improve UI/UX based on feedback. Optimize queries or backend logic where necessary.
 4.  **TypeScript:** Continue improving type safety, potentially defining more specific types for shared data structures (e.g., `NotificationData`).
 

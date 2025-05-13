@@ -2,7 +2,7 @@
 
 This document tracks the current status, progress, and evolution of the internship management system (Manajement Magang).
 
-## Current Status (As of May 12, 2025)
+## Current Status (As of May 13, 2025)
 
 ### Core Features Status
 
@@ -21,7 +21,9 @@ This document tracks the current status, progress, and evolution of the internsh
 - **Testing (Report - Student):** ✅ (Pest Feature Tests for CRUD operations)
 - **Testing (Report - Dosen Revision Upload):** ✅ (Pest Feature Tests for revision upload functionality)
 - **Testing (Internship - Student):** ✅ (Pest Feature Tests for CRUD, including fixes for removed 'show' page logic)
-- **Testing (Guidance Class - Admin):** ⏳ (CRUD tests in progress, student attachment logic fixed)
+- **Testing (Guidance Class - Admin):** ✅ (CRUD tests completed, student attachment logic fixed and verified)
+- **Testing (FAQ - Admin):** ✅ (Pest Feature Tests for CRUD operations)
+- **Testing (Tutorial - Admin):** ✅ (Pest Feature Tests for CRUD operations)
 
 ### Database Schema Status
 
@@ -78,10 +80,12 @@ This document tracks the current status, progress, and evolution of the internsh
 - ✅ Feature tests for Report CRUD (Student perspective) (`tests/Feature/Front/ReportCrudTest.php`)
 - ✅ Feature tests for Internship CRUD (Student perspective) (`tests/Feature/InternshipCrudTest.php`), including fixes related to removed 'show' page.
 - ✅ **Feature tests for Dosen Report Revision Upload (`tests/Feature/ReportRevisionUploadTest.php`).**
-- ✅ **Guidance Class CRUD Test:** Fixed issue with student auto-attachment in `test_students_are_attached_and_notified_on_guidance_class_creation`.
+- ✅ **Guidance Class CRUD Test:** Fixed issue with student auto-attachment in `test_students_are_attached_and_notified_on_guidance_class_creation` and verified the fix.
 
 ## Recent Changes
 
+- **[2025-05-13] - Test Verification & Memory Bank Update:** Verified all tests are passing via `php artisan test` (including FAQ and Tutorial CRUD). Updated memory bank (`activeContext.md`, `progress.md`) to reflect this. Current focus shifted to User CRUD tests (Admin).
+- **[2025-05-13] - Memory Bank Update:** Reviewed and updated all core memory bank files. Confirmed `GuidanceClassCrudTest` fix. Current focus is writing Pest tests for FAQ CRUD operations.
 - **[2025-05-12] - Fix: Guidance Class Student Attachment.** Updated `GuidanceClassController@store` to automatically find and attach eligible students (creating `guidance_class_attendance` records) when a new guidance class is created. This addresses a failing test in `GuidanceClassCrudTest`.
 - **[2025-05-12] - Memory Bank Review:** Reviewed all core memory bank files (`projectbrief.md`, `productContext.md`, `activeContext.md`, `systemPatterns.md`, `techContext.md`, `progress.md`) as requested by the user. No significant content updates were required based on the immediate preceding conversation (context condensation).
 - **[2025-05-11] - Feature: Dosen Report Revision Upload.** Implemented backend (model, migration, controller, request, route, notification) and frontend (TypeScript type, UI in table, new modal) for Dosen to upload revised student reports. Added comprehensive Pest feature tests.
@@ -126,9 +130,9 @@ This document tracks the current status, progress, and evolution of the internsh
 
 ### Immediate Tasks (Post-Documentation)
 
-1.  **Testing:** Verify the fix for `GuidanceClassCrudTest`.
-2.  **Testing:** Write Pest tests for FAQ CRUD operations (Admin).
-3.  **Testing:** Write Pest tests for Tutorial CRUD operations (Admin).
+1.  **Testing:** Write Pest tests for User CRUD operations (Admin).
+2.  **Testing:** Write Pest tests for Settings pages (all roles).
+3.  **Testing:** Write Pest tests for Dosen-specific interactions and Mahasiswa view flows.
 
 ### Short-term Goals
 
@@ -164,5 +168,5 @@ This document tracks the current status, progress, and evolution of the internsh
 ## Roadmap Status
 
 - **Phase 1 (Core Features):** Mostly Complete ✅
-- **Phase 2 (Refinement & Testing):** In Progress ⏳ (Notifications, Settings, Trash, Logbook Dosen Notes & UI enhancements, Logbook/Report/Internship CRUD tests (Student) completed. Logbook field name refactored. Soft Deletes strategy implemented. Internship 'show' page removed. Testing ongoing. Documentation updated. Guidance Class student auto-attachment fixed.)
+- **Phase 2 (Refinement & Testing):** In Progress ⏳ (Notifications, Settings, Trash, Logbook Dosen Notes & UI enhancements, Logbook/Report/Internship/Guidance Class/FAQ/Tutorial CRUD tests completed. Logbook field name refactored. Soft Deletes strategy implemented. Internship 'show' page removed. Testing ongoing. Documentation updated.)
 - **Phase 3 (Advanced Features):** Planned 📋
