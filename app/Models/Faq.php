@@ -20,8 +20,11 @@ class Faq extends Model
         'order',
     ];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-        'order' => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+            'order' => 'integer',
+        ];
+    }
 }

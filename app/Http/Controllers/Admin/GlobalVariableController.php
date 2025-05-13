@@ -84,7 +84,7 @@ class GlobalVariableController extends Controller
      */
     public function edit(GlobalVariable $globalVariable)
     {
-        return inertia('admin/global-variables/edit', compact('globalVariable'));
+        return inertia('admin/global-variables/edit', ['globalVariable' => $globalVariable]);
     }
 
     /**

@@ -21,12 +21,6 @@ class MahasiswaProfile extends Model
         'gpa',
     ];
 
-    protected $casts = [
-        'class_year' => 'integer',
-        'semester' => 'integer',
-        'gpa' => 'decimal:2',
-    ];
-
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -35,5 +29,13 @@ class MahasiswaProfile extends Model
     public function advisor()
     {
         return $this->belongsTo(User::class, 'advisor_id');
+    }
+    protected function casts(): array
+    {
+        return [
+            'class_year' => 'integer',
+            'semester' => 'integer',
+            'gpa' => 'decimal:2',
+        ];
     }
 }

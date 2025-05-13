@@ -80,10 +80,7 @@ class ReportController extends Controller
             }
         }
 
-        // Authorization checks: Must be owner or advisor, and internship accepted
-        if ((! $isOwner && ! $isAdvisor) || $internship->status !== 'accepted') {
-            abort(403, 'Unauthorized access or internship not accepted.');
-        }
+        abort_if((! $isOwner && ! $isAdvisor) || $internship->status !== 'accepted', 403, 'Unauthorized access or internship not accepted.');
 
         $query = $internship->reports(); // Use reports relationship
 
@@ -138,10 +135,7 @@ class ReportController extends Controller
 
     public function create(Internship $internship)
     {
-        // Authorization checks: Only owner can create
-        if ($internship->user_id !== auth()->id() || $internship->status !== 'accepted') {
-            abort(403, 'Anda hanya dapat menambah laporan untuk magang yang telah disetujui.');
-        }
+        abort_if($internship->user_id !== auth()->id() || $internship->status !== 'accepted', 403, 'Anda hanya dapat menambah laporan untuk magang yang telah disetujui.');
 
         return Inertia::render('front/internships/reports/create', [ // Updated view path
             'internship' => $internship,
@@ -150,10 +144,7 @@ class ReportController extends Controller
 
     public function store(Request $request, Internship $internship)
     {
-        // Authorization checks: Only owner can store
-        if ($internship->user_id !== auth()->id() || $internship->status !== 'accepted') {
-            abort(403, 'Anda hanya dapat menambah laporan untuk magang yang telah disetujui.');
-        }
+        abort_if($internship->user_id !== auth()->id() || $internship->status !== 'accepted', 403, 'Anda hanya dapat menambah laporan untuk magang yang telah disetujui.');
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -187,10 +178,7 @@ class ReportController extends Controller
 
     public function edit(Internship $internship, Report $report)
     {
-        // Authorization checks: Only owner can edit
-        if ($internship->user_id !== auth()->id() || $report->internship_id !== $internship->id || $report->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        abort_if($internship->user_id !== auth()->id() || $report->internship_id !== $internship->id || $report->user_id !== auth()->id(), 403, 'Unauthorized action.');
 
         // Prevent editing approved reports
         if ($report->status === 'approved') {
@@ -248,10 +236,7 @@ class ReportController extends Controller
 
     public function destroy(Internship $internship, Report $report)
     {
-        // Authorization checks: Only owner can delete
-        if ($internship->user_id !== auth()->id() || $report->internship_id !== $internship->id || $report->user_id !== auth()->id()) {
-            abort(403, 'Tindakan tidak sah.');
-        }
+        abort_if($internship->user_id !== auth()->id() || $report->internship_id !== $internship->id || $report->user_id !== auth()->id(), 403, 'Tindakan tidak sah.');
 
         // Authorize using ReportPolicy
         $this->authorize('delete', $report);
@@ -290,20 +275,11 @@ class ReportController extends Controller
             }
         }
 
-        // Authorize: Must be owner or advisor
-        if (! $isOwner && ! $isAdvisor && ! $user->hasRole('admin')) { // Assuming admin can also download
-            abort(403, 'Tindakan tidak sah.');
-        }
+        abort_if(! $isOwner && ! $isAdvisor && ! $user->hasRole('admin'), 403, 'Tindakan tidak sah.');
 
-        // Check if report belongs to the internship
-        if ($report->internship_id !== $internship->id) {
-            abort(404, 'Laporan tidak ditemukan untuk magang ini.');
-        }
+        abort_if($report->internship_id !== $internship->id, 404, 'Laporan tidak ditemukan untuk magang ini.');
 
-        // Check if file exists
-        if (! $report->report_file || ! Storage::disk('public')->exists($report->report_file)) {
-            abort(404, 'Berkas tidak ditemukan.');
-        }
+        abort_if(! $report->report_file || ! Storage::disk('public')->exists($report->report_file), 404, 'Berkas tidak ditemukan.');
 
         return Storage::disk('public')->download($report->report_file);
     }
@@ -311,10 +287,7 @@ class ReportController extends Controller
     // Method for Dosen/Admin to approve a report
     public function approve(Internship $internship, Report $report)
     {
-        // Check if the report belongs to the internship first for a more specific error
-        if ($report->internship_id !== $internship->id) {
-            abort(404, 'Laporan tidak ditemukan untuk magang ini.');
-        }
+        abort_if($report->internship_id !== $internship->id, 404, 'Laporan tidak ditemukan untuk magang ini.');
 
         // Authorize using ReportPolicy
         $this->authorize('approveOrReject', $report);
@@ -339,10 +312,7 @@ class ReportController extends Controller
     // Method for Dosen/Admin to reject a report
     public function reject(Request $request, Internship $internship, Report $report)
     {
-        // Check if the report belongs to the internship first for a more specific error
-        if ($report->internship_id !== $internship->id) {
-            abort(404, 'Laporan tidak ditemukan untuk magang ini.');
-        }
+        abort_if($report->internship_id !== $internship->id, 404, 'Laporan tidak ditemukan untuk magang ini.');
 
         // Authorize using ReportPolicy
         $this->authorize('approveOrReject', $report);
@@ -380,15 +350,7 @@ class ReportController extends Controller
      */
     public function uploadRevision(StoreReportRevisionRequest $request, Internship $internship, Report $report): RedirectResponse
     {
-        // Authorization: Basic role check is in StoreReportRevisionRequest.
-        // Policy for specific report authorization (e.g., is this Dosen the advisor for this student's report)
-        // can be added here or via a ReportPolicy.
-        // Example: $this->authorize('uploadRevision', $report);
-
-        // Ensure the report belongs to the specified internship.
-        if ($report->internship_id !== $internship->id) {
-            abort(404, 'Laporan tidak ditemukan untuk magang ini.');
-        }
+        abort_if($report->internship_id !== $internship->id, 404, 'Laporan tidak ditemukan untuk magang ini.');
 
         // Check if report status is not pending
         if ($report->status === 'pending') {

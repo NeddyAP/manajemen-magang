@@ -319,17 +319,10 @@ class GuidanceClassController extends Controller
             },
         ])->findOrFail($id);
 
-        // Check if user is authorized to view this class
-        if ($userRole === 'dosen' && $guidanceClass->lecturer_id !== $user->id) {
-            abort(403, 'Anda tidak memiliki akses ke kelas bimbingan ini.');
-        }
+        abort_if($userRole === 'dosen' && $guidanceClass->lecturer_id !== $user->id, 403, 'Anda tidak memiliki akses ke kelas bimbingan ini.');
 
-        if (
-            $userRole === 'mahasiswa' &&
-            (! $user->mahasiswaProfile || $user->mahasiswaProfile->advisor_id !== $guidanceClass->lecturer_id)
-        ) {
-            abort(403, 'Anda tidak memiliki akses ke kelas bimbingan ini.');
-        }
+        abort_if($userRole === 'mahasiswa' &&
+        (! $user->mahasiswaProfile || $user->mahasiswaProfile->advisor_id !== $guidanceClass->lecturer_id), 403, 'Anda tidak memiliki akses ke kelas bimbingan ini.');
 
         // Get eligible students (those advised by this lecturer and with accepted internships)
         $query = User::role('mahasiswa')

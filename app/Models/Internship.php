@@ -26,20 +26,16 @@ class Internship extends Model
         'progress',
     ];
 
-    protected $casts = [
-        'start_date' => 'date',
-        'end_date' => 'date',
-        'progress' => 'integer',
-    ];
-
     protected $appends = [
         'progress_percentage',
         'completion_status',
     ];
 
-    public function getCompletionStatusAttribute()
+    protected function completionStatus(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
-        return app(InternshipCompletion::class)->checkStatus($this);
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function () {
+            return app(InternshipCompletion::class)->checkStatus($this);
+        });
     }
 
     public function user()
@@ -56,9 +52,18 @@ class Internship extends Model
     {
         return $this->hasMany(Report::class);
     }
-
-    public function getProgressPercentageAttribute()
+    protected function progressPercentage(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
-        return $this->progress * 100 / 100;
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function () {
+            return $this->progress * 100 / 100;
+        });
+    }
+    protected function casts(): array
+    {
+        return [
+            'start_date' => 'date',
+            'end_date' => 'date',
+            'progress' => 'integer',
+        ];
     }
 }

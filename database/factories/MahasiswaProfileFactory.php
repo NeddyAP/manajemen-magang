@@ -6,6 +6,9 @@ use App\Models\MahasiswaProfile;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\MahasiswaProfile>
+ */
 class MahasiswaProfileFactory extends Factory
 {
     /**
@@ -24,13 +27,13 @@ class MahasiswaProfileFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'student_number' => $this->faker->unique()->numerify('##########'),
-            'study_program' => $this->faker->randomElement(['Informatika', 'Sistem Informasi', 'Teknik Komputer', 'Manajemen', 'Akuntansi', 'Hukum']),
-            'class_year' => $this->faker->numberBetween(intval(date('Y')) - 6, intval(date('Y')) - 1), // Angkatan, e.g., 1-6 years ago
-            'academic_status' => $this->faker->randomElement(['Aktif', 'Cuti', 'Lulus']),
-            'semester' => $this->faker->numberBetween(1, 14),
+            'student_number' => fake()->unique()->numerify('##########'),
+            'study_program' => fake()->randomElement(['Informatika', 'Sistem Informasi', 'Teknik Komputer', 'Manajemen', 'Akuntansi', 'Hukum']),
+            'class_year' => fake()->numberBetween(intval(date('Y')) - 6, intval(date('Y')) - 1), // Angkatan, e.g., 1-6 years ago
+            'academic_status' => fake()->randomElement(['Aktif', 'Cuti', 'Lulus']),
+            'semester' => fake()->numberBetween(1, 14),
             'advisor_id' => null, // Can be overridden, e.g., User::factory()->dosen()->create()->id
-            'gpa' => $this->faker->randomFloat(2, 2.00, 4.00),
+            'gpa' => fake()->randomFloat(2, 2.00, 4.00),
         ];
     }
 }

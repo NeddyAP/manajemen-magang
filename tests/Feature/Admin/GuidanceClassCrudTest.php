@@ -34,10 +34,11 @@ class GuidanceClassCrudTest extends TestCase
         $response = $this->actingAs($this->adminUser)->get(route('admin.guidance-classes.index'));
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) => $page
-            ->component('admin/guidance-classes/index')
-            ->has('classes')
-            ->has('lecturers')
+        $response->assertInertia(
+            fn ($page) => $page
+                ->component('admin/guidance-classes/index')
+                ->has('classes')
+                ->has('lecturers')
         );
     }
 
@@ -46,9 +47,10 @@ class GuidanceClassCrudTest extends TestCase
         $response = $this->actingAs($this->adminUser)->get(route('admin.guidance-classes.create'));
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) => $page
-            ->component('admin/guidance-classes/create')
-            ->has('lecturers')
+        $response->assertInertia(
+            fn ($page) => $page
+                ->component('admin/guidance-classes/create')
+                ->has('lecturers')
         );
     }
 
@@ -159,13 +161,6 @@ class GuidanceClassCrudTest extends TestCase
             'user_id' => $ineligibleStudent->id,
         ]);
 
-        // Skip the relationship checks for now
-        // $createdClass->load('students');
-        // $this->assertCount(2, $createdClass->students);
-        // $this->assertTrue($createdClass->students->contains($student1));
-        // $this->assertTrue($createdClass->students->contains($student2));
-        // $this->assertFalse($createdClass->students->contains($ineligibleStudent));
-
         // Manually send notifications for testing purposes
         $notification = new ClassScheduled($createdClass);
         $student1->notify($notification);
@@ -183,10 +178,11 @@ class GuidanceClassCrudTest extends TestCase
         $response = $this->actingAs($this->adminUser)->get(route('admin.guidance-classes.show', $guidanceClass));
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) => $page
-            ->component('admin/guidance-classes/show')
-            ->has('class')
-            ->where('class.id', $guidanceClass->id)
+        $response->assertInertia(
+            fn ($page) => $page
+                ->component('admin/guidance-classes/show')
+                ->has('class')
+                ->where('class.id', $guidanceClass->id)
         );
     }
 
@@ -197,11 +193,12 @@ class GuidanceClassCrudTest extends TestCase
         $response = $this->actingAs($this->adminUser)->get(route('admin.guidance-classes.edit', $guidanceClass));
 
         $response->assertStatus(200);
-        $response->assertInertia(fn ($page) => $page
-            ->component('admin/guidance-classes/edit')
-            ->has('guidanceClass')
-            ->has('lecturers')
-            ->where('guidanceClass.id', $guidanceClass->id)
+        $response->assertInertia(
+            fn ($page) => $page
+                ->component('admin/guidance-classes/edit')
+                ->has('guidanceClass')
+                ->has('lecturers')
+                ->where('guidanceClass.id', $guidanceClass->id)
         );
     }
 

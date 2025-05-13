@@ -112,7 +112,7 @@ class LogbookController extends Controller
             'internship.user.mahasiswaProfile.advisor',
         ]);
 
-        return inertia('admin/logbooks/show', compact('logbook'));
+        return inertia('admin/logbooks/show', ['logbook' => $logbook]);
     }
 
     /**

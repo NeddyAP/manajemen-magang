@@ -21,12 +21,12 @@ class ReportFactory extends Factory
         return [
             'user_id' => User::factory(),
             'internship_id' => Internship::factory(),
-            'title' => $this->faker->sentence,
-            'report_file' => 'dummy_reports/'.$this->faker->uuid.'.pdf', // Dummy file path
+            'title' => fake()->sentence,
+            'report_file' => 'dummy_reports/'.fake()->uuid.'.pdf', // Dummy file path
             // 'report_type', 'content', 'report_date' do not exist in the migration
             'version' => 1,
             'status' => 'pending', // Default status from migration
-            'reviewer_notes' => $this->faker->optional()->sentence,
+            'reviewer_notes' => fake()->optional()->sentence,
         ];
     }
 }

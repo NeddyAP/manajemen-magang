@@ -23,12 +23,14 @@ class AdminProfile extends Model
         'work_location',
     ];
 
-    protected $casts = [
-        'join_date' => 'date',
-    ];
-
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    protected function casts(): array
+    {
+        return [
+            'join_date' => 'date',
+        ];
     }
 }

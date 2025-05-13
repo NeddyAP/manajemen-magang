@@ -185,9 +185,7 @@ class InternshipApplicantController extends Controller
      */
     public function create()
     {
-        if (! auth()->user()->hasRole('mahasiswa')) {
-            abort(403, 'Hanya mahasiswa yang dapat membuat aplikasi magang.');
-        }
+        abort_unless(auth()->user()->hasRole('mahasiswa'), 403, 'Hanya mahasiswa yang dapat membuat aplikasi magang.');
 
         return Inertia::render('front/internships/applicants/create');
     }
@@ -226,11 +224,7 @@ class InternshipApplicantController extends Controller
      */
     public function edit(Internship $internship)
     {
-        // Check if the internship belongs to the authenticated user
-        if ($internship->user_id !== auth()->id()) {
-            // Dosen cannot edit student applications directly through this interface
-            abort(403, 'Tindakan tidak sah.');
-        }
+        abort_if($internship->user_id !== auth()->id(), 403, 'Tindakan tidak sah.');
 
         return Inertia::render('front/internships/applicants/edit', [
             'internship' => $internship->load('user.mahasiswaProfile'), // Eager load user and profile
@@ -242,11 +236,7 @@ class InternshipApplicantController extends Controller
      */
     public function update(UpdateInternshipRequest $request, Internship $internship)
     {
-        // Check if the internship belongs to the authenticated user
-        if ($internship->user_id !== auth()->id()) {
-            // Dosen cannot update student applications directly through this interface
-            abort(403, 'Tindakan tidak sah.');
-        }
+        abort_if($internship->user_id !== auth()->id(), 403, 'Tindakan tidak sah.');
 
         // Only prevent updates if status is accepted (for mahasiswa)
         if ($internship->status === 'accepted') {
@@ -283,11 +273,7 @@ class InternshipApplicantController extends Controller
      */
     public function destroy(Internship $internship)
     {
-        // Check if the internship belongs to the authenticated user
-        if ($internship->user_id !== auth()->id()) {
-            // Dosen cannot delete student applications directly through this interface
-            abort(403, 'Tindakan tidak sah.');
-        }
+        abort_if($internship->user_id !== auth()->id(), 403, 'Tindakan tidak sah.');
 
         // Prevent deletion if status is accepted
         if ($internship->status === 'accepted') {
@@ -360,9 +346,7 @@ class InternshipApplicantController extends Controller
             }
         }
 
-        if (! $isOwner && ! $isAdvisor && ! $user->hasRole('admin')) { // Assuming admin can also download
-            abort(403, 'Tindakan tidak sah.');
-        }
+        abort_if(! $isOwner && ! $isAdvisor && ! $user->hasRole('admin'), 403, 'Tindakan tidak sah.');
 
         if (! $internship->application_file || ! Storage::disk('public')->exists($internship->application_file)) {
             return back()->with('error', 'Berkas aplikasi tidak ditemukan.');

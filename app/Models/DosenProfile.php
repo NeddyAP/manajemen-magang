@@ -20,10 +20,6 @@ class DosenProfile extends Model
         'teaching_start_year',
     ];
 
-    protected $casts = [
-        'teaching_start_year' => 'integer',
-    ];
-
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -35,5 +31,11 @@ class DosenProfile extends Model
     public function advisees()
     {
         return $this->hasMany(MahasiswaProfile::class, 'advisor_id', 'user_id');
+    }
+    protected function casts(): array
+    {
+        return [
+            'teaching_start_year' => 'integer',
+        ];
     }
 }

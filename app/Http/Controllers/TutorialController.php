@@ -44,6 +44,6 @@ class TutorialController extends Controller
         $tutorials = $query->orderBy('created_at', 'desc')
             ->get();
 
-        return inertia('front/tutorials/index', compact('tutorials'));
+        return inertia('front/tutorials/index', ['tutorials' => $tutorials]);
     }
 }

@@ -96,10 +96,10 @@ class ReportController extends Controller
                         // Handle date range filtering
                         $dates = explode(',', $value);
                         if (count($dates) === 2) {
-                            if (! empty($dates[0])) {
+                            if (isset($dates[0]) && ($dates[0] !== '' && $dates[0] !== '0')) {
                                 $query->whereDate('created_at', '>=', $dates[0]);
                             }
-                            if (! empty($dates[1])) {
+                            if (isset($dates[1]) && ($dates[1] !== '' && $dates[1] !== '0')) {
                                 $query->whereDate('created_at', '<=', $dates[1]);
                             }
                         }

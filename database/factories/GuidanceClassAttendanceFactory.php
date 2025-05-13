@@ -30,9 +30,9 @@ class GuidanceClassAttendanceFactory extends Factory
         return [
             'guidance_class_id' => GuidanceClass::factory(),
             'user_id' => User::factory()->mahasiswa(), // Default to a mahasiswa user
-            'attended_at' => $this->faker->optional(0.7)->dateTimeThisMonth(),
-            'attendance_method' => $this->faker->randomElement(['qr_scan', 'manual', null]),
-            'notes' => $this->faker->optional()->sentence(),
+            'attended_at' => fake()->optional(0.7)->dateTimeThisMonth(),
+            'attendance_method' => fake()->randomElement(['qr_scan', 'manual', null]),
+            'notes' => fake()->optional()->sentence(),
         ];
     }
 
@@ -43,8 +43,8 @@ class GuidanceClassAttendanceFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'attended_at' => Carbon::instance($this->faker->dateTimeThisMonth()),
-                'attendance_method' => $this->faker->randomElement(['qr_scan', 'manual']),
+                'attended_at' => Carbon::instance(fake()->dateTimeThisMonth()),
+                'attendance_method' => fake()->randomElement(['qr_scan', 'manual']),
             ];
         });
     }
@@ -69,7 +69,7 @@ class GuidanceClassAttendanceFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'attended_at' => Carbon::instance($this->faker->dateTimeThisMonth()),
+                'attended_at' => Carbon::instance(fake()->dateTimeThisMonth()),
                 'attendance_method' => 'manual',
             ];
         });

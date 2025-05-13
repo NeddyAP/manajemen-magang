@@ -3,8 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\DosenProfile;
-use App\Models\MahasiswaProfile;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -34,7 +32,7 @@ class UserSeeder extends Seeder
         for ($i = 1; $i <= 5; $i++) {
             $dosenUsers->push(
                 User::factory()->dosen()->create([
-                    'name' => 'Dosen ' . $i,
+                    'name' => 'Dosen '.$i,
                     'email' => "dosen{$i}@example.com",
                     'password' => Hash::make('a'),
                 ])
@@ -44,7 +42,7 @@ class UserSeeder extends Seeder
         // Create Mahasiswa Users
         for ($i = 1; $i <= 20; $i++) {
             $mahasiswaUser = User::factory()->mahasiswa()->create([
-                'name' => 'Mahasiswa ' . $i,
+                'name' => 'Mahasiswa '.$i,
                 'email' => "mahasiswa{$i}@example.com",
                 'password' => Hash::make('a'),
             ]);

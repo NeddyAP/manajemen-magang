@@ -75,10 +75,10 @@ class LogbookController extends Controller
                         // Handle date range filtering if present in format 'start_date,end_date'
                         $dates = explode(',', $value);
                         if (count($dates) === 2) {
-                            if (! empty($dates[0])) {
+                            if (isset($dates[0]) && ($dates[0] !== '' && $dates[0] !== '0')) {
                                 $query->whereDate('date', '>=', $dates[0]);
                             }
-                            if (! empty($dates[1])) {
+                            if (isset($dates[1]) && ($dates[1] !== '' && $dates[1] !== '0')) {
                                 $query->whereDate('date', '<=', $dates[1]);
                             }
                         }
@@ -161,10 +161,7 @@ class LogbookController extends Controller
 
     public function create(Internship $internship)
     {
-        // Only owner can create
-        if ($internship->user_id !== auth()->id() || $internship->status !== 'accepted') {
-            abort(403, 'Unauthorized action.');
-        }
+        abort_if($internship->user_id !== auth()->id() || $internship->status !== 'accepted', 403, 'Unauthorized action.');
 
         return Inertia::render('front/internships/logbooks/create', [
             'internship' => $internship,
@@ -173,10 +170,7 @@ class LogbookController extends Controller
 
     public function store(StoreLogbookRequest $request, Internship $internship)
     {
-        // Authorization is handled by StoreLogbookRequest and this check
-        if ($internship->user_id !== auth()->id() || $internship->status !== 'accepted') {
-            abort(403, 'Unauthorized action or internship not accepted.');
-        }
+        abort_if($internship->user_id !== auth()->id() || $internship->status !== 'accepted', 403, 'Unauthorized action or internship not accepted.');
 
         $validated = $request->validated();
 
@@ -199,10 +193,7 @@ class LogbookController extends Controller
 
     public function edit(Internship $internship, Logbook $logbook)
     {
-        // owner and advisor can edit
-        if ((! auth()->user()->hasRole('dosen') && $internship->user_id !== auth()->id()) || $logbook->internship_id !== $internship->id) {
-            abort(403, 'Unauthorized action.');
-        }
+        abort_if((! auth()->user()->hasRole('dosen') && $internship->user_id !== auth()->id()) || $logbook->internship_id !== $internship->id, 403, 'Unauthorized action.');
 
         return Inertia::render('front/internships/logbooks/edit', [
             'internship' => $internship,
@@ -212,10 +203,7 @@ class LogbookController extends Controller
 
     public function update(UpdateLogbookRequest $request, Internship $internship, Logbook $logbook)
     {
-        // Authorization is handled by UpdateLogbookRequest and this check
-        if ($logbook->internship_id !== $internship->id) { // Ensure logbook belongs to the internship
-            abort(404);
-        }
+        abort_if($logbook->internship_id !== $internship->id, 404);
         // Additional check if Dosen is trying to update notes vs student updating their entry
         if (auth()->user()->hasRole('dosen')) {
             $validated['supervisor_notes'] = $request->input('supervisor_notes');
@@ -233,10 +221,7 @@ class LogbookController extends Controller
 
     public function destroy(Internship $internship, Logbook $logbook)
     {
-        // Ensure logbook belongs to the internship (route model binding should mostly handle this)
-        if ($logbook->internship_id !== $internship->id) {
-            abort(404);
-        }
+        abort_if($logbook->internship_id !== $internship->id, 404);
 
         $this->authorize('delete', $logbook);
 
@@ -395,8 +380,6 @@ class LogbookController extends Controller
             }
         }
 
-        if ((! $isOwner && ! $isAdvisor) || $internship->status !== 'accepted') {
-            abort(403, 'Akses tidak diizinkan atau status magang belum diterima.');
-        }
+        abort_if((! $isOwner && ! $isAdvisor) || $internship->status !== 'accepted', 403, 'Akses tidak diizinkan atau status magang belum diterima.');
     }
 }

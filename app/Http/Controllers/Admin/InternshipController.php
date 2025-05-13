@@ -242,9 +242,7 @@ class InternshipController extends Controller
      */
     public function downloadApplicationFile(Internship $internship)
     {
-        if (! $internship->application_file) {
-            abort(404, 'Berkas tidak ditemukan.');
-        }
+        abort_unless($internship->application_file, 404, 'Berkas tidak ditemukan.');
 
         return Storage::disk('public')->download($internship->application_file);
     }

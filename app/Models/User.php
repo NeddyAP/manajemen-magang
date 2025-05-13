@@ -68,17 +68,18 @@ class User extends Authenticatable
         return $this->hasOne(MahasiswaProfile::class);
     }
 
-    public function getProfileAttribute()
+    protected function profile(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
-        if ($this->hasRole('admin') || $this->hasRole('superadmin')) {
-            return $this->adminProfile;
-        } elseif ($this->hasRole('dosen')) {
-            return $this->dosenProfile;
-        } elseif ($this->hasRole('mahasiswa')) {
-            return $this->mahasiswaProfile;
-        }
-
-        return null;
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function () {
+            if ($this->hasRole('admin') || $this->hasRole('superadmin')) {
+                return $this->adminProfile;
+            } elseif ($this->hasRole('dosen')) {
+                return $this->dosenProfile;
+            } elseif ($this->hasRole('mahasiswa')) {
+                return $this->mahasiswaProfile;
+            }
+            return null;
+        });
     }
 
     // --- Mahasiswa Specific Relationships ---

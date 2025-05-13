@@ -84,7 +84,7 @@ class FaqController extends Controller
      */
     public function edit(Faq $faq)
     {
-        return inertia('admin/faqs/edit', compact('faq'));
+        return inertia('admin/faqs/edit', ['faq' => $faq]);
     }
 
     /**

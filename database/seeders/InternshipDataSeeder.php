@@ -20,6 +20,7 @@ class InternshipDataSeeder extends Seeder
 
         if ($mahasiswaUsers->isEmpty()) {
             $this->command->info('Tidak ada pengguna Mahasiswa ditemukan untuk membuat data magang.');
+
             return;
         }
 
@@ -34,7 +35,7 @@ class InternshipDataSeeder extends Seeder
                         ->for($internship)
                         ->for($mahasiswaUser) // Explicitly set user_id for logbook
                         ->create([
-                            'date' => fake()->dateTimeBetween($internship->start_date, $internship->end_date)
+                            'date' => fake()->dateTimeBetween($internship->start_date, $internship->end_date),
                         ]);
                 }
             }

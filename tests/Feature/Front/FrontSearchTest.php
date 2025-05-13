@@ -9,6 +9,25 @@ use Tests\TestCase;
 
 class FrontSearchTest extends TestCase
 {
+    public $admin;
+    public $mahasiswa;
+    public $internship;
+    /**
+     * @var \App\Models\Logbook|\Illuminate\Database\Eloquent\Collection<int, \App\Models\Logbook>
+     */
+    public $logbook1;
+    /**
+     * @var \App\Models\Logbook|\Illuminate\Database\Eloquent\Collection<int, \App\Models\Logbook>
+     */
+    public $logbook2;
+    /**
+     * @var \App\Models\Report|\Illuminate\Database\Eloquent\Collection<int, \App\Models\Report>
+     */
+    public $report1;
+    /**
+     * @var \App\Models\Report|\Illuminate\Database\Eloquent\Collection<int, \App\Models\Report>
+     */
+    public $report2;
     use RefreshDatabase;
 
     protected function setUp(): void

@@ -22,10 +22,6 @@ class GuidanceClassAttendance extends Pivot
         'notes',
     ];
 
-    protected $casts = [
-        'attended_at' => 'datetime',
-    ];
-
     /**
      * Get the guidance class that owns the attendance record.
      */
@@ -89,7 +85,8 @@ class GuidanceClassAttendance extends Pivot
     /**
      * Scope query to get only eligible students' attendance.
      */
-    public function scopeEligible($query)
+    #[\Illuminate\Database\Eloquent\Attributes\Scope]
+    public function eligible($query)
     {
         return $query->whereHas('user', function ($q): void {
             $q->whereHas('mahasiswaProfile', function ($q): void {
@@ -112,5 +109,11 @@ class GuidanceClassAttendance extends Pivot
                 DB::raw('COUNT(*) - COUNT(attended_at) as not_attended'),
             ])
             ->first();
+    }
+    protected function casts(): array
+    {
+        return [
+            'attended_at' => 'datetime',
+        ];
     }
 }

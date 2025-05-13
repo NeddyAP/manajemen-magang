@@ -27,15 +27,15 @@ class AdminProfileFactory extends Factory
     {
         return [
             // 'user_id' is typically set using ->for(User::factory()->adminRole())
-            'employee_id' => $this->faker->unique()->numerify('EMP######'),
-            'department' => $this->faker->jobTitle(),
-            'position' => $this->faker->word(),
-            'employment_status' => $this->faker->randomElement(['Tetap', 'Kontrak', 'Magang']),
-            'join_date' => $this->faker->date(),
-            'phone_number' => $this->faker->phoneNumber(), // Removed optional()
-            'address' => $this->faker->address(),
-            'supervisor_name' => $this->faker->name(),
-            'work_location' => $this->faker->city(),
+            'employee_id' => fake()->unique()->numerify('EMP######'),
+            'department' => fake()->jobTitle(),
+            'position' => fake()->word(),
+            'employment_status' => fake()->randomElement(['Tetap', 'Kontrak', 'Magang']),
+            'join_date' => fake()->date(),
+            'phone_number' => fake()->phoneNumber(), // Removed optional()
+            'address' => fake()->address(),
+            'supervisor_name' => fake()->name(),
+            'work_location' => fake()->city(),
         ];
     }
 }

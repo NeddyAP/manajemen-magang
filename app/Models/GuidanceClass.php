@@ -24,11 +24,6 @@ class GuidanceClass extends Model
         'qr_code',
     ];
 
-    protected $casts = [
-        'start_date' => 'datetime',
-        'end_date' => 'datetime',
-    ];
-
     public function lecturer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'lecturer_id')
@@ -165,5 +160,12 @@ class GuidanceClass extends Model
                 $query->where('users.id', $studentId);
             }])
             ->get();
+    }
+    protected function casts(): array
+    {
+        return [
+            'start_date' => 'datetime',
+            'end_date' => 'datetime',
+        ];
     }
 }
