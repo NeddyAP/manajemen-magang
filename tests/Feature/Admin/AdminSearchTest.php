@@ -10,6 +10,7 @@ use App\Models\Logbook;
 use App\Models\Report;
 use App\Models\Tutorial;
 use App\Models\User;
+use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
