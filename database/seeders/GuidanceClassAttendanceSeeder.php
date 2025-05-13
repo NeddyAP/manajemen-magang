@@ -18,31 +18,33 @@ class GuidanceClassAttendanceSeeder extends Seeder
         $guidanceClasses = GuidanceClass::all();
         $students = User::whereHas('roles', function ($query) {
             $query->where('name', 'mahasiswa');
-        })->get();
+        })
+        ->whereHas('mahasiswaProfile') // Ensure student has a MahasiswaProfile
+        ->get();
 
         if ($guidanceClasses->isEmpty() || $students->isEmpty()) {
-            $this->command->warn('No guidance classes or students found. Skipping GuidanceClassAttendanceSeeder.');
+            $this->command->warn('Tidak ada kelas bimbingan atau mahasiswa ditemukan. Melewati GuidanceClassAttendanceSeeder.');
 
             return;
         }
 
-        foreach ($guidanceClasses as $class) {
+        foreach ($guidanceClasses as $guidanceClass) {
             // Assign 5 to 15 students to each class
-            $selectedStudents = $students->random(min($students->count(), fake()->numberBetween(5, 15)));
+            $selectedStudentsCount = min($students->count(), fake()->numberBetween(5, 15));
+            if ($selectedStudentsCount === 0) continue;
+
+            $selectedStudents = $students->random($selectedStudentsCount);
+            // If random returns a single item, convert it to a collection
+            if ($selectedStudents instanceof User) {
+                $selectedStudents = collect([$selectedStudents]);
+            }
+
 
             foreach ($selectedStudents as $student) {
-                $attendedAt = null;
-                if (fake()->boolean(80)) { // 80% chance of attending
-                    $attendedAt = Carbon::parse($class->start_date)->addMinutes(fake()->numberBetween(0, 30));
-                }
-
-                GuidanceClassAttendance::create([
-                    'guidance_class_id' => $class->id,
-                    'user_id' => $student->id,
-                    'attended_at' => $attendedAt,
-                    'attendance_method' => $attendedAt ? fake()->randomElement(['qr_code', 'manual']) : null,
-                    'notes' => $attendedAt && fake()->boolean(20) ? fake()->sentence() : null,
-                ]);
+                GuidanceClassAttendance::factory()
+                    ->for($guidanceClass)
+                    ->for($student)
+                    ->create();
             }
         }
     }
