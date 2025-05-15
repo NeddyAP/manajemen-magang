@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-export type Appearance = 'light' | 'dark' | 'system' | 'green'; // Changed 'blue' to 'green'
+export type Appearance = 'light' | 'dark' | 'system'; 
 
 const prefersDark = () => {
     if (typeof window === 'undefined') {
@@ -26,11 +26,10 @@ const applyTheme = (appearance: Appearance) => {
     document.documentElement.classList.remove('dark');
     document.documentElement.removeAttribute('data-theme');
 
-    if (appearance === 'green') {
-        // Changed 'blue' to 'green'
-        document.documentElement.setAttribute('data-theme', 'green'); // Changed 'blue' to 'green'
+    if (appearance === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
     } else {
-        // Apply dark class only if not green theme and conditions met
+        // Apply dark class only if not light theme and conditions met
         document.documentElement.classList.toggle('dark', isDark);
     }
 };
@@ -45,11 +44,11 @@ const mediaQuery = () => {
 
 const handleSystemThemeChange = () => {
     const currentAppearance = localStorage.getItem('appearance') as Appearance;
-    applyTheme(currentAppearance || 'green'); // Changed default to 'green'
+    applyTheme(currentAppearance || 'light'); // Changed default to 'light'
 };
 
 export function initializeTheme() {
-    const savedAppearance = (localStorage.getItem('appearance') as Appearance) || 'green'; // Changed default to 'green'
+    const savedAppearance = (localStorage.getItem('appearance') as Appearance) || 'light'; // Changed default to 'light'
 
     applyTheme(savedAppearance);
 
@@ -58,7 +57,7 @@ export function initializeTheme() {
 }
 
 export function useAppearance() {
-    const [appearance, setAppearance] = useState<Appearance>('green'); // Changed default state to 'green'
+    const [appearance, setAppearance] = useState<Appearance>('light'); // Changed default state to 'light'
 
     const updateAppearance = useCallback((mode: Appearance) => {
         setAppearance(mode);
@@ -74,7 +73,7 @@ export function useAppearance() {
 
     useEffect(() => {
         const savedAppearance = localStorage.getItem('appearance') as Appearance | null;
-        updateAppearance(savedAppearance || 'green'); // Changed default to 'green'
+        updateAppearance(savedAppearance || 'light'); // Changed default to 'light'
 
         return () => mediaQuery()?.removeEventListener('change', handleSystemThemeChange);
     }, [updateAppearance]);

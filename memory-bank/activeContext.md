@@ -43,7 +43,7 @@ This is a comprehensive internship management system (Manajement Magang) built w
 8.  **User Settings:**
     - Profile updates.
     - Password changes.
-    - Appearance (Light/Dark/Green mode).
+    - Appearance (Light/Dark).
 9.  **Trash Management (Admin):**
     - View, Restore, Force Delete soft-deleted records.
 10. **Global Variable Management (Admin):**
