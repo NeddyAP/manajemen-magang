@@ -7,7 +7,7 @@ import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth-layout';
+import AuthSplitLayout from '@/layouts/auth/auth-split-layout'; // Changed to AuthSplitLayout
 
 type RegisterForm = {
     name: string;
@@ -32,12 +32,19 @@ export default function Register() {
     };
 
     return (
-        <AuthLayout title="Buat akun" description="Masukkan detail Anda di bawah ini untuk membuat akun">
-            <Head title="Daftar" />
-            <form className="flex flex-col gap-6" onSubmit={submit}>
-                <div className="grid gap-6">
-                    <div className="grid gap-2">
-                        <Label htmlFor="name">Nama</Label>
+        <AuthSplitLayout
+            title="Daftar Akun"
+            description="Isi detail di bawah untuk membuat akun baru"
+            brandingHeadline="Buat Akun Baru"
+            brandingSubHeadline="Daftar dan Mulai Perjalananmu"
+            brandingDescription="Bergabunglah dengan kami dan mulailah pengalaman KKL dan KKN yang tak terlupakan. Proses pendaftaran cepat dan mudah!"
+            brandingButtonText="Pelajari Lebih Lanjut"
+        >
+            <Head title="Daftar Akun" />
+            <form className="space-y-6" onSubmit={submit}>
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="name">Nama Lengkap*</Label>
                         <Input
                             id="name"
                             type="text"
@@ -48,13 +55,14 @@ export default function Register() {
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
                             disabled={processing}
-                            placeholder="Nama Lengkap"
+                            placeholder="Masukkan nama lengkap Anda"
+                            className="rounded-md" // Added rounded corners
                         />
-                        <InputError message={errors.name} className="mt-2" />
+                        <InputError message={errors.name} />
                     </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Alamat Email</Label>
+                    <div className="space-y-2">
+                        <Label htmlFor="email">Email / akun pengguna*</Label>
                         <Input
                             id="email"
                             type="email"
@@ -64,13 +72,14 @@ export default function Register() {
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
                             disabled={processing}
-                            placeholder="email@contoh.com"
+                            placeholder="Masukkan email Anda"
+                            className="rounded-md" // Added rounded corners
                         />
                         <InputError message={errors.email} />
                     </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="password">Kata Sandi</Label>
+                    <div className="space-y-2">
+                        <Label htmlFor="password">Password*</Label>
                         <Input
                             id="password"
                             type="password"
@@ -80,13 +89,14 @@ export default function Register() {
                             value={data.password}
                             onChange={(e) => setData('password', e.target.value)}
                             disabled={processing}
-                            placeholder="Kata Sandi"
+                            placeholder="Masukkan password"
+                            className="rounded-md" // Added rounded corners
                         />
                         <InputError message={errors.password} />
                     </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="password_confirmation">Konfirmasi kata sandi</Label>
+                    <div className="space-y-2">
+                        <Label htmlFor="password_confirmation">Konfirmasi Password*</Label>
                         <Input
                             id="password_confirmation"
                             type="password"
@@ -96,24 +106,40 @@ export default function Register() {
                             value={data.password_confirmation}
                             onChange={(e) => setData('password_confirmation', e.target.value)}
                             disabled={processing}
-                            placeholder="Konfirmasi kata sandi"
+                            placeholder="Konfirmasi password Anda"
+                            className="rounded-md" // Added rounded corners
                         />
                         <InputError message={errors.password_confirmation} />
                     </div>
 
-                    <Button type="submit" className="mt-2 w-full" tabIndex={5} disabled={processing}>
-                        {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                        Buat akun
+                    <Button type="submit" className="w-full rounded-md bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-[var(--primary-foreground)]" tabIndex={5} disabled={processing}>
+                        {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+                        Daftar
                     </Button>
                 </div>
 
-                <div className="text-muted-foreground text-center text-sm">
+                <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-2 text-muted-foreground">atau lanjutkan dengan</span>
+                    </div>
+                </div>
+
+                <Button variant="outline" type="button" className="w-full rounded-md" tabIndex={6} disabled={processing}>
+                    {/* Placeholder for Google Icon */}
+                    {/* <Icon name="google" className="mr-2 h-4 w-4" /> */}
+                    G Masuk dengan Google
+                </Button>
+
+                <div className="text-muted-foreground mt-6 text-center text-sm">
                     Sudah punya akun?{' '}
-                    <TextLink href={route('login')} tabIndex={6}>
+                    <TextLink href={route('login')} tabIndex={7}>
                         Masuk
                     </TextLink>
                 </div>
             </form>
-        </AuthLayout>
+        </AuthSplitLayout>
     );
 }

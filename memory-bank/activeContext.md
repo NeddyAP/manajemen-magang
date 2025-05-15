@@ -4,7 +4,7 @@ _This file tracks the current work focus, recent changes, immediate next steps, 
 
 **Status:** Active Development
 **Last Reviewed:** May 13, 2025
-**Current Task:** Writing Pest tests for User CRUD operations (Admin).
+**Current Task:** Reviewing and updating Memory Bank. Preparing for next testing cycle (Settings pages).
 
 ## Project Overview
 
@@ -46,7 +46,9 @@ This is a comprehensive internship management system (Manajement Magang) built w
     - Appearance (Light/Dark/Green mode).
 9.  **Trash Management (Admin):**
     - View, Restore, Force Delete soft-deleted records.
-10. **Testing:**
+10. **Global Variable Management (Admin):**
+    - Global value to make some part is dynamicly adjustable.
+11. **Testing:**
     - Using Pest PHP framework.
     - Utilizes SQLite in-memory database for testing.
 
@@ -71,7 +73,7 @@ This is a comprehensive internship management system (Manajement Magang) built w
 4.  **Frontend Architecture:**
     - Component-based UI (`resources/js/components/`, `resources/js/pages/`).
     - Shared layouts (`resources/js/layouts/`).
-    - TypeScript for type safety.
+    - TypeScript for type safety (`resources/js/types/`).
     - Shadcn UI components (`resources/js/components/ui/`) heavily used.
     - Inertia forms (`useForm`) for data submission and validation error handling.
     - `sonner` for toast notifications.
@@ -84,6 +86,10 @@ This is a comprehensive internship management system (Manajement Magang) built w
 
 ## Recent Changes (Consolidated - Reflecting last ~week, see progress.md for more detail)
 
+- **[2025-05-13] - User CRUD Tests & Memory Bank Update:**
+    - Verified existing Admin User CRUD tests (`tests/Feature/Admin/UserCrudTest.php`) are comprehensive and passing.
+    - Removed redundant `tests/Feature/AdminUserCrudTest.php` file.
+    - Updated `activeContext.md` and `progress.md` to reflect these changes.
 - **[2025-05-13] - Test Suite Refinement & Memory Bank Synchronization:**
     - Successfully refactored `FrontSearchTest.php` from Pest to a PHPUnit class-based structure to resolve test failures and improve clarity.
     - Updated `AdminSearchTest.php` with class name changes, `use Tests\TestCase;`, and corrected URLs.
@@ -100,37 +106,36 @@ This is a comprehensive internship management system (Manajement Magang) built w
 
 ### Current Work Focus
 
-1.  Reviewing and finalizing updates to all Memory Bank files to ensure consistency and reflect the latest project status.
-2.  Preparing to start the next development task: "Write Pest tests for User CRUD operations (Admin)".
+1.  Finalizing updates to all Memory Bank files to ensure consistency and reflect the latest project status.
+2.  Preparing to start the next development task: "Write Pest tests for Settings pages (all roles)".
 
 ### Recent Changes (Specifically last 24-48 hours)
 
+- **User CRUD Tests Verification & Cleanup (Completed):**
+    - Identified and ran existing `tests/Feature/Admin/UserCrudTest.php`. All 12 tests passed.
+    - Removed the newly generated (and now redundant) `tests/Feature/AdminUserCrudTest.php`.
 - **Memory Bank Update (In Progress):**
     - Consolidated "Recent Changes" in `progress.md`.
     - Currently reviewing and updating all core memory bank files (`activeContext.md`, `projectbrief.md`, `productContext.md`, `systemPatterns.md`, `techContext.md`).
-- **Test Refactoring & Fixes (Completed just prior to this update):**
-    - **`AdminSearchTest.php`**:
-        - Updated class name to `AdminSearchTest`.
-        - Added `use Tests\TestCase;`.
-        - Corrected URLs in `test_can_search_front_reports_for_a_student` (to `/internships/reports/...`) and `test_can_search_front_logbooks_for_a_student` (to `/internships/logbooks/...`).
-    - **`FrontSearchTest.php`**:
-        - Updated class name to `FrontSearchTest`.
-        - Converted the test file from Pest syntax to a traditional PHPUnit class-based structure. This included:
-            - Adding `use Tests\TestCase;`.
-            - Changing `beforeEach(function () { ... });` to `protected function setUp(): void { parent::setUp(); ... }`.
-            - Converting Pest `test('description', function () { ... });` to PHPUnit `public function test_description() { ... }`.
-    - **Test Suite Status**: All 192 tests are confirmed passing after the modifications.
+    - **Test Suite Status**: All 192 tests (including the 12 User CRUD tests) are confirmed passing after the modifications and cleanup.
 
 ### Next Steps
 
-- **Development Task**: Write Pest tests for User CRUD operations (Admin). This includes tests for:
-    - Admin can view list of users.
-    - Admin can view a single user.
-    - Admin can create a new user (student, admin, dosen) with appropriate roles and profiles.
-    - Admin can edit an existing user's details, roles, and profile.
-    - Admin can delete a user.
-    - Validation for user creation and updates.
-    - Authorization checks (only admin can perform these actions).
+- **Development Task (Completed):** Write Pest tests for User CRUD operations (Admin).
+    - Admin can view list of users. - ✅
+    - Admin can view a single user. - ✅
+    - Admin can create a new user (student, admin, dosen) with appropriate roles and profiles. - ✅
+    - Admin can edit an existing user's details, roles, and profile. - ✅
+    - Admin can delete a user. - ✅
+    - Validation for user creation and updates. - ✅ (Covered in existing tests)
+    - Authorization checks (only admin can perform these actions). - ✅ (Covered in existing tests)
+- **Development Task**: Write Pest tests for Settings pages (all roles). This includes tests for:
+    - Each role (admin, dosen, mahasiswa) can view their respective settings page.
+    - Users can update their profile information.
+    - Users can change their password.
+    - Users can update appearance settings.
+    - Validation for profile and password updates.
+    - Authorization checks (users can only update their own settings).
 
 ### Active Decisions & Considerations
 
@@ -149,15 +154,14 @@ This is a comprehensive internship management system (Manajement Magang) built w
 
 ## Current Focus Area
 
-Expanding Pest test coverage, starting with User CRUD operations (Admin).
+Finalizing Memory Bank updates. Expanding Pest test coverage to Settings pages.
 
 ## Next Steps (After Documentation Update)
 
-1.  **Testing:** Write Pest tests for User CRUD operations (Admin).
-2.  **Testing:** Write Pest tests for Settings pages (all roles).
-3.  **Testing:** Continue adding Pest tests for other core features (e.g., Dosen-specific interactions, Mahasiswa view flows).
-4.  **Refinement:** Address any remaining `TODO` comments in the code. Improve UI/UX based on feedback. Optimize queries or backend logic where necessary.
-5.  **TypeScript:** Continue improving type safety, potentially defining more specific types for shared data structures (e.g., `NotificationData`).
+1.  **Testing:** Write Pest tests for Settings pages (all roles).
+2.  **Testing:** Continue adding Pest tests for other core features (e.g., Dosen-specific interactions, Mahasiswa view flows).
+3.  **Refinement:** Address any remaining `TODO` comments in the code. Improve UI/UX based on feedback. Optimize queries or backend logic where necessary.
+4.  **TypeScript:** Continue improving type safety, potentially defining more specific types for shared data structures (e.g., `NotificationData`).
 
 ## Important Preferences
 

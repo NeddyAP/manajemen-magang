@@ -88,26 +88,23 @@ export default function Tutorials({ tutorials }: { tutorials: Tutorial[] }) {
     const renderTutorialCard = (tutorial: Tutorial) => (
         <div
             key={tutorial.id}
-            className={`flex h-full transform flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-700 dark:bg-gray-800 ${
-                tutorial.id && animatedCards[tutorial.id.toString()] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-            }`}
+            className={`flex h-full transform flex-col overflow-hidden rounded-xl border border-gray-100 bg-gray-50 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-700 dark:bg-gray-800 ${tutorial.id && animatedCards[tutorial.id.toString()] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+                }`}
             style={{ transitionDelay: `${tutorials.findIndex((t) => t.id === tutorial.id) * 50}ms` }}
         >
-            <div className="flex-grow p-5">
-                <div className="mb-3">
-                    <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                        {tutorial.access_level}
-                    </span>
-                </div>
+            <img
+                src="/assets/panduan-kkl.png"
+                alt={tutorial.title}
+                className="h-80 w-full rounded-t-xl object-fill p-1"
+            />
+            <div className="flex-grow p-3 text-center">
                 <h2 className="mb-2 text-xl font-bold text-gray-800 dark:text-white">{tutorial.title}</h2>
-                <p className="mb-4 line-clamp-3 text-gray-600 dark:text-gray-300">{tutorial.content}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{tutorial.content}</p>
             </div>
-
-            <div className="flex items-center gap-3 px-5 pb-4 text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-3 px-5 text-sm text-gray-500 dark:text-gray-400">
                 <CalendarDays className="h-4 w-4" />
                 <span>{tutorial.created_at ? new Date(tutorial.created_at).toLocaleDateString() : 'Tanggal tidak tersedia'}</span>
             </div>
-
             <div className="mt-auto border-t border-gray-100 p-4 dark:border-gray-700">
                 <a
                     href={tutorial.file_path}
@@ -123,7 +120,7 @@ export default function Tutorials({ tutorials }: { tutorials: Tutorial[] }) {
     return (
         <FrontLayout>
             <Head title="Buku Panduan" />
-            <div className="container mx-auto px-4 py-20 transition-colors duration-300 md:px-6 lg:px-20 dark:bg-gray-900">
+            <div className="container mx-auto px-4 py-20 transition-colors duration-300 md:px-6 lg:px-20">
                 <div className="mx-auto max-w-6xl">
                     <div className="mb-10 text-center">
                         <h1 className="mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-3xl font-bold text-transparent md:text-4xl lg:text-5xl dark:from-blue-400 dark:to-purple-400">

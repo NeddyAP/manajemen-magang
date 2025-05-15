@@ -24,6 +24,7 @@ This document tracks the current status, progress, and evolution of the internsh
 - **Testing (Guidance Class - Admin):** ✅ (CRUD tests completed, student attachment logic fixed and verified)
 - **Testing (FAQ - Admin):** ✅ (Pest Feature Tests for CRUD operations)
 - **Testing (Tutorial - Admin):** ✅ (Pest Feature Tests for CRUD operations)
+- **Testing (User CRUD - Admin):** ✅ (`tests/Feature/Admin/UserCrudTest.php` verified and passing)
 
 ### Database Schema Status
 
@@ -80,6 +81,7 @@ This document tracks the current status, progress, and evolution of the internsh
 - ✅ Feature tests for Internship CRUD (Student perspective) (`tests/Feature/InternshipCrudTest.php`), including fixes related to removed 'show' page.
 - ✅ **Feature tests for Dosen Report Revision Upload (`tests/Feature/ReportRevisionUploadTest.php`).**
 - ✅ **Guidance Class CRUD Test:** Fixed issue with student auto-attachment in `test_students_are_attached_and_notified_on_guidance_class_creation` and verified the fix.
+- ✅ **User CRUD Test:** Verified `tests/Feature/Admin/UserCrudTest.php` for Admin User CRUD operations.
 
 ## Progress - May 13, 2025
 
@@ -96,17 +98,17 @@ This document tracks the current status, progress, and evolution of the internsh
     - All 192 PHPUnit/Pest tests are passing.
     - `AdminSearchTest.php` is functional and tests admin search capabilities.
     - `FrontSearchTest.php` is functional, testing front-end search capabilities, and has been successfully refactored from Pest to PHPUnit class-based structure.
+    - Admin User CRUD operations are tested and passing via `tests/Feature/Admin/UserCrudTest.php`.
 
 ### What's Left to Build
 
-- **User CRUD Tests (Admin)**: As per `activeContext.md`, the next immediate task is to write Pest tests for User CRUD operations by an Admin.
-    - Test admin can view list of users.
-    - Test admin can view a single user.
-    - Test admin can create a new user (student, admin, dosen) with appropriate roles and profiles.
-    - Test admin can edit an existing user's details, roles, and profile.
-    - Test admin can delete a user.
-    - Test validation for user creation and updates.
-    - Test authorization checks.
+- **Testing (Settings Pages - All Roles)**:
+    - Test each role can view their settings page.
+    - Test users can update profile information.
+    - Test users can change password.
+    - Test users can update appearance settings.
+    - Test validation for profile/password updates.
+    - Test authorization for settings updates.
 - **Further Feature Development**: (To be populated based on `projectbrief.md` and `productContext.md` if not already covered or if new features are planned).
 - **Refinements & Bug Fixes**: (Ongoing, based on testing and user feedback).
 
@@ -123,10 +125,14 @@ This document tracks the current status, progress, and evolution of the internsh
 ### Evolution of Project Decisions
 
 - **Test Structure for `FrontSearchTest.php`**: Initially implemented using Pest syntax. Due to persistent test failures that were difficult to debug with Pest's functional style in this specific case, the decision was made to refactor `FrontSearchTest.php` to a traditional PHPUnit class-based structure. This resolved the issues and brought it in line with other feature tests like `AdminSearchTest.php`. This indicates a pragmatic approach to test implementation, prioritizing stability and debuggability.
+- **User CRUD Test File Consolidation**: A new `AdminUserCrudTest.php` was initially generated. However, an existing comprehensive test file (`tests/Feature/Admin/UserCrudTest.php`) was subsequently identified. The new, redundant file was removed to avoid duplication and maintain a single source of truth for these tests.
 - **URL Corrections in `AdminSearchTest.php`**: Identified and corrected incorrect URLs for report and logbook search tests, reinforcing the need for careful verification of test parameters against application routes.
 
 ## Recent Changes (Consolidated Summary - Last ~Week)
 
+- **User CRUD Test Verification & Cleanup (May 13, 2025):**
+    - Verified that the existing `tests/Feature/Admin/UserCrudTest.php` comprehensively covers Admin User CRUD operations and all its tests are passing.
+    - Removed the recently generated (and redundant) `tests/Feature/AdminUserCrudTest.php`.
 - **Test Suite Refinement & Verification (May 13, 2025):**
     - Successfully refactored `FrontSearchTest.php` from Pest to a PHPUnit class-based structure to resolve test failures and improve clarity.
     - Updated `AdminSearchTest.php` with class name changes, `use Tests\TestCase;`, and corrected URLs.
@@ -176,13 +182,12 @@ This document tracks the current status, progress, and evolution of the internsh
 
 ### Immediate Tasks (Post-Documentation)
 
-1.  **Testing:** Write Pest tests for User CRUD operations (Admin).
-2.  **Testing:** Write Pest tests for Settings pages (all roles).
-3.  **Testing:** Write Pest tests for Dosen-specific interactions and Mahasiswa view flows.
+1.  **Testing:** Write Pest tests for Settings pages (all roles).
+2.  **Testing:** Write Pest tests for Dosen-specific interactions and Mahasiswa view flows.
 
 ### Short-term Goals
 
-1.  Continue expanding test coverage (Users, Settings, Admin functions).
+1.  Continue expanding test coverage (Settings, Dosen/Mahasiswa flows, other Admin functions).
 2.  Refine Admin dashboard with more useful statistics.
 
 ### Long-term Goals
@@ -195,7 +200,7 @@ This document tracks the current status, progress, and evolution of the internsh
 ## Technical Debt
 
 - **Code Quality:** Some controllers might benefit from refactoring into Services. Some frontend components could be further optimized or generalized.
-- **Testing:** Significant portion of the application lacks automated tests beyond Auth, Logbook (Student), Report (Student), and Internship (Student).
+- **Testing:** Significant portion of the application lacks automated tests beyond Auth, Logbook (Student), Report (Student), Internship (Student), Guidance Class (Admin), FAQ (Admin), Tutorial (Admin), and User CRUD (Admin).
 - **Documentation:** API documentation (if needed) is missing. Inline code comments could be improved in complex sections.
 - **Infrastructure:** Caching strategy not yet implemented. Queue worker setup might need refinement for production.
 
@@ -214,5 +219,5 @@ This document tracks the current status, progress, and evolution of the internsh
 ## Roadmap Status
 
 - **Phase 1 (Core Features):** Mostly Complete ✅
-- **Phase 2 (Refinement & Testing):** In Progress ⏳ (Notifications, Settings, Trash, Logbook Dosen Notes & UI enhancements, Logbook/Report/Internship/Guidance Class/FAQ/Tutorial CRUD tests completed. Logbook field name refactored. Soft Deletes strategy implemented. Internship 'show' page removed. Testing ongoing. Documentation updated.)
+- **Phase 2 (Refinement & Testing):** In Progress ⏳ (Notifications, Settings, Trash, Logbook Dosen Notes & UI enhancements, Logbook/Report/Internship/Guidance Class/FAQ/Tutorial/User CRUD tests completed. Logbook field name refactored. Soft Deletes strategy implemented. Internship 'show' page removed. Testing ongoing. Documentation updated.)
 - **Phase 3 (Advanced Features):** Planned 📋

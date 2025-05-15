@@ -5,15 +5,15 @@ import { FormEventHandler } from 'react';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+// import { Checkbox } from '@/components/ui/checkbox'; // "Ingat saya" removed
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth-layout';
+import AuthSplitLayout from '@/layouts/auth/auth-split-layout'; // Changed to AuthSplitLayout
 
 type LoginForm = {
     email: string;
     password: string;
-    remember: boolean;
+    remember: boolean; // Kept in form data for now, though UI element is removed
 };
 
 interface LoginProps {
@@ -25,7 +25,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     const { data, setData, post, processing, errors, reset } = useForm<Required<LoginForm>>({
         email: '',
         password: '',
-        remember: false,
+        remember: false, // Default value
     });
 
     const submit: FormEventHandler = (e) => {
@@ -36,13 +36,21 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     };
 
     return (
-        <AuthLayout title="Masuk ke akun Anda" description="Masukkan email dan kata sandi Anda di bawah ini untuk masuk">
-            <Head title="Masuk" />
+        // Using AuthSplitLayout and updated title
+        <AuthSplitLayout
+            title="Login"
+            description="Silakan masuk untuk melanjutkan"
+            brandingHeadline="Halo, Selamat Datang Kembali!"
+            brandingSubHeadline="Masuk untuk Melanjutkan"
+            brandingDescription="Akses kembali akun Anda untuk melanjutkan progres KKL dan KKN. Kami senang melihat Anda lagi!"
+            brandingButtonText="Jelajahi Fitur Kami"
+        >
+            <Head title="Login" />
 
-            <form className="flex flex-col gap-6" onSubmit={submit}>
-                <div className="grid gap-6">
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Alamat Email</Label>
+            <form className="space-y-6" onSubmit={submit}>
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="email">Email / akun pengguna*</Label>
                         <Input
                             id="email"
                             type="email"
@@ -52,16 +60,17 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             autoComplete="email"
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
-                            placeholder="email@example.com"
+                            placeholder="Masukkan email Anda"
+                            className="rounded-md" // Added rounded corners
                         />
                         <InputError message={errors.email} />
                     </div>
 
-                    <div className="grid gap-2">
-                        <div className="flex items-center">
-                            <Label htmlFor="password">Kata Sandi</Label>
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                            <Label htmlFor="password">Password*</Label>
                             {canResetPassword && (
-                                <TextLink href={route('password.request')} className="ml-auto text-sm" tabIndex={5}>
+                                <TextLink href={route('password.request')} className="text-sm" tabIndex={3}>
                                     Lupa kata sandi?
                                 </TextLink>
                             )}
@@ -74,37 +83,44 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             autoComplete="current-password"
                             value={data.password}
                             onChange={(e) => setData('password', e.target.value)}
-                            placeholder="Kata Sandi"
+                            placeholder="Masukkan password"
+                            className="rounded-md" // Added rounded corners
                         />
                         <InputError message={errors.password} />
                     </div>
 
-                    <div className="flex items-center space-x-3">
-                        <Checkbox
-                            id="remember"
-                            name="remember"
-                            checked={data.remember}
-                            onClick={() => setData('remember', !data.remember)}
-                            tabIndex={3}
-                        />
-                        <Label htmlFor="remember">Ingat saya</Label>
-                    </div>
+                    {/* "Ingat saya" checkbox removed as per image */}
 
-                    <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
-                        {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
+                    <Button type="submit" className="w-full rounded-md bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-[var(--primary-foreground)]" tabIndex={4} disabled={processing}>
+                        {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
                         Masuk
                     </Button>
                 </div>
 
-                <div className="text-muted-foreground text-center text-sm">
+                <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-2 text-muted-foreground">atau lanjutkan dengan</span>
+                    </div>
+                </div>
+
+                <Button variant="outline" type="button" className="w-full rounded-md" tabIndex={5} disabled={processing}>
+                    {/* Placeholder for Google Icon, assuming one might be added later */}
+                    {/* <Icon name="google" className="mr-2 h-4 w-4" /> */}
+                    G Masuk dengan Google
+                </Button>
+
+                <div className="text-muted-foreground mt-6 text-center text-sm">
                     Belum punya akun?{' '}
-                    <TextLink href={route('register')} tabIndex={5}>
+                    <TextLink href={route('register')} tabIndex={6}>
                         Daftar
                     </TextLink>
                 </div>
             </form>
 
-            {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
-        </AuthLayout>
+            {status && <div className="mb-4 mt-4 text-center text-sm font-medium text-green-600 dark:text-green-400">{status}</div>}
+        </AuthSplitLayout>
     );
 }

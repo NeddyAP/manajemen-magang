@@ -3,7 +3,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import FrontLayout from '@/layouts/front-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { BookOpen, ClipboardList, FileText, UserIcon } from 'lucide-react';
+import {
+    BookOpen,
+    ClipboardList,
+    FileText,
+    LayoutDashboard,
+    FilePlus,
+    Archive,
+    Users,
+} from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -28,7 +36,6 @@ interface CardItem {
     id: string;
     title: string;
     description: string;
-    content: string;
     icon: React.ReactNode;
     route: string;
     buttonText: string;
@@ -48,8 +55,7 @@ export default function InternshipsIndex() {
             id: 'admin-dashboard',
             title: 'Dashboard Admin',
             description: 'Kelola program magang',
-            content: 'Kelola semua aplikasi magang, logbook, dan laporan akhir magang.',
-            icon: <UserIcon className="text-primary h-6 w-6" />,
+            icon: <LayoutDashboard className="mb-4 h-12 w-12 text-primary" />,
             route: route('admin.dashboard'),
             buttonText: 'Lihat Dashboard',
             buttonVariant: 'default',
@@ -59,8 +65,7 @@ export default function InternshipsIndex() {
             id: 'apply',
             title: 'Ajukan Magang',
             description: 'Ajukan program magang',
-            content: 'Kirim aplikasi magang Anda dengan dokumen dan informasi yang diperlukan',
-            icon: <UserIcon className="text-primary h-6 w-6" />,
+            icon: <FilePlus className="mb-4 h-12 w-12 text-primary" />,
             route: route('front.internships.applicants.create'),
             buttonText: 'Ajukan Sekarang',
             buttonVariant: 'default',
@@ -70,8 +75,7 @@ export default function InternshipsIndex() {
             id: 'my-applications',
             title: 'Aplikasi Magang',
             description: 'Lihat aplikasi magang',
-            content: 'Periksa status aplikasi dan kelola progres magang',
-            icon: <UserIcon className="text-primary h-6 w-6" />,
+            icon: <FileText className="mb-4 h-12 w-12 text-primary" />,
             route: route('front.internships.applicants.index'),
             buttonText: 'Lihat Aplikasi',
             buttonVariant: 'outline',
@@ -80,8 +84,7 @@ export default function InternshipsIndex() {
             id: 'logbooks',
             title: 'Logbook Magang',
             description: 'Kelola logbook magang Anda',
-            content: 'Catat dan dokumentasikan aktivitas magang Anda setiap hari',
-            icon: <BookOpen className="text-primary h-6 w-6" />,
+            icon: <BookOpen className="mb-4 h-12 w-12 text-primary" />,
             route: route('front.internships.logbooks.intern-list'),
             buttonText: 'Pilih Magang',
             buttonVariant: 'outline',
@@ -90,8 +93,7 @@ export default function InternshipsIndex() {
             id: 'reports',
             title: 'Laporan Magang',
             description: 'Kelola laporan akhir magang Anda',
-            content: 'Unggah, perbarui, dan lihat status laporan akhir magang Anda.',
-            icon: <FileText className="text-primary h-6 w-6" />,
+            icon: <Archive className="mb-4 h-12 w-12 text-primary" />,
             route: route('front.internships.reports.intern-list'),
             buttonText: 'Pilih Magang',
             buttonVariant: 'outline',
@@ -100,8 +102,7 @@ export default function InternshipsIndex() {
             id: 'classes',
             title: 'Kelas Bimbingan',
             description: 'Kelas dan kehadiran bimbingan',
-            content: 'Lihat jadwal kelas bimbingan, rekam kehadiran, dan ikuti bimbingan dengan dosen.',
-            icon: <ClipboardList className="text-primary h-6 w-6" />,
+            icon: <Users className="mb-4 h-12 w-12 text-primary" />,
             route: route('front.internships.guidance-classes.index'),
             buttonText: 'Lihat Kelas',
             buttonVariant: 'outline',
@@ -122,24 +123,29 @@ export default function InternshipsIndex() {
             <Head title="Magang" />
             <div className="flex min-h-screen flex-1 flex-col gap-4 p-4">
                 <div className="border-sidebar-border/70 dark:border-sidebar-border relative container mx-auto max-w-7xl flex-1 overflow-hidden rounded-xl">
-                    <div className="mb-6">
-                        <h1 className="text-2xl font-bold">Program Magang</h1>
-                        <p className="text-muted-foreground">Kelola aplikasi dan progres magang Anda</p>
+                    <div className="mb-8 text-center">
+                        <h1 className="text-3xl font-bold tracking-tight mt-10">Program Magang</h1>
+                        <p className="text-muted-foreground">
+                            Kelola semua kebutuhan program magang Anda di satu tempat.
+                        </p>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                         {filteredCards.map((card) => (
-                            <Card key={card.id}>
-                                <CardHeader>
-                                    <div className="flex items-center justify-between">
-                                        <CardTitle>{card.title}</CardTitle>
-                                        {card.icon}
-                                    </div>
-                                    <CardDescription>{card.description}</CardDescription>
+                            <Card key={card.id} className="flex flex-col text-center">
+                                <CardHeader className="flex flex-col items-center pt-8">
+                                    {card.icon}
+                                    <CardTitle className="text-xl font-semibold">{card.title}</CardTitle>
+                                    <CardDescription className="mt-1 text-sm">
+                                        {card.description}
+                                    </CardDescription>
                                 </CardHeader>
-                                <CardContent>
-                                    <p className="mb-4 text-sm">{card.content}</p>
-                                    <Button asChild variant={card.buttonVariant}>
+                                <CardContent className="mt-auto flex flex-col items-center pb-8">
+                                    {/* <p className="mb-4 text-sm">{card.content}</p> // Removed as per new design */}
+                                    <Button
+                                        asChild
+                                        variant={card.buttonVariant}
+                                        className="mt-4 w-full max-w-xs">
                                         <Link href={card.route}>{card.buttonText}</Link>
                                     </Button>
                                 </CardContent>

@@ -28,7 +28,10 @@ export interface NavItem {
 }
 
 export interface SharedData {
-    name: string;
+    app: {
+        name: string;
+        // Add other app-specific properties if they exist
+    };
     quote: { message: string; author: string };
     auth: Auth;
     ziggy: Config & { location: string };

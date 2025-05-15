@@ -91,15 +91,21 @@ class GuidanceClassController extends Controller
         $perPage = $request->input('per_page', 10);
         $classes = $query->paginate($perPage)
             ->withQueryString()
-            ->through(fn ($class) => [
+            ->through(fn($class) => [
                 'id' => $class->id,
                 'title' => $class->title,
-                'lecturer' => [
+                'lecturer' => $class->lecturer ? [
                     'id' => $class->lecturer->id,
                     'name' => $class->lecturer->name,
                     'employee_number' => $class->lecturer->dosenProfile->employee_number ?? null,
                     'expertise' => $class->lecturer->dosenProfile->expertise ?? null,
                     'academic_position' => $class->lecturer->dosenProfile->academic_position ?? null,
+                ] : [
+                    'id' => null,
+                    'name' => 'N/A', // Or some other placeholder
+                    'employee_number' => null,
+                    'expertise' => null,
+                    'academic_position' => null,
                 ],
                 'start_date' => $class->start_date,
                 'end_date' => $class->end_date,
@@ -110,7 +116,7 @@ class GuidanceClassController extends Controller
         $lecturers = User::role('dosen')
             ->with('dosenProfile')
             ->get()
-            ->map(fn ($lecturer) => [
+            ->map(fn($lecturer) => [
                 'id' => $lecturer->id,
                 'name' => $lecturer->name,
                 'employee_number' => $lecturer->dosenProfile->employee_number ?? null,
@@ -189,7 +195,7 @@ class GuidanceClassController extends Controller
                 ->with('success', 'Kelas bimbingan berhasil dibuat dan presensi mahasiswa telah disiapkan.');
         } catch (Exception $e) {
             // Log the exception for debugging
-            Log::error('Error creating guidance class: '.$e->getMessage(), ['exception' => $e]);
+            Log::error('Error creating guidance class: ' . $e->getMessage(), ['exception' => $e]);
 
             return redirect()
                 ->route('admin.guidance-classes.index')
@@ -223,7 +229,7 @@ class GuidanceClassController extends Controller
         if ($search = $request->input('search')) {
             $searchTerm = trim($search);
 
-            $query->where(function ($q) use ($searchTerm): void {
+            $query->where(function ($q) use ($searchTerm, $guidanceClass): void {
                 // Search in user fields
                 $q->where('name', 'like', "%{$searchTerm}%")
                     ->orWhere('email', 'like', "%{$searchTerm}%");
@@ -350,12 +356,14 @@ class GuidanceClassController extends Controller
             'start_date' => $guidanceClass->start_date,
             'end_date' => $guidanceClass->end_date,
             'qr_code' => $guidanceClass->qr_code, // Make sure QR code is included
-            'lecturer' => [
+            'lecturer' => $guidanceClass->lecturer ? [
                 'id' => $guidanceClass->lecturer->id,
                 'name' => $guidanceClass->lecturer->name,
-                'employee_number' => $guidanceClass->lecturer->dosenProfile->employee_number,
-                'expertise' => $guidanceClass->lecturer->dosenProfile->expertise,
-                'academic_position' => $guidanceClass->lecturer->dosenProfile->academic_position,
+                'academic_position' => $guidanceClass->lecturer->dosenProfile->academic_position ?? null,
+            ] : [
+                'id' => null,
+                'name' => 'N/A', // Or some other placeholder
+                'academic_position' => null,
             ],
             'students' => $students->items(),
         ];
