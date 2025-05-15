@@ -91,7 +91,7 @@ class GuidanceClassController extends Controller
         $perPage = $request->input('per_page', 10);
         $classes = $query->paginate($perPage)
             ->withQueryString()
-            ->through(fn($class) => [
+            ->through(fn ($class) => [
                 'id' => $class->id,
                 'title' => $class->title,
                 'lecturer' => $class->lecturer ? [
@@ -116,7 +116,7 @@ class GuidanceClassController extends Controller
         $lecturers = User::role('dosen')
             ->with('dosenProfile')
             ->get()
-            ->map(fn($lecturer) => [
+            ->map(fn ($lecturer) => [
                 'id' => $lecturer->id,
                 'name' => $lecturer->name,
                 'employee_number' => $lecturer->dosenProfile->employee_number ?? null,
@@ -195,7 +195,7 @@ class GuidanceClassController extends Controller
                 ->with('success', 'Kelas bimbingan berhasil dibuat dan presensi mahasiswa telah disiapkan.');
         } catch (Exception $e) {
             // Log the exception for debugging
-            Log::error('Error creating guidance class: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error creating guidance class: '.$e->getMessage(), ['exception' => $e]);
 
             return redirect()
                 ->route('admin.guidance-classes.index')

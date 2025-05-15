@@ -1,11 +1,12 @@
-import { type BreadcrumbItem, type SharedData } from '@/types';
+import { type BreadcrumbItem, type SharedData, type User } from '@/types';
 import { Transition } from '@headlessui/react';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { FormEventHandler, useRef, useState } from 'react';
 
 import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
@@ -30,6 +31,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface ProfileForm {
     name: string;
     email: string;
+    avatar?: File | null;
     employee_id: string;
     department: string;
     position: string;
@@ -41,25 +43,24 @@ interface ProfileForm {
     work_location: string;
 }
 
-interface ProfileData {
-    employee_id?: string;
-    department?: string;
-    position?: string;
-    employment_status?: string;
-    join_date?: string;
-    phone_number?: string;
-    address?: string;
-    supervisor_name?: string;
-    work_location?: string;
-    [key: string]: string | undefined;
+// This ProfileData interface seems redundant if ProfileForm is used for the form and props.
+// Let's define props more directly.
+interface ProfilePageProps {
+    mustVerifyEmail: boolean;
+    status?: string;
+    profile?: Partial<Omit<ProfileForm, 'name' | 'email' | 'avatar'>>; // Profile specific data, excluding base user data and avatar
 }
 
-export default function Profile({ mustVerifyEmail, status, profile }: { mustVerifyEmail: boolean; status?: string; profile?: ProfileData }) {
+export default function Profile({ mustVerifyEmail, status, profile = {} }: ProfilePageProps) {
     const { auth } = usePage<SharedData>().props;
+    const user = auth.user as User & { avatar_url?: string | null };
+    const avatarInputRef = useRef<HTMLInputElement>(null);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(user.avatar_url || null);
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
+    const { data, setData, errors, processing, recentlySuccessful } = useForm({
         name: auth.user.name,
         email: auth.user.email,
+        avatar: null as File | null,
         employee_id: profile?.employee_id || '',
         department: profile?.department || '',
         position: profile?.position || '',
@@ -74,9 +75,34 @@ export default function Profile({ mustVerifyEmail, status, profile }: { mustVeri
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        patch(route('profile.update'), {
+        const submissionData = {
+            ...data,
+            _method: 'PATCH',
+        } as unknown as FormData;
+
+        router.post(route('profile.update'), submissionData, {
             preserveScroll: true,
+            onSuccess: () => {
+                if (avatarInputRef.current) {
+                    avatarInputRef.current.value = '';
+                }
+            },
         });
+    };
+
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setData('avatar', file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setAvatarPreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            setData('avatar', null);
+            setAvatarPreview(user.avatar_url || null);
+        }
     };
 
     return (
@@ -88,6 +114,18 @@ export default function Profile({ mustVerifyEmail, status, profile }: { mustVeri
                     <HeadingSmall title="Profile information" description="Update your profile information" />
 
                     <form onSubmit={submit} className="space-y-6">
+                        <div className="grid items-center gap-3">
+                            <Label htmlFor="avatar">Avatar</Label>
+                            <div className="flex items-center gap-4">
+                                <Avatar className="h-20 w-20">
+                                    <AvatarImage src={avatarPreview || undefined} alt={auth.user.name} />
+                                    <AvatarFallback>{auth.user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                                </Avatar>
+                                <Input id="avatar" type="file" onChange={handleAvatarChange} ref={avatarInputRef} className="max-w-xs" />
+                            </div>
+                            <InputError message={errors.avatar} />
+                        </div>
+
                         <div className="grid gap-2">
                             <Label htmlFor="name">Nama</Label>
 

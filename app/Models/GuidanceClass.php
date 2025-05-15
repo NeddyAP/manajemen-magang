@@ -161,6 +161,7 @@ class GuidanceClass extends Model
             }])
             ->get();
     }
+
     protected function casts(): array
     {
         return [

@@ -112,7 +112,12 @@ export default function Register() {
                         <InputError message={errors.password_confirmation} />
                     </div>
 
-                    <Button type="submit" className="w-full rounded-md bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-[var(--primary-foreground)]" tabIndex={5} disabled={processing}>
+                    <Button
+                        type="submit"
+                        className="w-full rounded-md bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--primary)]/90"
+                        tabIndex={5}
+                        disabled={processing}
+                    >
                         {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
                         Daftar
                     </Button>
@@ -123,14 +128,13 @@ export default function Register() {
                         <span className="w-full border-t" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-2 text-muted-foreground">atau lanjutkan dengan</span>
+                        <span className="bg-background text-muted-foreground px-2">atau lanjutkan dengan</span>
                     </div>
                 </div>
 
                 <Button variant="outline" type="button" className="w-full rounded-md" tabIndex={6} disabled={processing}>
                     {/* Placeholder for Google Icon */}
-                    {/* <Icon name="google" className="mr-2 h-4 w-4" /> */}
-                    G Masuk dengan Google
+                    {/* <Icon name="google" className="mr-2 h-4 w-4" /> */}G Masuk dengan Google
                 </Button>
 
                 <div className="text-muted-foreground mt-6 text-center text-sm">

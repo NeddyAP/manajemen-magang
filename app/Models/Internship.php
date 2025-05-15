@@ -52,12 +52,14 @@ class Internship extends Model
     {
         return $this->hasMany(Report::class);
     }
+
     protected function progressPercentage(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
         return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function () {
             return $this->progress * 100 / 100;
         });
     }
+
     protected function casts(): array
     {
         return [

@@ -3,15 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import FrontLayout from '@/layouts/front-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import {
-    BookOpen,
-    ClipboardList,
-    FileText,
-    LayoutDashboard,
-    FilePlus,
-    Archive,
-    Users,
-} from 'lucide-react';
+import { Archive, BookOpen, FilePlus, FileText, LayoutDashboard, Users } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -55,7 +47,7 @@ export default function InternshipsIndex() {
             id: 'admin-dashboard',
             title: 'Dashboard Admin',
             description: 'Kelola program magang',
-            icon: <LayoutDashboard className="mb-4 h-12 w-12 text-primary" />,
+            icon: <LayoutDashboard className="text-primary mb-4 h-12 w-12" />,
             route: route('admin.dashboard'),
             buttonText: 'Lihat Dashboard',
             buttonVariant: 'default',
@@ -65,7 +57,7 @@ export default function InternshipsIndex() {
             id: 'apply',
             title: 'Ajukan Magang',
             description: 'Ajukan program magang',
-            icon: <FilePlus className="mb-4 h-12 w-12 text-primary" />,
+            icon: <FilePlus className="text-primary mb-4 h-12 w-12" />,
             route: route('front.internships.applicants.create'),
             buttonText: 'Ajukan Sekarang',
             buttonVariant: 'default',
@@ -75,7 +67,7 @@ export default function InternshipsIndex() {
             id: 'my-applications',
             title: 'Aplikasi Magang',
             description: 'Lihat aplikasi magang',
-            icon: <FileText className="mb-4 h-12 w-12 text-primary" />,
+            icon: <FileText className="text-primary mb-4 h-12 w-12" />,
             route: route('front.internships.applicants.index'),
             buttonText: 'Lihat Aplikasi',
             buttonVariant: 'outline',
@@ -84,7 +76,7 @@ export default function InternshipsIndex() {
             id: 'logbooks',
             title: 'Logbook Magang',
             description: 'Kelola logbook magang Anda',
-            icon: <BookOpen className="mb-4 h-12 w-12 text-primary" />,
+            icon: <BookOpen className="text-primary mb-4 h-12 w-12" />,
             route: route('front.internships.logbooks.intern-list'),
             buttonText: 'Pilih Magang',
             buttonVariant: 'outline',
@@ -93,7 +85,7 @@ export default function InternshipsIndex() {
             id: 'reports',
             title: 'Laporan Magang',
             description: 'Kelola laporan akhir magang Anda',
-            icon: <Archive className="mb-4 h-12 w-12 text-primary" />,
+            icon: <Archive className="text-primary mb-4 h-12 w-12" />,
             route: route('front.internships.reports.intern-list'),
             buttonText: 'Pilih Magang',
             buttonVariant: 'outline',
@@ -102,7 +94,7 @@ export default function InternshipsIndex() {
             id: 'classes',
             title: 'Kelas Bimbingan',
             description: 'Kelas dan kehadiran bimbingan',
-            icon: <Users className="mb-4 h-12 w-12 text-primary" />,
+            icon: <Users className="text-primary mb-4 h-12 w-12" />,
             route: route('front.internships.guidance-classes.index'),
             buttonText: 'Lihat Kelas',
             buttonVariant: 'outline',
@@ -124,10 +116,8 @@ export default function InternshipsIndex() {
             <div className="flex min-h-screen flex-1 flex-col gap-4 p-4">
                 <div className="border-sidebar-border/70 dark:border-sidebar-border relative container mx-auto max-w-7xl flex-1 overflow-hidden rounded-xl">
                     <div className="mb-8 text-center">
-                        <h1 className="text-3xl font-bold tracking-tight mt-10">Program Magang</h1>
-                        <p className="text-muted-foreground">
-                            Kelola semua kebutuhan program magang Anda di satu tempat.
-                        </p>
+                        <h1 className="mt-10 text-3xl font-bold tracking-tight">Program Magang</h1>
+                        <p className="text-muted-foreground">Kelola semua kebutuhan program magang Anda di satu tempat.</p>
                     </div>
 
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
@@ -136,16 +126,11 @@ export default function InternshipsIndex() {
                                 <CardHeader className="flex flex-col items-center pt-8">
                                     {card.icon}
                                     <CardTitle className="text-xl font-semibold">{card.title}</CardTitle>
-                                    <CardDescription className="mt-1 text-sm">
-                                        {card.description}
-                                    </CardDescription>
+                                    <CardDescription className="mt-1 text-sm">{card.description}</CardDescription>
                                 </CardHeader>
                                 <CardContent className="mt-auto flex flex-col items-center pb-8">
                                     {/* <p className="mb-4 text-sm">{card.content}</p> // Removed as per new design */}
-                                    <Button
-                                        asChild
-                                        variant={card.buttonVariant}
-                                        className="mt-4 w-full max-w-xs">
+                                    <Button asChild variant={card.buttonVariant} className="mt-4 w-full max-w-xs">
                                         <Link href={card.route}>{card.buttonText}</Link>
                                     </Button>
                                 </CardContent>

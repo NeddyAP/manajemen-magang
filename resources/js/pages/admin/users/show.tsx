@@ -1,3 +1,4 @@
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -262,7 +263,10 @@ export default function ShowUser({ user }: ShowUserProps) {
                 <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
                     <div className="flex items-center gap-4">
                         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-2xl font-semibold text-gray-700 dark:bg-gray-700 dark:text-gray-200">
-                            {user.name.substring(0, 2).toUpperCase()}
+                            <Avatar className="h-20 w-20">
+                                <AvatarImage src={user.avatar_url || undefined} alt={user.name} />
+                                <AvatarFallback>{user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                            </Avatar>
                         </div>
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{user.name}</h1>

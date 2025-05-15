@@ -32,6 +32,7 @@ class DosenProfile extends Model
     {
         return $this->hasMany(MahasiswaProfile::class, 'advisor_id', 'user_id');
     }
+
     protected function casts(): array
     {
         return [

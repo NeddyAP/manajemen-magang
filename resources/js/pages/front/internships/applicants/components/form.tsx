@@ -6,32 +6,36 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Internship } from '@/types/internship';
-import { Link, router, useForm, usePage } from '@inertiajs/react';
-import { format } from 'date-fns';
-import { CalendarIcon, ChevronLeft } from 'lucide-react';
-import { FormEventHandler, useEffect, useState } from 'react';
-import { PageProps } from '@/types';
-import { User } from '@/types/user'; // Import User from @/types/user
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import { PageProps } from '@/types';
+import { Internship } from '@/types/internship';
+import { User } from '@/types/user'; // Import User from @/types/user
+import { useForm, usePage } from '@inertiajs/react';
+import { format } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
+import { FormEventHandler, useEffect, useState } from 'react';
 import { toast } from 'sonner';
+
+interface MahasiswaProfile {
+    student_number: string | null;
+}
 
 interface FormProps {
     internship?: Internship;
     mode: 'create' | 'edit';
     disabled?: boolean;
+    mahasiswa_profile: MahasiswaProfile;
 }
 
 type InternshipType = 'kkl' | 'kkn';
 
-export default function InternshipForm({ internship, mode, disabled = false }: FormProps) {
+export default function InternshipForm({ internship, mode, disabled = false, mahasiswa_profile }: FormProps) {
     const { auth } = usePage<PageProps<{ user: User }>>().props;
-    const typedUser = auth.user as User & { mahasiswa_profile?: { student_number?: string } }; // Changed student_number to student_number
+    const typedUser = auth.user as User & { mahasiswa_profile?: { student_number?: string } };
 
     const studentName = typedUser?.name ?? '';
-    const studentNim = typedUser?.mahasiswa_profile?.student_number ?? ''; // Changed student_number to student_number
-    console.log('Student:', typedUser?.mahasiswa_profile);
+    const studentNim = mahasiswa_profile?.student_number ?? '';
     const [activeTab, setActiveTab] = useState('form');
 
     const internshipTypes = [
@@ -39,7 +43,7 @@ export default function InternshipForm({ internship, mode, disabled = false }: F
         { value: 'kkn', label: 'Kuliah Kerja Nyata (KKN)' },
     ];
 
-    const { data, setData, post, processing, errors, clearErrors, transform, setError, reset } = useForm({
+    const { data, setData, post, processing, errors, clearErrors, transform, setError } = useForm({
         type: (internship?.type as InternshipType) ?? 'kkl',
         application_file: null as File | null | undefined,
         company_name: internship?.company_name ?? '',
@@ -87,7 +91,7 @@ export default function InternshipForm({ internship, mode, disabled = false }: F
             }
 
             if (!formIsValid) {
-                Object.keys(newErrors).forEach(key => {
+                Object.keys(newErrors).forEach((key) => {
                     setError(key as keyof typeof data, newErrors[key]);
                 });
                 toast.error('Harap lengkapi semua kolom yang wajib diisi pada Formulir Pengajuan.');
@@ -128,13 +132,32 @@ export default function InternshipForm({ internship, mode, disabled = false }: F
         // send it as 'undefined' so the backend doesn't try to validate/process an empty file.
         // If a new file was selected, data.application_file would be a File object.
         transform((currentFormData) => {
-            // Exclude nama_mahasiswa and nim_mahasiswa from submission
-            const { nama_mahasiswa, nim_mahasiswa, ...submissionData } = currentFormData as any; // Use 'as any' for simplicity here or define a more specific type
+            // currentFormData has the shape of the object returned by useForm
+            const {
+                type,
+                application_file, // This is File | null | undefined from useForm's state
+                company_name,
+                company_address,
+                start_date,
+                end_date,
+                _method,
+                // Any other fields that are part of `useForm`'s state and should be submitted
+            } = currentFormData;
 
-            if (mode === 'edit' && submissionData.application_file === null) {
-                submissionData.application_file = undefined;
+            let submissionApplicationFile = application_file;
+            if (mode === 'edit' && application_file === null) {
+                submissionApplicationFile = undefined;
             }
-            return submissionData;
+
+            return {
+                type,
+                application_file: submissionApplicationFile,
+                company_name,
+                company_address,
+                start_date,
+                end_date,
+                _method,
+            };
         });
 
         post(url, {
@@ -160,23 +183,23 @@ export default function InternshipForm({ internship, mode, disabled = false }: F
     };
 
     return (
-        <div className="flex flex-col md:flex-row gap-x-0 md:gap-x-8 w-full">
+        <div className="flex w-full flex-col gap-x-0 md:flex-row md:gap-x-8">
             {/* Left Stepper Column */}
-            <div className="w-full md:w-1/3 lg:w-1/4 bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-6 rounded-lg shadow-lg hidden md:flex flex-col">
-                <h2 className="text-xl font-semibold mb-6">Tahapan Pengajuan</h2>
+            <div className="hidden w-full flex-col rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 p-6 text-white shadow-lg md:flex md:w-1/3 lg:w-1/4">
+                <h2 className="mb-6 text-xl font-semibold">Tahapan Pengajuan</h2>
                 <div className="space-y-4">
                     {[
                         { id: 'form', label: 'Formulir Pengajuan' },
                         { id: 'upload', label: 'File Upload' },
                         { id: 'confirm', label: 'Konfirmasi' },
                     ].map((step) => (
-                        <div
-                            key={step.id}
-                            className={`flex items-center space-x-3 ${activeTab === step.id ? 'opacity-100' : 'opacity-50'}`}
-                        >
+                        <div key={step.id} className={`flex items-center space-x-3 ${activeTab === step.id ? 'opacity-100' : 'opacity-50'}`}>
                             <div
-                                className={`w-3 h-3 rounded-full ${activeTab === step.id ? 'bg-white ring-2 ring-offset-2 ring-offset-blue-700 ring-white' : 'border-2 border-blue-300'
-                                    }`}
+                                className={`h-3 w-3 rounded-full ${
+                                    activeTab === step.id
+                                        ? 'bg-white ring-2 ring-white ring-offset-2 ring-offset-blue-700'
+                                        : 'border-2 border-blue-300'
+                                }`}
                             ></div>
                             <span className={activeTab === step.id ? 'font-medium' : ''}>{step.label}</span>
                         </div>
@@ -188,20 +211,39 @@ export default function InternshipForm({ internship, mode, disabled = false }: F
             <div className="w-full md:w-2/3 lg:w-3/4">
                 <div className="mb-5">
                     <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Formulir Pengajuan Magang</h1>
-                    <p className="text-muted-foreground mt-1">
-                        Lengkapi semua informasi yang diperlukan pada setiap tahapan.
-                    </p>
+                    <p className="text-muted-foreground mt-1">Lengkapi semua informasi yang diperlukan pada setiap tahapan.</p>
                 </div>
+                {internship?.status === 'rejected' && internship.status_message && (
+                    <div className="mb-6 rounded-md border border-red-500 bg-red-50 p-4 text-red-700">
+                        <p className="font-medium">Alasan Penolakan:</p>
+                        <p className="text-sm">{internship?.status_message}</p>
+                    </div>
+                )}
+
+                {internship?.status === 'accepted' && (
+                    <div className="mb-6 rounded-md border border-yellow-500 bg-yellow-50 p-4 text-yellow-700">
+                        <p className="font-medium">Aplikasi ini tidak dapat diedit</p>
+                        <p className="text-sm">Aplikasi yang telah disetujui tidak dapat diubah.</p>
+                    </div>
+                )}
 
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                    <TabsList className="hidden"> {/* Visually hidden but accessible for tab functionality if needed */}
+                    <TabsList className="hidden">
+                        {' '}
+                        {/* Visually hidden but accessible for tab functionality if needed */}
                         <TabsTrigger value="form">Formulir</TabsTrigger>
                         <TabsTrigger value="upload">Upload</TabsTrigger>
                         <TabsTrigger value="confirm">Konfirmasi</TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value="form">
-                        <form onSubmit={(e) => { e.preventDefault(); handleNextTab(); }} encType="multipart/form-data">
+                    <TabsContent value="form" className="min-h-[500px]">
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleNextTab();
+                            }}
+                            encType="multipart/form-data"
+                        >
                             <Card className="shadow-md">
                                 <CardContent className="space-y-5 pt-6">
                                     <div className="space-y-2">
@@ -311,15 +353,26 @@ export default function InternshipForm({ internship, mode, disabled = false }: F
                         </form>
                     </TabsContent>
 
-                    <TabsContent value="upload">
+                    <TabsContent value="upload" className="min-h-[500px]">
                         <Card className="shadow-md">
                             <CardContent className="space-y-5 pt-6">
                                 <div className="space-y-2">
                                     <Label htmlFor="application_file">Berkas Lamaran {mode === 'create' ? '*' : ''}</Label>
-                                    <Input id="application_file" type="file" accept=".pdf" disabled={disabled || processing} onChange={handleFileChange} />
+                                    <Input
+                                        id="application_file"
+                                        type="file"
+                                        accept=".pdf"
+                                        disabled={disabled || processing}
+                                        onChange={handleFileChange}
+                                    />
                                     {currentFile && (
-                                        <p className="text-sm text-muted-foreground">
-                                            File saat ini: {data.application_file instanceof File ? data.application_file.name : (currentFile ? getFileName(currentFile) : 'Belum ada file dipilih.')}
+                                        <p className="text-muted-foreground text-sm">
+                                            File saat ini:{' '}
+                                            {data.application_file instanceof File
+                                                ? data.application_file.name
+                                                : currentFile
+                                                  ? getFileName(currentFile)
+                                                  : 'Belum ada file dipilih.'}
                                             {mode === 'edit' && internship?.application_file && !data.application_file && (
                                                 <a
                                                     href={route('front.internships.applicants.download', internship.id)}
@@ -347,7 +400,7 @@ export default function InternshipForm({ internship, mode, disabled = false }: F
                         </div>
                     </TabsContent>
 
-                    <TabsContent value="confirm">
+                    <TabsContent value="confirm" className="min-h-[500px]">
                         <Card className="shadow-md">
                             <CardContent className="space-y-5 pt-6">
                                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">Ringkasan Pengajuan</h3>
@@ -363,7 +416,7 @@ export default function InternshipForm({ internship, mode, disabled = false }: F
                                     <div>
                                         <span className="font-semibold text-gray-700 dark:text-gray-300">Program dipilih:</span>
                                         <span className="ml-2 text-gray-600 dark:text-gray-400">
-                                            {internshipTypes.find(it => it.value === data.type)?.label || data.type}
+                                            {internshipTypes.find((it) => it.value === data.type)?.label || data.type}
                                         </span>
                                     </div>
                                     <div>
@@ -377,13 +430,25 @@ export default function InternshipForm({ internship, mode, disabled = false }: F
                                     <div>
                                         <span className="font-semibold text-gray-700 dark:text-gray-300">Tanggal Mulai:</span>
                                         <span className="ml-2 text-gray-600 dark:text-gray-400">
-                                            {data.start_date ? new Date(data.start_date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : '-'}
+                                            {data.start_date
+                                                ? new Date(data.start_date).toLocaleDateString('id-ID', {
+                                                      year: 'numeric',
+                                                      month: 'long',
+                                                      day: 'numeric',
+                                                  })
+                                                : '-'}
                                         </span>
                                     </div>
                                     <div>
                                         <span className="font-semibold text-gray-700 dark:text-gray-300">Tanggal Selesai:</span>
                                         <span className="ml-2 text-gray-600 dark:text-gray-400">
-                                            {data.end_date ? new Date(data.end_date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) : '-'}
+                                            {data.end_date
+                                                ? new Date(data.end_date).toLocaleDateString('id-ID', {
+                                                      year: 'numeric',
+                                                      month: 'long',
+                                                      day: 'numeric',
+                                                  })
+                                                : '-'}
                                         </span>
                                     </div>
                                     <div>
@@ -392,8 +457,8 @@ export default function InternshipForm({ internship, mode, disabled = false }: F
                                             {data.application_file instanceof File
                                                 ? data.application_file.name
                                                 : mode === 'edit' && internship?.application_file
-                                                    ? `${getFileName(internship.application_file)} (Berkas lama akan dipertahankan jika tidak ada perubahan)`
-                                                    : 'Tidak ada berkas dipilih.'}
+                                                  ? `${getFileName(internship.application_file)} (Berkas lama akan dipertahankan jika tidak ada perubahan)`
+                                                  : 'Tidak ada berkas dipilih.'}
                                         </span>
                                     </div>
                                 </div>

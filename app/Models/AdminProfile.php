@@ -27,6 +27,7 @@ class AdminProfile extends Model
     {
         return $this->belongsTo(User::class);
     }
+
     protected function casts(): array
     {
         return [

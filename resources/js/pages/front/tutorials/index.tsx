@@ -88,15 +88,12 @@ export default function Tutorials({ tutorials }: { tutorials: Tutorial[] }) {
     const renderTutorialCard = (tutorial: Tutorial) => (
         <div
             key={tutorial.id}
-            className={`flex h-full transform flex-col overflow-hidden rounded-xl border border-gray-100 bg-gray-50 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-700 dark:bg-gray-800 ${tutorial.id && animatedCards[tutorial.id.toString()] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-                }`}
+            className={`flex h-full transform flex-col overflow-hidden rounded-xl border border-gray-100 bg-gray-50 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-700 dark:bg-gray-800 ${
+                tutorial.id && animatedCards[tutorial.id.toString()] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+            }`}
             style={{ transitionDelay: `${tutorials.findIndex((t) => t.id === tutorial.id) * 50}ms` }}
         >
-            <img
-                src="/assets/panduan-kkl.png"
-                alt={tutorial.title}
-                className="h-80 w-full rounded-t-xl object-fill p-1"
-            />
+            <img src="/assets/panduan-kkl.png" alt={tutorial.title} className="h-80 w-full rounded-t-xl object-fill p-1" />
             <div className="flex-grow p-3 text-center">
                 <h2 className="mb-2 text-xl font-bold text-gray-800 dark:text-white">{tutorial.title}</h2>
                 <p className="text-sm text-gray-600 dark:text-gray-300">{tutorial.content}</p>

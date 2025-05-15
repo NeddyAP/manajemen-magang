@@ -36,6 +36,9 @@ export interface SharedData {
     auth: Auth;
     ziggy: Config & { location: string };
     globalVariables: GlobalVariable[];
+    mahasiswa_profile: MahasiswaProfile;
+    dosen_profile: DosenProfile;
+    admin_profile: AdminProfile;
     [key: string]: unknown;
 }
 
@@ -44,6 +47,7 @@ export interface User {
     name: string;
     email: string;
     avatar?: string;
+    avatar_url?: string | null;
     roles?: { name: string }[];
     email_verified_at: string | null;
     created_at: string;

@@ -4,11 +4,16 @@ import { Internship } from '@/types/internship';
 import { Head } from '@inertiajs/react';
 import InternshipForm from './components/form';
 
-interface Props {
-    internship: Internship;
+interface MahasiswaProfileData {
+    student_number: string | null; // Allow null if student_number might not exist
 }
 
-export default function EditInternshipApplication({ internship }: Props) {
+interface Props {
+    internship: Internship;
+    mahasiswa_profile: MahasiswaProfileData; // Expect the simplified object
+}
+
+export default function EditInternshipApplication({ internship, mahasiswa_profile }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Magang',
@@ -31,28 +36,12 @@ export default function EditInternshipApplication({ internship }: Props) {
             <div className="flex min-h-screen flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="container mx-auto max-w-7xl">
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 overflow-hidden rounded-xl md:min-h-min">
-                        <div className="mb-6">
-                            <h1 className="text-2xl font-bold">Detail Aplikasi Magang</h1>
-                            <p className="text-muted-foreground">
-                                {isEditable ? 'Perbarui detail aplikasi magang Anda' : 'Lihat detail aplikasi magang Anda'}
-                            </p>
-                        </div>
-
-                        {internship.status === 'rejected' && internship.status_message && (
-                            <div className="mb-6 rounded-md border border-red-500 bg-red-50 p-4 text-red-700">
-                                <p className="font-medium">Alasan Penolakan:</p>
-                                <p className="text-sm">{internship.status_message}</p>
-                            </div>
-                        )}
-
-                        {internship.status === 'accepted' && (
-                            <div className="mb-6 rounded-md border border-yellow-500 bg-yellow-50 p-4 text-yellow-700">
-                                <p className="font-medium">Aplikasi ini tidak dapat diedit</p>
-                                <p className="text-sm">Aplikasi yang telah disetujui tidak dapat diubah.</p>
-                            </div>
-                        )}
-
-                        <InternshipForm mode="edit" internship={internship} disabled={!isEditable} />
+                        <InternshipForm
+                            mode="edit"
+                            internship={internship}
+                            disabled={!isEditable}
+                            mahasiswa_profile={mahasiswa_profile} // Pass the prop from controller
+                        />
                     </div>
                 </div>
             </div>

@@ -8,6 +8,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -51,8 +52,30 @@ class ProfileController extends Controller
         $user = $request->user();
         $userRole = $user->roles->pluck('name');
 
-        // Update user data
-        $user->fill($request->validated());
+        // Get all validated data first
+        $validatedData = $request->validated();
+        $newAvatarPath = null;
+
+        if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
+            // Delete old avatar if exists
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $newAvatarPath = $path; // Store new path separately
+        }
+
+        // Remove avatar from $validatedData to prevent accidental nullification
+        // if no new file is uploaded. We'll set it explicitly if $newAvatarPath is not null.
+        unset($validatedData['avatar']);
+
+        // Fill user with other validated data
+        $user->fill($validatedData);
+
+        // If a new avatar was uploaded, set it now
+        if ($newAvatarPath) {
+            $user->avatar = $newAvatarPath;
+        }
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
@@ -61,20 +84,23 @@ class ProfileController extends Controller
         $user->save();
 
         // Update role-specific profile
+        // Exclude avatar from role-specific profile updates as it's on the user model
+        $profileData = $request->except('avatar');
+
         if ($user->hasRole('admin') || $user->hasRole('superadmin')) {
             $user->adminProfile()->updateOrCreate(
                 ['user_id' => $user->id],
-                $request->validated()
+                $profileData
             );
         } elseif ($user->hasRole('dosen')) {
             $user->dosenProfile()->updateOrCreate(
                 ['user_id' => $user->id],
-                $request->validated()
+                $profileData
             );
         } elseif ($user->hasRole('mahasiswa')) {
             $user->mahasiswaProfile()->updateOrCreate(
                 ['user_id' => $user->id],
-                $request->validated()
+                $profileData
             );
         }
 
@@ -93,6 +119,11 @@ class ProfileController extends Controller
         $user = $request->user();
 
         Auth::logout();
+
+        // Delete avatar from storage
+        if ($user->avatar) {
+            Storage::disk('public')->delete($user->avatar);
+        }
 
         $user->delete();
 

@@ -25,17 +25,17 @@ export default function AuthSplitLayout({
 
     return (
         <div className="flex min-h-dvh flex-col items-center justify-center bg-transparent">
-            <div className="relative grid w-full max-w-4xl lg:grid-cols-2 rounded-tl-4xl rounded-br-4xl rounded-tr-none rounded-bl-none shadow-xl overflow-hidden">
+            <div className="relative grid w-full max-w-4xl overflow-hidden rounded-tl-4xl rounded-tr-none rounded-br-4xl rounded-bl-none shadow-xl lg:grid-cols-2">
                 {/* Left Panel: Branding */}
-                <div className="relative hidden h-full flex-col bg-[var(--primary)] p-10 text-white lg:flex dark:border-r">
+                <div className="relative m-3 hidden flex-col rounded-tl-3xl rounded-tr-none rounded-br-4xl rounded-bl-none bg-[var(--primary)] p-10 text-white lg:flex dark:border-r">
                     {/* <div className="absolute inset-0 bg-[var(--primary)]" /> */}
-                    <div className="relative z-20 flex items-center justify-center text-lg font-medium w-full">
+                    <div className="relative z-20 flex w-full items-center justify-center text-lg font-medium">
                         <AppLogoIcon width={32} height={32} className="mr-2" />
                         <span>FAKULTAS ILMU KOMPUTER</span>
                     </div>
-                    <div className="relative z-10 mt-auto text-center flex-grow flex flex-col justify-center">
+                    <div className="relative z-10 mt-auto flex flex-grow flex-col justify-center text-center">
                         <blockquote className="space-y-2">
-                            <p className="text-3xl font-bold mb-15">{brandingHeadline}</p>
+                            <p className="mb-15 text-3xl font-bold">{brandingHeadline}</p>
                             <p className="text-lg">{brandingSubHeadline}</p>
                             <footer className="text-sm">{brandingDescription}</footer>
                         </blockquote>
@@ -43,7 +43,7 @@ export default function AuthSplitLayout({
                     <div className="relative z-20 mt-8">
                         <button
                             type="button"
-                            className="w-full rounded-3xl bg-[var(--primary-foreground)] px-4 py-2 text-center text-[var(--primary)] transition-colors hover:bg-accent-foreground"
+                            className="hover:bg-accent-foreground w-full rounded-3xl bg-[var(--primary-foreground)] px-4 py-2 text-center text-[var(--primary)] transition-colors"
                         >
                             {brandingButtonText}
                         </button>
@@ -51,7 +51,7 @@ export default function AuthSplitLayout({
                 </div>
 
                 {/* Right Panel: Form */}
-                <div className="flex h-full items-center justify-center p-8 lg:p-8 bg-white dark:bg-gray-800">
+                <div className="flex h-full items-center justify-center bg-white p-8 lg:p-8 dark:bg-gray-800">
                     <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px]">
                         <Link
                             href={route('home')}

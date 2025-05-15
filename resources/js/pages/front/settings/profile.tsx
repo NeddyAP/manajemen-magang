@@ -1,16 +1,17 @@
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { type BreadcrumbItem, type SharedData } from '@/types';
+import { type BreadcrumbItem, type SharedData, type User } from '@/types';
 import { Transition } from '@headlessui/react';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import * as React from 'react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useRef, useState } from 'react';
 
 import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -28,6 +29,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 interface ProfileForm {
     name: string;
     email: string;
+    avatar?: File | null;
     employee_number?: string;
     expertise?: string;
     last_education?: string;
@@ -55,14 +57,18 @@ const years = Array.from({ length: currentYear - 1970 + 1 }, (_, i) => (currentY
 
 export default function Profile({ mustVerifyEmail, status, profile = {} }: ProfileProps) {
     const { auth } = usePage<SharedData>().props;
+    const user = auth.user as User & { avatar_url?: string | null };
     const isDosen = auth.role === 'dosen';
     const isMahasiswa = auth.role === 'mahasiswa';
     const [openTeachingYearCombobox, setOpenTeachingYearCombobox] = React.useState(false);
     const [openClassYearCombobox, setOpenClassYearCombobox] = React.useState(false);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(user.avatar_url || null);
+    const avatarInputRef = useRef<HTMLInputElement>(null);
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
+    const { data, setData, errors, processing, recentlySuccessful } = useForm({
         name: auth.user.name,
         email: auth.user.email,
+        avatar: null as File | null,
         // Dosen fields
         employee_number: profile?.employee_number || '',
         expertise: profile?.expertise || '',
@@ -83,9 +89,38 @@ export default function Profile({ mustVerifyEmail, status, profile = {} }: Profi
     const submit: FormEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
 
-        patch(route('profile.update'), {
+        // Prepare data for submission, including the _method spoof.
+        const submissionData = {
+            ...data, // This includes the avatar File object if selected
+            _method: 'PATCH',
+        } as unknown as FormData; // Cast to FormData or a compatible type if TypeScript complains, though router.post handles object with File correctly.
+
+        router.post(route('profile.update'), submissionData, {
             preserveScroll: true,
+            onSuccess: () => {
+                if (avatarInputRef.current) {
+                    avatarInputRef.current.value = ''; // Clear the file input
+                }
+                // If you want to clear the avatar from the form state after upload:
+                // setData('avatar', null);
+                // The page should reload or receive new props with the updated avatar_url from the backend.
+            },
         });
+    };
+
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setData('avatar', file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setAvatarPreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            setData('avatar', null);
+            setAvatarPreview(user.avatar_url || null);
+        }
     };
 
     return (
@@ -97,6 +132,18 @@ export default function Profile({ mustVerifyEmail, status, profile = {} }: Profi
                     <HeadingSmall title="Informasi Profil" description="Perbarui informasi profil Anda" />
 
                     <form onSubmit={submit} className="space-y-6">
+                        <div className="grid items-center gap-3">
+                            <Label htmlFor="avatar">Avatar</Label>
+                            <div className="flex items-center gap-4">
+                                <Avatar className="h-20 w-20">
+                                    <AvatarImage src={avatarPreview || undefined} alt={auth.user.name} />
+                                    <AvatarFallback>{auth.user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                                </Avatar>
+                                <Input id="avatar" type="file" onChange={handleAvatarChange} ref={avatarInputRef} className="max-w-xs" />
+                            </div>
+                            <InputError message={errors.avatar} />
+                        </div>
+
                         <div className="grid gap-2">
                             <Label htmlFor="name">Nama</Label>
 
@@ -209,7 +256,7 @@ export default function Profile({ mustVerifyEmail, status, profile = {} }: Profi
                                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                 </Button>
                                             </PopoverTrigger>
-                                            <PopoverContent className="w-[200px] p-0" align="start">
+                                            <PopoverContent className="w-[calc(var(--radix-popover-trigger-width))] p-0" align="start">
                                                 <Command>
                                                     <CommandInput placeholder="Cari tahun..." />
                                                     <CommandEmpty>Tahun tidak ditemukan.</CommandEmpty>
@@ -286,7 +333,7 @@ export default function Profile({ mustVerifyEmail, status, profile = {} }: Profi
                                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                 </Button>
                                             </PopoverTrigger>
-                                            <PopoverContent className="w-[200px] p-0" align="start">
+                                            <PopoverContent className="w-[calc(var(--radix-popover-trigger-width))] p-0" align="start">
                                                 <Command>
                                                     <CommandInput placeholder="Cari tahun..." />
                                                     <CommandEmpty>Tahun tidak ditemukan.</CommandEmpty>

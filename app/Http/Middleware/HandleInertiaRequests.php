@@ -41,7 +41,10 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user(),
-                'role' => $request->user()?->roles?->first()?->name, // Made more robust with null-safe operators
+                'role' => $request->user()?->roles?->first()?->name,
+                'mahasiswa_profile' => $request->user()?->mahasiswa_profile,
+                'dosen_profile' => $request->user()?->dosen_profile,
+                'admin_profile' => $request->user()?->admin_profile,
             ],
             'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),

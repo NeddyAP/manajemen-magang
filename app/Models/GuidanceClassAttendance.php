@@ -110,6 +110,7 @@ class GuidanceClassAttendance extends Pivot
             ])
             ->first();
     }
+
     protected function casts(): array
     {
         return [

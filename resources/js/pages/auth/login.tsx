@@ -40,7 +40,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
         <AuthSplitLayout
             title="Login"
             description="Silakan masuk untuk melanjutkan"
-            brandingHeadline="Halo, Selamat Datang Kembali!"
+            brandingHeadline="Selamat Datang!"
             brandingSubHeadline="Masuk untuk Melanjutkan"
             brandingDescription="Akses kembali akun Anda untuk melanjutkan progres KKL dan KKN. Kami senang melihat Anda lagi!"
             brandingButtonText="Jelajahi Fitur Kami"
@@ -91,7 +91,12 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
                     {/* "Ingat saya" checkbox removed as per image */}
 
-                    <Button type="submit" className="w-full rounded-md bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-[var(--primary-foreground)]" tabIndex={4} disabled={processing}>
+                    <Button
+                        type="submit"
+                        className="w-full rounded-md bg-[var(--primary)] text-[var(--primary-foreground)] hover:bg-[var(--primary)]/90"
+                        tabIndex={4}
+                        disabled={processing}
+                    >
                         {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
                         Masuk
                     </Button>
@@ -102,14 +107,13 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         <span className="w-full border-t" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-2 text-muted-foreground">atau lanjutkan dengan</span>
+                        <span className="bg-background text-muted-foreground px-2">atau lanjutkan dengan</span>
                     </div>
                 </div>
 
                 <Button variant="outline" type="button" className="w-full rounded-md" tabIndex={5} disabled={processing}>
                     {/* Placeholder for Google Icon, assuming one might be added later */}
-                    {/* <Icon name="google" className="mr-2 h-4 w-4" /> */}
-                    G Masuk dengan Google
+                    {/* <Icon name="google" className="mr-2 h-4 w-4" /> */}G Masuk dengan Google
                 </Button>
 
                 <div className="text-muted-foreground mt-6 text-center text-sm">
@@ -120,7 +124,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 </div>
             </form>
 
-            {status && <div className="mb-4 mt-4 text-center text-sm font-medium text-green-600 dark:text-green-400">{status}</div>}
+            {status && <div className="mt-4 mb-4 text-center text-sm font-medium text-green-600 dark:text-green-400">{status}</div>}
         </AuthSplitLayout>
     );
 }

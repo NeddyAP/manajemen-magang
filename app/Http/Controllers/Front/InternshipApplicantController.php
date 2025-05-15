@@ -187,7 +187,13 @@ class InternshipApplicantController extends Controller
     {
         abort_unless(auth()->user()->hasRole('mahasiswa'), 403, 'Hanya mahasiswa yang dapat membuat aplikasi magang.');
 
-        return Inertia::render('front/internships/applicants/create');
+        $user = Auth::user();
+        $profile = MahasiswaProfile::where('user_id', $user->id)->first();
+        $studentNumber = $profile ? $profile->student_number : null;
+
+        return Inertia::render('front/internships/applicants/create', [
+            'mahasiswa_profile' => ['student_number' => $studentNumber],
+        ]);
     }
 
     /**
@@ -226,8 +232,16 @@ class InternshipApplicantController extends Controller
     {
         abort_if($internship->user_id !== auth()->id(), 403, 'Tindakan tidak sah.');
 
+        $internship->loadMissing('user.mahasiswaProfile'); // Ensure relationships are loaded
+
+        $studentNumber = null;
+        if ($internship->user && $internship->user->mahasiswaProfile) {
+            $studentNumber = $internship->user->mahasiswaProfile->student_number;
+        }
+
         return Inertia::render('front/internships/applicants/edit', [
-            'internship' => $internship->load('user.mahasiswaProfile'), // Eager load user and profile
+            'internship' => $internship, // Pass the full internship object
+            'mahasiswa_profile' => ['student_number' => $studentNumber], // Pass the simplified profile data
         ]);
     }
 

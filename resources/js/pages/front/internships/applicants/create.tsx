@@ -17,15 +17,22 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function CreateInternshipApplication() {
+interface MahasiswaProfile {
+    student_number: string;
+}
+
+interface CreateInternshipApplicationProps {
+    mahasiswa_profile: MahasiswaProfile;
+}
+
+export default function CreateInternshipApplication({ mahasiswa_profile }: CreateInternshipApplicationProps) {
     return (
         <FrontLayout breadcrumbs={breadcrumbs}>
             <Head title="Ajukan Magang" />
             <div className="flex min-h-screen flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="container mx-auto max-w-7xl">
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 overflow-hidden rounded-xl md:min-h-min">
-
-                        <InternshipForm mode="create" />
+                        <InternshipForm mode="create" mahasiswa_profile={mahasiswa_profile} />
                     </div>
                 </div>
             </div>
