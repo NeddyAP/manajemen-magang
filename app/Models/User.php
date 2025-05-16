@@ -43,17 +43,6 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-        'last_login_at' => 'datetime',
-    ];
-
-    /**
      * The accessors to append to the model's array form.
      *
      * @var array<int, string>
@@ -63,9 +52,11 @@ class User extends Authenticatable
     /**
      * Get the URL to the user's avatar.
      */
-    public function getAvatarUrlAttribute(): ?string
+    protected function avatarUrl(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
-        return $this->avatar ? Storage::url($this->avatar) : null;
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function () {
+            return $this->avatar ? Storage::url($this->avatar) : null;
+        });
     }
 
     // Profiles
@@ -208,5 +199,19 @@ class User extends Authenticatable
 
         // Return an empty query builder if not a dosen
         return Logbook::query()->whereRaw('1 = 0');
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'last_login_at' => 'datetime',
+        ];
     }
 }

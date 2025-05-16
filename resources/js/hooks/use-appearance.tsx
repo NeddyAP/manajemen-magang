@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-export type Appearance = 'light' | 'dark' | 'system'; 
+export type Appearance = 'light' | 'dark' | 'system';
 
 const prefersDark = () => {
     if (typeof window === 'undefined') {
