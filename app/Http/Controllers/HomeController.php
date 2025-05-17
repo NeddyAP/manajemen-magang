@@ -19,7 +19,7 @@ class HomeController extends Controller
             ->get()
             ->groupBy('category');
 
-        $categories = $faqsByCategory->keys();
+        $categories = $faqsByCategory->reverse()->keys();
 
         return inertia('front/home/index', [
             'faqCategories' => $categories,

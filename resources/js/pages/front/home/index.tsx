@@ -68,62 +68,95 @@ export default function Home({ faqCategories = [], faqsByCategory = {} }: HomePr
                 </section>
 
                 <div className="mx-auto max-w-7xl">
-                    <section
-                        id="tutorial"
-                        className="from-background to-secondary/5 flex min-h-screen w-full items-center justify-center bg-gradient-to-b px-6 lg:px-8"
-                    >
-                        <div className="w-full max-w-5xl py-24">
-                            <h2 className="mb-8 text-center text-3xl font-semibold">Panduan Penggunaan Website</h2>
-                            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-                                {/* grid looping from globalvariable (video iframe) */}
-                                {globalVariables.map((globalVariable) => {
-                                    if (globalVariable.type === 'video_tutorial') {
-                                        return (
-                                            <Card key={globalVariable.id} className="w-full">
-                                                <CardHeader>
-                                                    <CardTitle>{globalVariable.key}</CardTitle>
-                                                    <CardDescription>{globalVariable.description}</CardDescription>
-                                                </CardHeader>
-                                                <CardContent>
-                                                    <iframe
-                                                        src={globalVariable.value}
-                                                        title={globalVariable.key}
-                                                        className="h-[400px] w-full rounded-lg"
-                                                        allowFullScreen
-                                                    ></iframe>
-                                                </CardContent>
-                                            </Card>
-                                        );
-                                    }
-                                })}
+                    <section id="tutorial" className="min-h-screen w-full items-center justify-center px-6 py-8 lg:px-8">
+                        <div className="w-full max-w-6xl py-24">
+                            <div className="mb-12 text-center">
+                                <h2 className="text-4xl font-bold tracking-tight sm:text-5xl">Pelajari Cara Kerja Sistem</h2>
+                                <p className="text-muted-foreground mt-4 text-lg">
+                                    Video panduan singkat untuk membantu Anda memulai dan memaksimalkan penggunaan platform kami.
+                                </p>
+                            </div>
+                            <div className="grid grid-cols-1 gap-x-8 gap-y-12 md:grid-cols-2 lg:grid-cols-2">
+                                {globalVariables.filter((gv) => gv.type === 'video_tutorial').length > 0 ? (
+                                    globalVariables.map((globalVariable) => {
+                                        if (globalVariable.type === 'video_tutorial') {
+                                            return (
+                                                <Card
+                                                    key={globalVariable.id}
+                                                    className="group w-full overflow-hidden rounded-xl shadow-lg transition-all duration-300 hover:shadow-2xl dark:border-gray-700"
+                                                >
+                                                    <CardHeader className="p-0">
+                                                        <div className="aspect-video overflow-hidden">
+                                                            <iframe
+                                                                src={globalVariable.value}
+                                                                title={globalVariable.key}
+                                                                className="h-full w-full transition-transform duration-300 group-hover:scale-105"
+                                                                allowFullScreen
+                                                            ></iframe>
+                                                        </div>
+                                                    </CardHeader>
+                                                    <CardContent className="p-6">
+                                                        <CardTitle className="mb-2 text-2xl font-semibold group-hover:text-sky-500 dark:group-hover:text-sky-400">
+                                                            {globalVariable.key}
+                                                        </CardTitle>
+                                                        <CardDescription className="text-muted-foreground text-base">
+                                                            {globalVariable.description}
+                                                        </CardDescription>
+                                                    </CardContent>
+                                                </Card>
+                                            );
+                                        }
+                                        return null;
+                                    })
+                                ) : (
+                                    <p className="text-muted-foreground col-span-full text-center text-xl">Video tutorial akan segera tersedia.</p>
+                                )}
                             </div>
                         </div>
                     </section>
 
-                    <section
-                        id="faq"
-                        className="from-secondary/5 to-background flex min-h-screen w-full items-center justify-center bg-gradient-to-b px-6 lg:px-8"
-                    >
-                        <div className="w-full max-w-4xl py-24">
-                            <h2 className="mb-8 text-center text-3xl font-semibold">Pertanyaan yang Sering Diajukan</h2>
+                    <section id="faq" className="mb-20 flex min-h-screen w-full items-center justify-center bg-gradient-to-b px-6 lg:px-8">
+                        <div className="w-full max-w-5xl py-24">
+                            <div className="mb-12 text-center">
+                                <h2 className="text-4xl font-bold tracking-tight sm:text-5xl">Ada Pertanyaan?</h2>
+                                <p className="text-muted-foreground mt-4 text-lg">
+                                    Temukan jawaban atas pertanyaan umum di sini. Jika tidak menemukan yang Anda cari, jangan ragu untuk menghubungi
+                                    kami.
+                                </p>
+                            </div>
 
                             {faqCategories.length > 0 ? (
                                 <Tabs defaultValue={faqCategories[0]} className="w-full">
-                                    <TabsList className="mb-6 flex w-full flex-wrap justify-center gap-2">
+                                    <TabsList className="mb-10 grid grid-cols-2 gap-3 sm:grid-cols-3 md:flex md:flex-wrap md:justify-center">
                                         {faqCategories.map((category) => (
-                                            <TabsTrigger key={category} value={category} className="px-4 py-2">
-                                                {category}
+                                            <TabsTrigger
+                                                key={category}
+                                                value={category}
+                                                className="rounded-md border border-transparent px-4 py-3 text-base font-medium transition-all hover:bg-sky-100 data-[state=active]:border-sky-500 data-[state=active]:bg-sky-50 data-[state=active]:text-sky-700 data-[state=active]:shadow-md dark:hover:bg-gray-800 dark:data-[state=active]:border-sky-500 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-sky-300"
+                                            >
+                                                {category.charAt(0).toUpperCase() + category.slice(1)}
                                             </TabsTrigger>
                                         ))}
                                     </TabsList>
 
                                     {faqCategories.map((category) => (
-                                        <TabsContent key={category} value={category} className="w-full backdrop-blur-sm">
-                                            <Accordion type="single" collapsible className="w-full">
+                                        <TabsContent key={category} value={category} className="w-full">
+                                            <Accordion type="single" collapsible className="w-full space-y-4">
                                                 {faqsByCategory[category]?.map((faq, index) => (
-                                                    <AccordionItem key={index} value={`item-${category}-${index}`}>
-                                                        <AccordionTrigger className="text-left">{faq.question}</AccordionTrigger>
-                                                        <AccordionContent>{faq.answer}</AccordionContent>
+                                                    <AccordionItem
+                                                        key={index}
+                                                        value={`item-${category}-${index}`}
+                                                        className="rounded-lg border bg-white shadow-sm transition-shadow duration-300 hover:shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                                                    >
+                                                        <AccordionTrigger className="px-6 py-4 text-left text-lg font-medium hover:no-underline data-[state=open]:text-sky-600 dark:data-[state=open]:text-sky-400">
+                                                            {faq.question}
+                                                        </AccordionTrigger>
+                                                        <AccordionContent className="text-muted-foreground px-6 pt-0 pb-6 text-base">
+                                                            <div
+                                                                className="prose dark:prose-invert max-w-none"
+                                                                dangerouslySetInnerHTML={{ __html: faq.answer }}
+                                                            />
+                                                        </AccordionContent>
                                                     </AccordionItem>
                                                 ))}
                                             </Accordion>
@@ -131,7 +164,9 @@ export default function Home({ faqCategories = [], faqsByCategory = {} }: HomePr
                                     ))}
                                 </Tabs>
                             ) : (
-                                <p className="text-muted-foreground text-center">Tidak ada FAQ tersedia saat ini.</p>
+                                <p className="text-muted-foreground text-center text-xl">
+                                    Belum ada pertanyaan yang sering diajukan. Silakan periksa kembali nanti.
+                                </p>
                             )}
                         </div>
                     </section>
