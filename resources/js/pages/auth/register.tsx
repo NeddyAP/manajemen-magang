@@ -38,7 +38,6 @@ export default function Register() {
             brandingHeadline="Buat Akun Baru"
             brandingSubHeadline="Daftar dan Mulai Perjalananmu"
             brandingDescription="Bergabunglah dengan kami dan mulailah pengalaman KKL dan KKN yang tak terlupakan. Proses pendaftaran cepat dan mudah!"
-            brandingButtonText="Pelajari Lebih Lanjut"
         >
             <Head title="Daftar Akun" />
             <form className="space-y-6" onSubmit={submit}>

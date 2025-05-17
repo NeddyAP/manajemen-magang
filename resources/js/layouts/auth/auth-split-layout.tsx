@@ -1,4 +1,5 @@
 import AppLogoIcon from '@/components/app-logo-icon';
+import AppearanceToggleDropdown from '@/components/appearance-dropdown'; // Added import
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
@@ -24,14 +25,19 @@ export default function AuthSplitLayout({
     const { app } = usePage<SharedData>().props;
 
     return (
-        <div className="flex min-h-dvh flex-col items-center justify-center bg-transparent">
-            <div className="relative grid w-full max-w-4xl overflow-hidden rounded-tl-4xl rounded-tr-none rounded-br-4xl rounded-bl-none shadow-xl lg:grid-cols-2">
+        <div className="from-primary dark:from-primary/20 flex h-screen w-screen flex-col items-center justify-center bg-gradient-to-r to-white dark:bg-gradient-to-tl dark:via-gray-900 dark:to-gray-900">
+            <div className="absolute top-4 right-4 z-50">
+                <AppearanceToggleDropdown />
+            </div>
+            <div className="relative grid h-[700px] w-full max-w-4xl overflow-hidden rounded-tl-4xl rounded-tr-none rounded-br-4xl rounded-bl-none bg-white shadow-xl lg:grid-cols-2 dark:bg-gray-800">
                 {/* Left Panel: Branding */}
-                <div className="relative m-3 hidden flex-col rounded-tl-3xl rounded-tr-none rounded-br-4xl rounded-bl-none bg-[var(--primary)] p-10 text-white lg:flex dark:border-r">
+                <div className="relative m-5 hidden flex-col rounded-tl-3xl rounded-tr-none rounded-br-4xl rounded-bl-none bg-[var(--primary)] p-10 text-white lg:flex dark:border-r">
                     {/* <div className="absolute inset-0 bg-[var(--primary)]" /> */}
                     <div className="relative z-20 flex w-full items-center justify-center text-lg font-medium">
-                        <AppLogoIcon width={32} height={32} className="mr-2" />
-                        <span>FAKULTAS ILMU KOMPUTER</span>
+                        <Link href={route('home')} rel="noopener noreferrer" className="flex items-center" prefetch>
+                            <AppLogoIcon width={32} height={32} className="mr-2" />
+                            <span>FAKULTAS ILMU KOMPUTER</span>
+                        </Link>
                     </div>
                     <div className="relative z-10 mt-auto flex flex-grow flex-col justify-center text-center">
                         <blockquote className="space-y-2">
@@ -51,7 +57,7 @@ export default function AuthSplitLayout({
                 </div>
 
                 {/* Right Panel: Form */}
-                <div className="flex h-full items-center justify-center bg-white p-8 lg:p-8 dark:bg-gray-800">
+                <div className="flex h-full items-center justify-center overflow-y-auto bg-white p-8 lg:p-8 dark:bg-gray-800">
                     <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px]">
                         <Link
                             href={route('home')}

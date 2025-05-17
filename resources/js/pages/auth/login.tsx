@@ -43,7 +43,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
             brandingHeadline="Selamat Datang!"
             brandingSubHeadline="Masuk untuk Melanjutkan"
             brandingDescription="Akses kembali akun Anda untuk melanjutkan progres KKL dan KKN. Kami senang melihat Anda lagi!"
-            brandingButtonText="Jelajahi Fitur Kami"
         >
             <Head title="Login" />
 

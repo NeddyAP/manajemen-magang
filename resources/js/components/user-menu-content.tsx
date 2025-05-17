@@ -14,25 +14,28 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
 
     return (
         <>
-            <DropdownMenuLabel className="p-0 font-normal">
-                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+            <DropdownMenuLabel className="px-2 py-2 font-normal">
+                <div className="flex items-center gap-3 text-left">
                     <UserInfo user={user} showEmail={true} />
                 </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-                <DropdownMenuItem asChild>
-                    <Link className="block w-full" href={route('profile.edit')} as="button" prefetch onClick={cleanup}>
-                        <Settings className="mr-2" />
-                        Pengaturan
+            <DropdownMenuGroup className="py-1">
+                <DropdownMenuItem asChild className="hover:bg-muted/50 focus:bg-muted/60 cursor-pointer px-2 py-2 transition-colors duration-150">
+                    <Link className="flex w-full items-center" href={route('profile.edit')} as="button" prefetch onClick={cleanup}>
+                        <Settings className="mr-2.5 h-4 w-4" />
+                        <span>Pengaturan Akun</span>
                     </Link>
                 </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-                <Link className="block w-full" method="post" href={route('logout')} as="button" onClick={cleanup}>
-                    <LogOut className="mr-2" />
-                    Keluar
+            <DropdownMenuItem
+                asChild
+                className="hover:bg-muted/50 focus:bg-muted/60 cursor-pointer px-2 py-2 text-red-600 transition-colors duration-150 focus:text-red-700 dark:text-red-500 dark:focus:text-red-400"
+            >
+                <Link className="flex w-full items-center" method="post" href={route('logout')} as="button" onClick={cleanup}>
+                    <LogOut className="mr-2.5 h-4 w-4" />
+                    <span>Keluar</span>
                 </Link>
             </DropdownMenuItem>
         </>

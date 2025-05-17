@@ -39,7 +39,7 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
-const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
+const activeItemStyles = 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-foreground font-medium';
 
 interface AppHeaderProps {
     breadcrumbs?: BreadcrumbItem[];
@@ -131,31 +131,36 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     }
     return (
         <>
-            <div className="border-sidebar-border/80 border-b">
-                <div className="mx-auto flex h-16 items-center px-4 md:max-w-7xl">
+            <div className="border-sidebar-border/80 border-b shadow-sm">
+                <div className="mx-auto flex h-20 items-center px-6 md:max-w-7xl">
                     {/* Mobile Menu */}
                     <div className="lg:hidden">
                         <Sheet>
                             <SheetTrigger asChild>
-                                <Button variant="ghost" size="icon" className="mr-2 h-[34px] w-[34px]">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="hover:bg-accent/50 focus-visible:ring-ring mr-3 h-10 w-10 transition-colors focus-visible:ring-2 focus-visible:ring-offset-2"
+                                >
                                     <Menu className="h-5 w-5" />
                                 </Button>
                             </SheetTrigger>
                             <SheetContent side="left" className="bg-sidebar flex h-full w-64 flex-col items-stretch justify-between">
-                                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-                                <SheetHeader className="flex justify-start text-left">
+                                <SheetTitle className="sr-only">Navigasi Menu</SheetTitle>
+                                <SheetHeader className="flex justify-start p-4 text-left">
                                     <AppLogoIcon />
                                 </SheetHeader>
-                                <div className="flex h-full flex-1 flex-col space-y-4 p-4">
+                                <div className="flex h-full flex-1 flex-col space-y-6 p-4">
                                     <div className="flex h-full flex-col justify-between text-sm">
-                                        <div className="flex flex-col space-y-4">
+                                        <div className="flex flex-col space-y-5">
                                             {mainNavItems.map((item) => (
                                                 <Link
                                                     key={item.title}
                                                     href={item.href}
                                                     className={cn(
-                                                        'flex items-center space-x-2 font-medium',
-                                                        isActive(item.href) && 'text-neutral-900 dark:text-neutral-100',
+                                                        'hover:bg-accent/80 flex items-center space-x-3 rounded-md px-3 py-2 font-medium transition-colors duration-150 dark:hover:bg-neutral-700/80',
+                                                        isActive(item.href) &&
+                                                            'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-foreground',
                                                     )}
                                                 >
                                                     {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
@@ -164,15 +169,16 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                             ))}
                                         </div>
 
-                                        <div className="flex flex-col space-y-4">
+                                        <div className="flex flex-col space-y-5">
                                             {computedRightNavItems.map((item) => (
                                                 <a
                                                     key={item.title}
                                                     href={item.href}
                                                     rel="noopener noreferrer"
                                                     className={cn(
-                                                        'flex items-center space-x-2 font-medium',
-                                                        isActive(item.href) && 'text-neutral-900 dark:text-neutral-100',
+                                                        'hover:bg-accent/80 flex items-center space-x-3 rounded-md px-3 py-2 font-medium transition-colors duration-150 dark:hover:bg-neutral-700/80',
+                                                        isActive(item.href) &&
+                                                            'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-foreground',
                                                     )}
                                                 >
                                                     {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
@@ -191,9 +197,9 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                     </Link>
 
                     {/* Desktop Navigation */}
-                    <div className="ml-6 hidden h-full items-center space-x-6 lg:flex">
+                    <div className="ml-8 hidden h-full items-center space-x-6 lg:flex">
                         <NavigationMenu className="flex h-full items-stretch">
-                            <NavigationMenuList className="flex h-full items-stretch space-x-2">
+                            <NavigationMenuList className="flex h-full items-stretch space-x-4">
                                 {mainNavItems.map((item, index) => (
                                     <NavigationMenuItem key={index} className="relative flex h-full items-center">
                                         <Link
@@ -201,14 +207,14 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                             className={cn(
                                                 navigationMenuTriggerStyle(),
                                                 isActive(item.href) && activeItemStyles,
-                                                'h-9 cursor-pointer px-3',
+                                                'hover:bg-accent/80 focus-visible:bg-accent/80 h-10 cursor-pointer px-4 py-2 transition-colors duration-150 dark:hover:bg-neutral-700/80 dark:focus-visible:bg-neutral-700/80',
                                             )}
                                         >
                                             {item.icon && <Icon iconNode={item.icon} className="mr-2 h-4 w-4" />}
                                             {item.title}
                                         </Link>
                                         {isActive(item.href) && (
-                                            <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>
+                                            <div className="bg-primary dark:bg-primary-foreground absolute bottom-0 left-0 h-1 w-full translate-y-px"></div>
                                         )}
                                     </NavigationMenuItem>
                                 ))}
@@ -216,26 +222,38 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                         </NavigationMenu>
                     </div>
 
-                    <div className="ml-auto flex items-center space-x-2">
+                    <div className="ml-auto flex items-center space-x-3">
                         {/* Search Button - Always visible */}
-                        <Button variant="ghost" size="icon" className="group h-9 w-9 cursor-pointer">
-                            <Search className="!size-5 opacity-80 group-hover:opacity-100" />
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="group hover:bg-accent/50 focus-visible:ring-ring h-10 w-10 cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-offset-2"
+                        >
+                            <Search className="!size-5 opacity-80 transition-opacity group-hover:opacity-100" />
                         </Button>
 
                         {/* Conditional rendering based on auth */}
                         {auth.user ? (
                             // Authenticated user view
-                            <div className="flex items-center space-x-1">
+                            <div className="flex items-center space-x-2">
                                 {/* Links like Dashboard/Panduan - hidden on mobile */}
                                 <div className="hidden lg:flex">
                                     {computedRightNavItems.map((item, index) => (
                                         <TooltipProvider key={index}>
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
-                                                    <Button variant="ghost" size="icon" asChild className="group h-9 w-9 cursor-pointer">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        asChild
+                                                        className="group hover:bg-accent/50 focus-visible:ring-ring h-10 w-10 cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-offset-2"
+                                                    >
                                                         <Link href={item.href} rel="noopener noreferrer">
                                                             {item.icon && (
-                                                                <Icon iconNode={item.icon} className="!size-5 opacity-80 group-hover:opacity-100" />
+                                                                <Icon
+                                                                    iconNode={item.icon}
+                                                                    className="!size-5 opacity-80 transition-opacity group-hover:opacity-100"
+                                                                />
                                                             )}
                                                         </Link>
                                                     </Button>
@@ -251,26 +269,30 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                 {/* Notification Bell - visible on all sizes when logged in */}
                                 <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="icon" className="relative h-9 w-9">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="hover:bg-accent/50 focus-visible:ring-ring relative h-10 w-10 transition-colors focus-visible:ring-2 focus-visible:ring-offset-2"
+                                        >
                                             <Bell className="!size-5" />
                                             {unreadCount > 0 && (
                                                 <Badge
                                                     variant="destructive"
-                                                    className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full p-0 text-[10px] font-medium text-white"
+                                                    className="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full p-0.5 text-[10px] font-medium text-white"
                                                 >
-                                                    {unreadCount}
+                                                    {unreadCount > 9 ? '9+' : unreadCount}
                                                 </Badge>
                                             )}
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="w-80">
-                                        <div className="flex items-center justify-between px-2 py-1.5">
-                                            <span className="font-semibold">Notifikasi</span>
+                                    <DropdownMenuContent align="end" className="w-96 shadow-lg">
+                                        <div className="flex items-center justify-between p-3">
+                                            <span className="text-base font-semibold">Notifikasi</span>
                                             {notifications.length > 0 && (
                                                 <Button
-                                                    variant="ghost"
+                                                    variant="link"
                                                     size="sm"
-                                                    className="text-xs"
+                                                    className="text-primary hover:text-primary/80 h-auto px-2 py-1 text-xs transition-colors"
                                                     onClick={handleMarkAllAsRead}
                                                     disabled={loading}
                                                 >
@@ -280,22 +302,25 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                         </div>
                                         <DropdownMenuSeparator />
                                         {loading ? (
-                                            <div className="text-muted-foreground p-4 text-center text-sm">Memuat...</div>
+                                            <div className="text-muted-foreground p-4 text-center text-sm">Memuat notifikasi...</div>
                                         ) : notifications.length === 0 ? (
-                                            <div className="text-muted-foreground p-4 text-center text-sm">Tidak ada notifikasi baru</div>
+                                            <div className="text-muted-foreground p-6 text-center text-sm">Tidak ada notifikasi baru.</div>
                                         ) : (
-                                            <div className="max-h-80 overflow-y-auto">
+                                            <div className="max-h-96 overflow-y-auto">
                                                 {notifications.map((notification) => (
                                                     <DropdownMenuItem
                                                         key={notification.id}
-                                                        className="cursor-pointer"
+                                                        className="hover:bg-muted/50 focus:bg-muted/60 cursor-pointer px-3 py-2.5 transition-colors duration-150"
                                                         onSelect={(e) => e.preventDefault()}
                                                         onClick={() => handleNotificationClick(notification)}
                                                     >
-                                                        <div className="flex flex-col">
-                                                            <p className="text-sm">{notification.data.message}</p>
+                                                        <div className="flex flex-col space-y-0.5">
+                                                            <p className="text-sm leading-snug">{notification.data.message}</p>
                                                             <p className="text-muted-foreground text-xs">
-                                                                {new Date(notification.created_at).toLocaleString()}
+                                                                {new Date(notification.created_at).toLocaleString('id-ID', {
+                                                                    dateStyle: 'medium',
+                                                                    timeStyle: 'short',
+                                                                })}
                                                             </p>
                                                         </div>
                                                     </DropdownMenuItem>
@@ -304,7 +329,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                         )}
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem
-                                            className="cursor-pointer justify-center text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                            className="text-primary hover:text-primary/80 dark:text-primary-foreground/80 dark:hover:text-primary-foreground hover:bg-muted/50 focus:bg-muted/60 cursor-pointer justify-center px-3 py-2.5 text-sm font-medium transition-colors duration-150"
                                             onSelect={(e) => e.preventDefault()}
                                             onClick={() => {
                                                 router.visit(route('notifications.index'));
@@ -319,30 +344,35 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                 {/* User Avatar Dropdown - visible on all sizes when logged in */}
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" className="size-10 rounded-full p-1">
-                                            <Avatar className="size-8 overflow-hidden rounded-full">
+                                        <Button
+                                            variant="ghost"
+                                            className="hover:ring-primary/50 focus-visible:ring-ring h-10 w-10 rounded-full p-0.5 transition-all hover:ring-2 focus-visible:ring-2 focus-visible:ring-offset-2"
+                                        >
+                                            <Avatar className="size-9 overflow-hidden rounded-full">
                                                 <AvatarImage src={auth.user.avatar_url || undefined} alt={auth.user.name} />
-                                                <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                                                <AvatarFallback className="bg-muted text-foreground rounded-full dark:bg-neutral-700 dark:text-white">
                                                     {getInitials(auth.user.name)}
                                                 </AvatarFallback>
                                             </Avatar>
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="w-56" align="end">
+                                    <DropdownMenuContent className="w-60 shadow-lg" align="end">
                                         <UserMenuContent user={auth.user} />
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
                         ) : (
                             // Guest view
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center space-x-3">
                                 <Link href="/login">
-                                    <Button variant="ghost" size="sm">
+                                    <Button variant="ghost" size="sm" className="hover:bg-accent/80 px-4 py-2 transition-colors">
                                         Masuk
                                     </Button>
                                 </Link>
                                 <Link href="/register">
-                                    <Button size="sm">Daftar</Button>
+                                    <Button size="sm" className="px-4 py-2 transition-colors">
+                                        Daftar
+                                    </Button>
                                 </Link>
                             </div>
                         )}
@@ -350,8 +380,8 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                 </div>
             </div>
             {breadcrumbs.length > 1 && (
-                <div className="border-sidebar-border/70 flex w-full border-b">
-                    <div className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 md:max-w-7xl">
+                <div className="border-sidebar-border/70 flex w-full border-b shadow-sm">
+                    <div className="mx-auto flex h-14 w-full items-center justify-start px-6 text-neutral-500 md:max-w-7xl dark:text-neutral-400">
                         <Breadcrumbs breadcrumbs={breadcrumbs} />
                     </div>
                 </div>
