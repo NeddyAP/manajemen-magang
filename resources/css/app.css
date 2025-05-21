@@ -254,3 +254,36 @@ body {
         @apply bg-background text-foreground;
     }
 }
+
+/* Global Scrollbar Styles */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-secondary);
+}
+
+.dark ::-webkit-scrollbar-track {
+    background: var(--secondary); /* .dark uses --secondary directly */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--color-primary);
+    border-radius: 10px;
+    border: 2px solid var(--color-secondary);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background-color: var(--primary); /* .dark uses --primary directly */
+    border: 2px solid var(--secondary); /* .dark uses --secondary directly */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-accent);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--accent); /* .dark uses --accent directly */
+}
