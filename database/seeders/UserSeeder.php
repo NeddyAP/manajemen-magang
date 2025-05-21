@@ -13,6 +13,34 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // Create Dosen Users
+        $dosenUsers = collect();
+        for ($i = 1; $i <= 5; $i++) {
+            $dosenUsers->push(
+                User::factory()->dosen()->create([
+                    'name' => 'Dosen '.$i,
+                    'email' => "dosen{$i}@example.com",
+                    'password' => Hash::make('a'),
+                ])
+            );
+        }
+
+        // Create Mahasiswa Users (advisor assignment is handled in UserFactory@mahasiswa)
+        User::factory()->count(20)->mahasiswa()->create([
+            // You can override default factory values here if needed for the 20 users,
+            // but for unique emails and names, the factory's definition() is usually sufficient.
+            // If specific naming like 'Mahasiswa X' is needed, a loop might be better,
+            // but the request was to simplify.
+        ]);
+
+        // Create Test Mahasiswa User (advisor assignment is handled in UserFactory@mahasiswa)
+        User::factory()->mahasiswa()->create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => Hash::make('password'), // Specific password for the test user
+        ]);
+
+        
         // Create Super Admin
         User::factory()->create([
             'name' => 'Super Admin',
@@ -26,40 +54,5 @@ class UserSeeder extends Seeder
             'email' => 'admin@example.com',
             'password' => Hash::make('a'),
         ])->assignRole('admin');
-
-        // Create Dosen Users
-        $dosenUsers = collect();
-        for ($i = 1; $i <= 5; $i++) {
-            $dosenUsers->push(
-                User::factory()->dosen()->create([
-                    'name' => 'Dosen '.$i,
-                    'email' => "dosen{$i}@example.com",
-                    'password' => Hash::make('a'),
-                ])
-            );
-        }
-
-        // Create Mahasiswa Users
-        for ($i = 1; $i <= 20; $i++) {
-            $mahasiswaUser = User::factory()->mahasiswa()->create([
-                'name' => 'Mahasiswa '.$i,
-                'email' => "mahasiswa{$i}@example.com",
-                'password' => Hash::make('a'),
-            ]);
-
-            // Assign a random Dosen as advisor
-            if ($mahasiswaUser->mahasiswaProfile && $dosenUsers->isNotEmpty()) {
-                $mahasiswaUser->mahasiswaProfile->update([
-                    'advisor_id' => $dosenUsers->random()->dosenProfile->id,
-                ]);
-            }
-        }
-
-        // Create Test Mahasiswa User
-        User::factory()->mahasiswa()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => Hash::make('password'), // As per original requirement for test user
-        ])->assignRole('mahasiswa');
     }
 }

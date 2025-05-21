@@ -56,7 +56,20 @@ class UserFactory extends Factory
             // Ensure 'mahasiswa' role exists
             $role = Role::firstOrCreate(['name' => 'mahasiswa', 'guard_name' => 'web']);
             $user->assignRole($role);
-            MahasiswaProfile::factory()->for($user)->create();
+            $mahasiswaProfile = MahasiswaProfile::factory()->for($user)->create();
+
+            // Assign a random Dosen as an advisor
+            $dosenUsers = User::whereHas('roles', function ($query) {
+                $query->where('name', 'dosen');
+            })->whereHas('dosenProfile')->inRandomOrder()->get();
+
+            if ($dosenUsers->isNotEmpty()) {
+                $advisor = $dosenUsers->first();
+                if ($advisor && $advisor->dosenProfile) {
+                    $mahasiswaProfile->advisor_id = $advisor->dosenProfile->id;
+                    $mahasiswaProfile->save();
+                }
+            }
         });
     }
 
