@@ -115,7 +115,7 @@ export const columns: ColumnDef<Internship>[] = [
 
             const statusMap: Record<string, { label: string; variant: 'default' | 'destructive' | 'outline' | 'secondary' }> = {
                 waiting: { label: 'Menunggu', variant: 'secondary' },
-                accepted: { label: 'Disetujui', variant: 'outline' },
+                accepted: { label: 'Diterima', variant: 'default' },
                 rejected: { label: 'Ditolak', variant: 'destructive' },
             };
 

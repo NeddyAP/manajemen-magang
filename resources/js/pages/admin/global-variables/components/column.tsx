@@ -187,4 +187,5 @@ export const columns: ColumnDef<GlobalVariable>[] = [
 export const initialColumnVisibility = {
     created_at: false,
     updated_at: false,
+    type: false,
 };
