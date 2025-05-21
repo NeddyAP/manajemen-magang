@@ -184,9 +184,11 @@ export const columns: ColumnDef<Internship>[] = [
             const fileUrl = `/storage/${filePath}`;
 
             return (
-                <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                    <FileSpreadsheet className="mr-2 inline h-4 w-4" />
-                </a>
+                <div className="flex justify-center">
+                    <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                        <FileSpreadsheet className="mr-2 inline h-4 w-4" />
+                    </a>
+                </div>
             );
         },
     },
@@ -267,7 +269,6 @@ export const columns: ColumnDef<Internship>[] = [
 
 export const initialColumnVisibility = {
     user_id: false,
-    progress: false,
     created_at: false,
     updated_at: false,
 };

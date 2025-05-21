@@ -40,7 +40,6 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password'), // Specific password for the test user
         ]);
 
-        
         // Create Super Admin
         User::factory()->create([
             'name' => 'Super Admin',

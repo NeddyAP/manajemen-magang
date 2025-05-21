@@ -100,32 +100,34 @@ export default function Internships({ internships, meta }: InternshipsProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Magang" />
-            <div className="flex min-h-screen flex-1 flex-col gap-4 rounded-xl p-4">
+            <div className="flex min-h-screen min-w-0 flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">
                     <InternshipAnalytics />
                     <InternshipStatusAnalytics />
                     <InternshipTypeAnalytics />
                 </div>
-                <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 overflow-hidden rounded-xl md:min-h-min">
+                <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 rounded-xl md:min-h-min">
                     <div className="mb-4 flex items-center justify-between">
                         <div className="flex flex-wrap gap-2">
                             <StatusFilter value={selectedStatus} onChange={handleStatusChange} />
                             <TypeFilter value={selectedType} onChange={handleTypeChange} />
                         </div>
                     </div>
-                    <DataTable
-                        className="inset-0 size-full"
-                        columns={columns}
-                        data={internships}
-                        filters={[
-                            { id: 'status', value: selectedStatus },
-                            { id: 'type', value: selectedType },
-                        ]}
-                        meta={meta}
-                        deleteRoute={route('admin.internships.destroy.bulk')}
-                        initialColumnVisibility={initialColumnVisibility}
-                        searchPlaceholder="Cari nama, perusahaan, email, status, dll..."
-                    />
+                    <div className="w-full overflow-x-auto">
+                        <DataTable
+                            className="inset-0 size-full"
+                            columns={columns}
+                            data={internships}
+                            filters={[
+                                { id: 'status', value: selectedStatus },
+                                { id: 'type', value: selectedType },
+                            ]}
+                            meta={meta}
+                            deleteRoute={route('admin.internships.destroy.bulk')}
+                            initialColumnVisibility={initialColumnVisibility}
+                            searchPlaceholder="Cari nama, perusahaan, email, status, dll..."
+                        />
+                    </div>
                 </div>
             </div>
         </AppLayout>
