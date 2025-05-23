@@ -136,12 +136,12 @@ npm run build
 
 ## Testing Strategy
 
-- **Framework:** Pest PHP (`phpunit.xml` configuration).
-- **Environment:** Configured to use SQLite with the `:memory:` database for tests (`phpunit.xml`). This ensures tests run quickly and in isolation without affecting the development database.
-- **Primary Type:** Feature Tests (`tests/Feature/`). These simulate user interactions via HTTP requests and assert responses, database state, and Inertia props.
-- **Setup:** The `RefreshDatabase` trait is used in test classes to manage database state between tests. Factories (`database/factories/`) are used to create test data.
-- **Coverage:** Aiming for high coverage of critical paths, especially Authentication, Authorization, and core CRUD operations. Run `php artisan test --coverage` to generate a report.
-- **Frontend Testing:** Currently not implemented. Potential future addition using tools like Vitest or React Testing Library.
+- **Backend Framework:** Pest PHP (`phpunit.xml` configuration).
+- **Backend Environment:** Configured to use SQLite with the `:memory:` database for tests (`phpunit.xml`). This ensures tests run quickly and in isolation without affecting the development database.
+- **Backend Primary Type:** Feature Tests (`tests/Feature/`). These simulate user interactions via HTTP requests and assert responses, database state, and Inertia props.
+- **Backend Setup:** The `RefreshDatabase` trait is used in test classes to manage database state between tests. Factories (`database/factories/`) are used to create test data.
+- **Backend Coverage:** Aiming for high coverage of critical paths, especially Authentication, Authorization, and core CRUD operations. Run `php artisan test --coverage` to generate a report.
+- **Frontend Testing:** Planned to use Vitest and React Testing Library. Test directories exist (`resources/js/tests/`) but are currently empty. Implementation is a high priority task.
 
 ## Security Considerations
 

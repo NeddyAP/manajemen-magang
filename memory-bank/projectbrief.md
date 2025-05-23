@@ -194,7 +194,7 @@ A comprehensive web-based system for managing internship programs (KKL/KKN) in e
 ## Project Timeline (Conceptual)
 
 *   **Phase 1 (Completed):** Core system setup, basic CRUD for main modules (Internships, Logbooks, Reports, Guidance, Users, FAQs, Tutorials), basic Auth, initial UI layout.
-*   **Phase 2 (Current):** Feature refinement, Notification system implementation, Settings pages, Admin dashboard enhancements, Trash management, Adding comprehensive tests (starting with Auth), Documentation updates.
+*   **Phase 2 (Current):** Feature refinement, Notification system implementation, Settings pages, Admin dashboard enhancements, Trash management, Backend testing with Pest PHP, Frontend testing implementation with Vitest and React Testing Library, Documentation updates.
 *   **Phase 3 (Future):** Advanced features (e.g., detailed analytics, improved QR attendance), performance optimizations, potential mobile responsiveness improvements, further testing.
 
 ## Risk Management

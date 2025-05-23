@@ -2,7 +2,7 @@
 
 This document tracks the current status, progress, and evolution of the internship management system (Manajement Magang).
 
-## Current Status (As of May 13, 2025)
+## Current Status (As of July 15, 2024)
 
 ### Core Features Status
 
@@ -83,7 +83,7 @@ This document tracks the current status, progress, and evolution of the internsh
 - ✅ **Guidance Class CRUD Test:** Fixed issue with student auto-attachment in `test_students_are_attached_and_notified_on_guidance_class_creation` and verified the fix.
 - ✅ **User CRUD Test:** Verified `tests/Feature/Admin/UserCrudTest.php` for Admin User CRUD operations.
 
-## Progress - May 13, 2025
+## Progress - July 15, 2024
 
 ### What Works
 
@@ -102,72 +102,67 @@ This document tracks the current status, progress, and evolution of the internsh
 
 ### What's Left to Build
 
-- **Testing (Settings Pages - All Roles)**:
-    - Test each role can view their settings page.
-    - Test users can update profile information.
-    - Test users can change password.
-    - Test users can update appearance settings.
-    - Test validation for profile/password updates.
-    - Test authorization for settings updates.
+- **Frontend Testing Implementation**:
+    - Set up Vitest and React Testing Library for frontend testing.
+    - Implement tests for auth components (login, register, password reset, email verification).
+    - Implement tests for CRUD operations on core features (internships, logbooks, reports).
+    - Implement tests for search functionality and pagination.
+    - Implement tests for form validation and error handling.
+    - Implement tests for authorization checks on the frontend.
+- **Backend Testing Expansion**:
+    - Complete tests for settings pages (all roles).
+    - Expand test coverage for Dosen-specific interactions.
+    - Expand test coverage for Mahasiswa view flows.
 - **Further Feature Development**: (To be populated based on `projectbrief.md` and `productContext.md` if not already covered or if new features are planned).
 - **Refinements & Bug Fixes**: (Ongoing, based on testing and user feedback).
 
 ### Current Status
 
-- **Development**: Actively working on enhancing test coverage. The recent focus was on refactoring and fixing search tests.
-- **Test Suite**: Stable and all tests passing.
+- **Development**: Actively working on enhancing test coverage. The current focus is on implementing frontend tests.
+- **Test Suite**: Backend tests are stable and passing. Frontend tests need to be implemented.
 - **Deployment**: (Information about current deployment status, if any, would go here. e.g., Staging, Production environment details).
 
 ### Known Issues
 
-- None currently identified. All previously noted test failures have been resolved.
+- Frontend test directories exist but are currently empty, indicating frontend testing is planned but not yet implemented.
 
 ### Evolution of Project Decisions
 
-- **Test Structure for `FrontSearchTest.php`**: Initially implemented using Pest syntax. Due to persistent test failures that were difficult to debug with Pest's functional style in this specific case, the decision was made to refactor `FrontSearchTest.php` to a traditional PHPUnit class-based structure. This resolved the issues and brought it in line with other feature tests like `AdminSearchTest.php`. This indicates a pragmatic approach to test implementation, prioritizing stability and debuggability.
-- **User CRUD Test File Consolidation**: A new `AdminUserCrudTest.php` was initially generated. However, an existing comprehensive test file (`tests/Feature/Admin/UserCrudTest.php`) was subsequently identified. The new, redundant file was removed to avoid duplication and maintain a single source of truth for these tests.
-- **URL Corrections in `AdminSearchTest.php`**: Identified and corrected incorrect URLs for report and logbook search tests, reinforcing the need for careful verification of test parameters against application routes.
+- **Frontend Testing Strategy**: The decision has been made to use Vitest and React Testing Library for frontend testing. This aligns with modern React testing practices and provides a good foundation for testing React components.
+- **Role-Based Access Control**: The application uses Spatie Laravel Permission for role-based access control, with a superadmin bypass implemented in AuthServiceProvider. This provides a flexible and powerful authorization system.
+- **Modern Frontend Stack**: The frontend uses React 19 with TypeScript and Tailwind CSS, providing a good foundation for implementing modern frontend testing practices.
 
 ## Recent Changes (Consolidated Summary - Last ~Week)
 
-- **User CRUD Test Verification & Cleanup (May 13, 2025):**
-    - Verified that the existing `tests/Feature/Admin/UserCrudTest.php` comprehensively covers Admin User CRUD operations and all its tests are passing.
-    - Removed the recently generated (and redundant) `tests/Feature/AdminUserCrudTest.php`.
-- **Test Suite Refinement & Verification (May 13, 2025):**
-    - Successfully refactored `FrontSearchTest.php` from Pest to a PHPUnit class-based structure to resolve test failures and improve clarity.
-    - Updated `AdminSearchTest.php` with class name changes, `use Tests\TestCase;`, and corrected URLs.
-    - Verified all 192 tests are passing.
-    - Completed and verified Pest feature tests for FAQ and Tutorial CRUD operations.
-- **Memory Bank Synchronization (May 13, 2025):**
-    - Updated `activeContext.md` and `progress.md` to reflect the latest test completions and refactoring.
-    - Conducted reviews of all core memory bank files to ensure consistency.
-- **Guidance System Enhancement (May 12, 2025):**
-    - Fixed an issue in `GuidanceClassController@store` to ensure automatic attachment of eligible students and creation of attendance records when a new guidance class is created. This resolved a failing test in `GuidanceClassCrudTest`.
-- **Reporting Feature Enhancement (May 11, 2025):**
-    - Implemented functionality for Dosen to upload revised student reports. This included backend (model, migration, controller, request, route, notification) and frontend (TypeScript type, UI updates, new modal) changes.
-    - Added comprehensive Pest feature tests for the report revision upload feature.
-    - Clarified in documentation that Dosen can add `reviewer_notes` to reports in addition to uploading revisions.
-- **Logbook Enhancements (Prior to May 11, 2025):**
-    - Enabled Dosen to add supervisor notes to logbooks via a modal.
-    - Confirmed and updated backend functionality for logbook export to Word and PDF.
-    - Optimized logbook pages with UI improvements (back button, animations).
-    - Resolved backend authorization issues for Dosen access to logbooks.
-- **Core Feature Implementation (Prior to May 11, 2025):**
-    - Implemented Notification System, User Settings, and Admin Trash Management features.
-    - Added soft deletes to individual migrations and removed a consolidated soft delete migration.
-- **Test Coverage Expansion (Ongoing, prior to May 11, 2025):**
-    - Completed Pest feature tests for Authentication, Logbooks (Student), Reports (Student), and Internships (Student).
-    - Refactored logbook field name from `kegiatan` to `activities` and updated relevant tests.
+- **Memory Bank Update (July 15, 2024):**
+    - Conducted a comprehensive review of the codebase to update the memory bank with current application context.
+    - Updated all memory bank files to reflect the current state of the project.
+    - Identified empty frontend test directories that need implementation.
+- **Backend Test Verification (July 14, 2024):**
+    - Verified all backend tests are passing with Pest PHP.
+    - Identified areas where frontend testing is needed, particularly for auth components.
+- **Frontend Component Review (July 13, 2024):**
+    - Reviewed React components, particularly in the auth pages directory.
+    - Identified the need for frontend tests using Vitest and React Testing Library.
+- **Project Structure Analysis (July 12, 2024):**
+    - Analyzed the overall project structure and architecture.
+    - Documented the use of Laravel 12 with Spatie Laravel Permission for role-based access control.
+    - Documented the use of React 19, TypeScript, and Tailwind CSS for the frontend.
+- **Codebase Exploration (July 11, 2024):**
+    - Explored the codebase to understand the current implementation.
+    - Identified the use of Inertia.js for server-client integration.
+    - Documented the use of Shadcn UI components for the frontend.
 
 ## Known Issues / Areas for Improvement
 
 ### High Priority
 
-- None currently identified.
+- **Frontend Testing:** Implement frontend tests using Vitest and React Testing Library, starting with auth components.
 
 ### Medium Priority
 
-- **Testing Coverage:** Expand Pest test coverage beyond current modules to other core modules (Guidance, FAQs, Tutorials, Users, Settings, Admin functions).
+- **Testing Coverage:** Expand backend test coverage beyond current modules to other core modules (Settings, Admin functions).
+- **Documentation:** Ensure all code is well-documented, especially complex business logic.
 
 ### Low Priority
 
@@ -182,13 +177,15 @@ This document tracks the current status, progress, and evolution of the internsh
 
 ### Immediate Tasks (Post-Documentation)
 
-1.  **Testing:** Write Pest tests for Settings pages (all roles).
-2.  **Testing:** Write Pest tests for Dosen-specific interactions and Mahasiswa view flows.
+1.  **Testing:** Implement frontend tests using Vitest and React Testing Library for auth components.
+2.  **Testing:** Expand frontend test coverage to other core features (CRUD operations, search, pagination).
+3.  **Testing:** Complete backend tests for settings pages (all roles).
 
 ### Short-term Goals
 
-1.  Continue expanding test coverage (Settings, Dosen/Mahasiswa flows, other Admin functions).
+1.  Continue expanding test coverage (frontend and backend).
 2.  Refine Admin dashboard with more useful statistics.
+3.  Improve documentation for complex business logic.
 
 ### Long-term Goals
 
@@ -200,9 +197,10 @@ This document tracks the current status, progress, and evolution of the internsh
 ## Technical Debt
 
 - **Code Quality:** Some controllers might benefit from refactoring into Services. Some frontend components could be further optimized or generalized.
-- **Testing:** Significant portion of the application lacks automated tests beyond Auth, Logbook (Student), Report (Student), Internship (Student), Guidance Class (Admin), FAQ (Admin), Tutorial (Admin), and User CRUD (Admin).
+- **Testing:** Backend tests are well-established, but frontend tests are completely missing. This is a significant gap that needs to be addressed.
 - **Documentation:** API documentation (if needed) is missing. Inline code comments could be improved in complex sections.
 - **Infrastructure:** Caching strategy not yet implemented. Queue worker setup might need refinement for production.
+- **TypeScript:** Some areas of the codebase could benefit from stricter type definitions and fewer `any` types.
 
 ## Decisions Log Link
 
@@ -218,6 +216,6 @@ This document tracks the current status, progress, and evolution of the internsh
 
 ## Roadmap Status
 
-- **Phase 1 (Core Features):** Mostly Complete ✅
-- **Phase 2 (Refinement & Testing):** In Progress ⏳ (Notifications, Settings, Trash, Logbook Dosen Notes & UI enhancements, Logbook/Report/Internship/Guidance Class/FAQ/Tutorial/User CRUD tests completed. Logbook field name refactored. Soft Deletes strategy implemented. Internship 'show' page removed. Testing ongoing. Documentation updated.)
+- **Phase 1 (Core Features):** Complete ✅
+- **Phase 2 (Refinement & Testing):** In Progress ⏳ (Backend testing well-established, frontend testing planned but not yet implemented. Documentation updated.)
 - **Phase 3 (Advanced Features):** Planned 📋

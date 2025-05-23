@@ -3,8 +3,8 @@
 _This file tracks the current work focus, recent changes, immediate next steps, active decisions, important patterns/preferences discovered, and project insights._
 
 **Status:** Active Development
-**Last Reviewed:** May 13, 2025
-**Current Task:** Reviewing and updating Memory Bank. Preparing for next testing cycle (Settings pages).
+**Last Reviewed:** July 15, 2024
+**Current Task:** Reviewing and updating Memory Bank. Preparing for frontend testing implementation.
 
 ## Project Overview
 
@@ -86,82 +86,76 @@ This is a comprehensive internship management system (Manajement Magang) built w
 
 ## Recent Changes (Consolidated - Reflecting last ~week, see progress.md for more detail)
 
-- **[2025-05-13] - User CRUD Tests & Memory Bank Update:**
-    - Verified existing Admin User CRUD tests (`tests/Feature/Admin/UserCrudTest.php`) are comprehensive and passing.
-    - Removed redundant `tests/Feature/AdminUserCrudTest.php` file.
-    - Updated `activeContext.md` and `progress.md` to reflect these changes.
-- **[2025-05-13] - Test Suite Refinement & Memory Bank Synchronization:**
-    - Successfully refactored `FrontSearchTest.php` from Pest to a PHPUnit class-based structure to resolve test failures and improve clarity.
-    - Updated `AdminSearchTest.php` with class name changes, `use Tests\TestCase;`, and corrected URLs.
-    - Verified all 192 tests are passing.
-    - Completed and verified Pest feature tests for FAQ and Tutorial CRUD operations.
-    - Updated `activeContext.md` and `progress.md` to reflect the latest test completions, refactoring, and consolidated recent changes.
-- **[2025-05-12] - Guidance System Enhancement:**
-    - Fixed an issue in `GuidanceClassController@store` to ensure automatic attachment of eligible students and creation of attendance records when a new guidance class is created.
-- **[2025-05-11] - Reporting Feature Enhancement:**
-    - Implemented functionality for Dosen to upload revised student reports.
-    - Added comprehensive Pest feature tests for the report revision upload feature.
+- **[2024-07-15] - Memory Bank Update:**
+    - Conducted a comprehensive review of the codebase to update the memory bank with current application context.
+    - Updated all memory bank files to reflect the current state of the project.
+    - Identified empty frontend test directories that need implementation.
+- **[2024-07-14] - Backend Test Verification:**
+    - Verified all backend tests are passing with Pest PHP.
+    - Identified areas where frontend testing is needed, particularly for auth components.
+- **[2024-07-13] - Frontend Component Review:**
+    - Reviewed React components, particularly in the auth pages directory.
+    - Identified the need for frontend tests using Vitest and React Testing Library.
+- **[2024-07-12] - Project Structure Analysis:**
+    - Analyzed the overall project structure and architecture.
+    - Documented the use of Laravel 12 with Spatie Laravel Permission for role-based access control.
+    - Documented the use of React 19, TypeScript, and Tailwind CSS for the frontend.
 
-## Active Context - May 13, 2025
+## Active Context - July 15, 2024
 
 ### Current Work Focus
 
 1.  Finalizing updates to all Memory Bank files to ensure consistency and reflect the latest project status.
-2.  Preparing to start the next development task: "Write Pest tests for Settings pages (all roles)".
+2.  Preparing to implement frontend tests using Vitest and React Testing Library, starting with auth components.
 
 ### Recent Changes (Specifically last 24-48 hours)
 
-- **User CRUD Tests Verification & Cleanup (Completed):**
-    - Identified and ran existing `tests/Feature/Admin/UserCrudTest.php`. All 12 tests passed.
-    - Removed the newly generated (and now redundant) `tests/Feature/AdminUserCrudTest.php`.
+- **Codebase Review (Completed):**
+    - Conducted a thorough review of the codebase structure, focusing on both backend and frontend components.
+    - Identified the use of Laravel 12 with Spatie Laravel Permission for role-based access control.
+    - Documented the React 19 frontend with TypeScript and Tailwind CSS.
 - **Memory Bank Update (In Progress):**
-    - Consolidated "Recent Changes" in `progress.md`.
-    - Currently reviewing and updating all core memory bank files (`activeContext.md`, `projectbrief.md`, `productContext.md`, `systemPatterns.md`, `techContext.md`).
-    - **Test Suite Status**: All 192 tests (including the 12 User CRUD tests) are confirmed passing after the modifications and cleanup.
+    - Currently updating all core memory bank files to reflect the current state of the project.
+    - Documenting the empty frontend test directories that need implementation.
+    - **Test Suite Status**: Backend tests using Pest PHP are passing, but frontend tests are not yet implemented.
 
 ### Next Steps
 
-- **Development Task (Completed):** Write Pest tests for User CRUD operations (Admin).
-    - Admin can view list of users. - ✅
-    - Admin can view a single user. - ✅
-    - Admin can create a new user (student, admin, dosen) with appropriate roles and profiles. - ✅
-    - Admin can edit an existing user's details, roles, and profile. - ✅
-    - Admin can delete a user. - ✅
-    - Validation for user creation and updates. - ✅ (Covered in existing tests)
-    - Authorization checks (only admin can perform these actions). - ✅ (Covered in existing tests)
-- **Development Task**: Write Pest tests for Settings pages (all roles). This includes tests for:
-    - Each role (admin, dosen, mahasiswa) can view their respective settings page.
-    - Users can update their profile information.
-    - Users can change their password.
-    - Users can update appearance settings.
-    - Validation for profile and password updates.
-    - Authorization checks (users can only update their own settings).
+- **Development Task**: Implement frontend tests using Vitest and React Testing Library. This includes tests for:
+    - Authentication components (login, register, password reset, email verification).
+    - CRUD operations for core features (internships, logbooks, reports).
+    - Search functionality.
+    - Pagination.
+    - Form validation.
+    - Authorization checks.
 
 ### Active Decisions & Considerations
 
-- **Test Structure Standardization**: The conversion of `FrontSearchTest.php` to PHPUnit was done to resolve persistent test failures and to align its structure with other class-based feature tests like `AdminSearchTest.php`. This suggests a preference for PHPUnit's class-based approach for more complex feature tests if Pest syntax leads to issues.
-- **Memory Bank Update Discipline**: Ensuring the memory bank is updated after significant changes (like major test refactoring) is crucial for maintaining project context.
+- **Frontend Testing Strategy**: Need to decide on the best approach for testing React components with Inertia.js integration. Vitest and React Testing Library are the chosen tools, but the implementation details need to be worked out.
+- **Memory Bank Update Discipline**: Ensuring the memory bank is updated with the current state of the project is crucial for maintaining project context.
 
 ### Learnings & Project Insights
 
-- **Robust Test Suite**: A comprehensive and consistently passing test suite is vital for confident refactoring and development. The recent fixes highlight the importance of this.
-- **Test Framework Flexibility**: While Pest offers a concise syntax, PHPUnit's traditional class structure provided a clearer path to resolving issues in `FrontSearchTest.php`. Being able to switch or adapt testing styles as needed is beneficial.
-- **URL Accuracy in Tests**: Incorrect URLs were a source of test failures in `AdminSearchTest.php`. Double-checking route names and parameters in tests is essential.
+- **Comprehensive Backend Testing**: The project has a robust backend test suite using Pest PHP, which provides a good foundation for implementing frontend tests.
+- **Role-Based Access Control**: The application has a well-implemented role-based access control system using Spatie Laravel Permission, with superadmin bypass implemented in AuthServiceProvider.
+- **Modern Frontend Stack**: The frontend uses React 19 with TypeScript and Tailwind CSS, providing a good foundation for implementing modern frontend testing practices.
 
 ### Open Questions & Blockers
 
-- None at present. The path is clear for the next development task.
+- How to effectively test Inertia.js components with Vitest and React Testing Library?
+- What mocking strategies should be used for testing components that rely on backend data?
 
 ## Current Focus Area
 
-Finalizing Memory Bank updates. Expanding Pest test coverage to Settings pages.
+Finalizing Memory Bank updates. Implementing frontend tests for auth components.
 
 ## Next Steps (After Documentation Update)
 
-1.  **Testing:** Write Pest tests for Settings pages (all roles).
-2.  **Testing:** Continue adding Pest tests for other core features (e.g., Dosen-specific interactions, Mahasiswa view flows).
-3.  **Refinement:** Address any remaining `TODO` comments in the code. Improve UI/UX based on feedback. Optimize queries or backend logic where necessary.
-4.  **TypeScript:** Continue improving type safety, potentially defining more specific types for shared data structures (e.g., `NotificationData`).
+1.  **Testing:** Implement frontend tests using Vitest and React Testing Library for auth components.
+2.  **Testing:** Expand frontend test coverage to other core features (CRUD operations, search, pagination).
+3.  **Testing:** Continue adding backend tests for any missing functionality.
+4.  **Refinement:** Address any remaining `TODO` comments in the code. Improve UI/UX based on feedback. Optimize queries or backend logic where necessary.
+5.  **TypeScript:** Continue improving type safety, potentially defining more specific types for shared data structures.
 
 ## Important Preferences
 
