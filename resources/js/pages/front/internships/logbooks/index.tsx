@@ -10,7 +10,7 @@ import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { ArrowLeft, FileCode, FileText, MoreVertical, Plus } from 'lucide-react';
 import { toast } from 'sonner';
-import { columns, initialColumnVisibility } from './components/column';
+import { createColumns, initialColumnVisibility, useUserRole } from './components/column';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -35,6 +35,9 @@ interface PageProps {
 }
 
 export default function LogbooksIndex({ internship, logbooks, totalLogbookCount, meta }: PageProps) {
+    const userRole = useUserRole();
+    const columns = createColumns(userRole);
+
     if (!internship.start_date || !internship.end_date || typeof internship.start_date !== 'string' || typeof internship.end_date !== 'string')
         return '-';
 

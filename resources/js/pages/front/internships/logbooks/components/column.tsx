@@ -17,10 +17,10 @@ import { router, usePage } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { Edit, MoreHorizontal, Pencil } from 'lucide-react';
+import { MoreHorizontal, Pencil } from 'lucide-react';
 
 // Get user role from auth
-const useUserRole = () => {
+export const useUserRole = () => {
     const { role } = usePage<SharedData>().props.auth;
     return {
         role,
@@ -30,7 +30,7 @@ const useUserRole = () => {
     };
 };
 
-export const columns: ColumnDef<Logbook>[] = [
+export const createColumns = (userRole: ReturnType<typeof useUserRole>): ColumnDef<Logbook>[] => [
     {
         id: 'select',
         header: ({ table }) => (
@@ -75,7 +75,7 @@ export const columns: ColumnDef<Logbook>[] = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="Catatan Pembimbing" />,
         cell: ({ row }) => {
             const notes = row.getValue('supervisor_notes');
-            const { isDosen } = useUserRole();
+            const { isDosen } = userRole;
             const logbook = row.original;
 
             // If no notes, show appropriate message
@@ -134,11 +134,10 @@ export const columns: ColumnDef<Logbook>[] = [
         id: 'actions',
         cell: ({ row }) => {
             const logbook = row.original;
-            const { isDosen, isMahasiswa, isAdmin } = useUserRole();
+            const { isDosen, isMahasiswa, isAdmin } = userRole;
 
             return (
                 <div className="flex items-center gap-2">
-
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -154,9 +153,7 @@ export const columns: ColumnDef<Logbook>[] = [
                             {/* Show edit option for mahasiswa (owner) or admin */}
                             {(isMahasiswa || isAdmin) && (
                                 <DropdownMenuItem asChild>
-                                    <a href={route('front.internships.logbooks.edit', [logbook.internship_id, logbook.id])}>
-                                        Ubah
-                                    </a>
+                                    <a href={route('front.internships.logbooks.edit', [logbook.internship_id, logbook.id])}>Ubah</a>
                                 </DropdownMenuItem>
                             )}
 
@@ -191,6 +188,9 @@ export const columns: ColumnDef<Logbook>[] = [
         },
     },
 ];
+
+// Legacy export for backwards compatibility
+export const columns: ColumnDef<Logbook>[] = [];
 
 export const initialColumnVisibility = {
     id: false,

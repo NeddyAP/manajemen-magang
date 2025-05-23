@@ -6,6 +6,7 @@ use App\Models\Internship;
 use App\Models\Logbook;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Spatie\Permission\Models\Role;
 use Tests\Helpers\PermissionTestHelper;
 use Tests\TestCase;
@@ -15,9 +16,13 @@ class LogbookDosenEditTest extends TestCase
     use RefreshDatabase;
 
     private User $dosen;
+
     private User $mahasiswa;
+
     private User $otherDosen;
+
     private Internship $internship;
+
     private Logbook $logbook;
 
     protected function setUp(): void
@@ -51,7 +56,7 @@ class LogbookDosenEditTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function dosen_can_view_edit_page_for_logbook_of_their_advisee()
     {
         $this->actingAs($this->dosen)
@@ -59,7 +64,7 @@ class LogbookDosenEditTest extends TestCase
             ->assertStatus(200);
     }
 
-    /** @test */
+    #[Test]
     public function dosen_cannot_view_edit_page_for_logbook_of_non_advisee()
     {
         $this->actingAs($this->otherDosen)
@@ -67,7 +72,7 @@ class LogbookDosenEditTest extends TestCase
             ->assertStatus(403);
     }
 
-    /** @test */
+    #[Test]
     public function dosen_can_update_only_supervisor_notes_field()
     {
         $updatedData = [
@@ -91,7 +96,7 @@ class LogbookDosenEditTest extends TestCase
         $this->assertEquals(now()->format('Y-m-d'), $this->logbook->date); // Should remain unchanged
     }
 
-    /** @test */
+    #[Test]
     public function mahasiswa_can_update_all_logbook_fields_except_supervisor_notes()
     {
         $originalNotes = 'Initial supervisor notes';
@@ -115,7 +120,7 @@ class LogbookDosenEditTest extends TestCase
         $this->assertEquals($originalNotes, $this->logbook->supervisor_notes); // Should remain unchanged
     }
 
-    /** @test */
+    #[Test]
     public function validation_works_for_dosen_updating_supervisor_notes()
     {
         // Test with very long supervisor_notes which should fail validation

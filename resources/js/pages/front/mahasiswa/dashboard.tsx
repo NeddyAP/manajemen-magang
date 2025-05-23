@@ -11,13 +11,15 @@ import { Internship, Logbook, Report } from '@/types/internship';
 import { Head } from '@inertiajs/react';
 
 // Define interfaces for upcomingClasses
-interface Student { // This should match the Student interface in UpcomingGuidanceClassesCard
+interface Student {
+    // This should match the Student interface in UpcomingGuidanceClassesCard
     id: number;
     name: string;
     // Add other relevant student properties if known
 }
 
-interface GuidanceClass { // This should match the GuidanceClass interface in UpcomingGuidanceClassesCard
+interface GuidanceClass {
+    // This should match the GuidanceClass interface in UpcomingGuidanceClassesCard
     id: number;
     title: string;
     description?: string;

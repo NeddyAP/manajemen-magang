@@ -4,7 +4,8 @@ import { UserRound } from 'lucide-react';
 
 // Define a more specific User type for this component's context
 interface AdvisorUser extends GlobalUser {
-    dosen_profile?: { // Ensure this matches the structure in GlobalUser
+    dosen_profile?: {
+        // Ensure this matches the structure in GlobalUser
         employee_number: string;
         expertise: string;
         academic_position: string;

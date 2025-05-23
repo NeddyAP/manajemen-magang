@@ -97,10 +97,15 @@ Route::get('/notifications', [NotificationController::class, 'history'])
     ->middleware(['auth', 'verified'])
     ->name('notifications.index');
 
-// Dosen Dashboard
+// Dosen Dashboard (redirects to internships index with dashboard view)
 Route::get('/dosen/dashboard', [DosenDashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'role:dosen'])
     ->name('dosen.dashboard');
+
+// Dosen Students Progress Dashboard
+Route::get('/dosen/students-progress', [DosenDashboardController::class, 'studentsProgress'])
+    ->middleware(['auth', 'verified', 'role:dosen'])
+    ->name('dosen.students-progress');
 
 // Mahasiswa Dashboard
 Route::get('/mahasiswa/dashboard', [MahasiswaDashboardController::class, 'index'])

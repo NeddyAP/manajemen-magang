@@ -12,6 +12,9 @@ import { ReportStatusCard } from '@/components/dashboard/mahasiswa/ReportStatusC
 import { UpcomingGuidanceClassesCard as MahasiswaUpcomingClassesCard } from '@/components/dashboard/mahasiswa/UpcomingGuidanceClassesCard';
 import { DatabaseNotification, User } from '@/types';
 import { Internship, Logbook, Report } from '@/types/internship';
+import { Link } from '@inertiajs/react';
+import { ChartBar } from 'lucide-react';
+import { Button } from '../ui/button';
 
 // Removed SupervisedStudent and Advisor interfaces as User type will be used directly.
 
@@ -74,8 +77,18 @@ export function DashboardView({ userRole, data }: DashboardViewProps) {
     if (userRole === 'dosen') {
         return (
             <div className="flex flex-col gap-4">
-                <h1 className="text-2xl font-bold">Dashboard Dosen</h1>
-                <p className="text-muted-foreground">Selamat datang di dashboard dosen. Berikut adalah ringkasan aktivitas dan tugas Anda.</p>
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold">Dashboard Dosen</h1>
+                        <p className="text-muted-foreground">Selamat datang di dashboard dosen. Berikut adalah ringkasan aktivitas dan tugas Anda.</p>
+                    </div>
+                    <Button asChild className="w-full md:w-auto">
+                        <Link href={route('dosen.students-progress')}>
+                            <ChartBar className="mr-2 h-4 w-4" />
+                            Lihat Progress Mahasiswa
+                        </Link>
+                    </Button>
+                </div>
 
                 {/* Top row - Additional info */}
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">

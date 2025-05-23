@@ -6,7 +6,8 @@ import { Button } from '../../ui/button';
 
 // Define a more specific User type for this component's context
 interface StudentUser extends GlobalUser {
-    mahasiswa_profile?: { // Ensure this matches the structure in GlobalUser
+    mahasiswa_profile?: {
+        // Ensure this matches the structure in GlobalUser
         student_number: string;
         study_program: string;
         // include other fields from GlobalUser.mahasiswa_profile if accessed
@@ -34,30 +35,34 @@ export function SupervisedStudentsCard({ students, totalAdvisees }: SupervisedSt
                     {students.length === 0 ? (
                         <p className="text-muted-foreground text-sm">Tidak ada mahasiswa bimbingan.</p>
                     ) : (
-                        students.map((student) => ( // student is now StudentUser
-                            <div key={student.id} className="flex items-center justify-between rounded-md border p-3 shadow-sm">
-                                <div>
-                                    <p className="text-sm font-medium">{student.name}</p>
-                                    <p className="text-muted-foreground text-xs">
-                                        {student.mahasiswa_profile?.student_number} - {student.mahasiswa_profile?.study_program}
-                                    </p>
+                        students.map(
+                            (
+                                student, // student is now StudentUser
+                            ) => (
+                                <div key={student.id} className="flex items-center justify-between rounded-md border p-3 shadow-sm">
+                                    <div>
+                                        <p className="text-sm font-medium">{student.name}</p>
+                                        <p className="text-muted-foreground text-xs">
+                                            {student.mahasiswa_profile?.student_number} - {student.mahasiswa_profile?.study_program}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        {(student.internships_count ?? 0) > 0 ? ( // Added nullish coalescing for safety
+                                            <span className="rounded bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">Aktif</span>
+                                        ) : (
+                                            <span className="rounded bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">Belum Magang</span>
+                                        )}
+                                    </div>
                                 </div>
-                                <div>
-                                    {(student.internships_count ?? 0) > 0 ? ( // Added nullish coalescing for safety
-                                        <span className="rounded bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">Aktif</span>
-                                    ) : (
-                                        <span className="rounded bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">Belum Magang</span>
-                                    )}
-                                </div>
-                            </div>
-                        ))
+                            ),
+                        )
                     )}
                 </div>
 
                 {students.length > 0 && totalAdvisees > students.length && (
                     <div className="mt-4">
                         <Button asChild variant="outline" className="w-full">
-                            <Link href={route('front.internships.index')}>Lihat Semua Mahasiswa</Link>
+                            <Link href={route('dosen.students-progress')}>Lihat Semua Mahasiswa</Link>
                         </Button>
                     </div>
                 )}

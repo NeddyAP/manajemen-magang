@@ -15,7 +15,7 @@ class UpdateLogbookRequest extends FormRequest
         $logbook = $this->route('logbook');
         $user = $this->user();
 
-        if (!$user || !$logbook) {
+        if (! $user || ! $logbook) {
             return false;
         }
 

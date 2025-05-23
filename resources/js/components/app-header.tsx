@@ -125,7 +125,11 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
         if (auth.permissions?.includes('admin.dashboard.view')) {
             computedRightNavItems.push({ title: 'Admin Dashboard', href: '/admin', icon: LayoutDashboard });
         } else if (auth.user.roles?.some((role) => role.name === 'dosen')) {
-            computedRightNavItems.push({ title: 'Dashboard Dosen', href: '/dosen/dashboard', icon: LayoutDashboard });
+            computedRightNavItems.push({
+                title: 'Dashboard Dosen',
+                href: route('front.internships.index', { view_preference: 'dashboard' }),
+                icon: LayoutDashboard,
+            });
         } else if (auth.user.roles?.some((role) => role.name === 'mahasiswa')) {
             computedRightNavItems.push({ title: 'Dashboard Mahasiswa', href: '/mahasiswa/dashboard', icon: LayoutDashboard });
         } else if (auth.permissions?.includes('internships.view')) {

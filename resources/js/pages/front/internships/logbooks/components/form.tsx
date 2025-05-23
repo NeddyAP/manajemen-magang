@@ -119,10 +119,11 @@ export default function LogbookForm({ logbook, mode, internshipId }: Props) {
                             <InputError message={errors.supervisor_notes} />
                         </div>
                     ) : (
-                        mode === 'edit' && data.supervisor_notes && (
+                        mode === 'edit' &&
+                        data.supervisor_notes && (
                             <div className="space-y-4">
                                 <Label htmlFor="supervisor_notes_display">Catatan Pembimbing</Label>
-                                <div className="rounded-md border border-input bg-gray-50 p-3 dark:bg-gray-900">
+                                <div className="border-input rounded-md border bg-gray-50 p-3 dark:bg-gray-900">
                                     {data.supervisor_notes || 'Belum ada catatan dari pembimbing.'}
                                 </div>
                             </div>

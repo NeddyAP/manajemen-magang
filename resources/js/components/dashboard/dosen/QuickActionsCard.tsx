@@ -1,14 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from '@inertiajs/react';
-import { Calendar, ClipboardList, FileText, Lightbulb, Users } from 'lucide-react';
+import { Calendar, ChartBar, ClipboardList, FileText, Lightbulb, Users } from 'lucide-react';
 
 export function QuickActionsCard() {
     const actions = [
         {
+            title: 'Pantau Kemajuan',
+            description: 'Pantau kemajuan mahasiswa bimbingan',
+            icon: <ChartBar className="h-5 w-5" />,
+            href: route('dosen.students-progress'),
+        },
+        {
             title: 'Kelola Mahasiswa',
             description: 'Lihat dan kelola mahasiswa bimbingan',
             icon: <Users className="h-5 w-5" />,
-            href: route('front.internships.index'),
+            href: route('front.internships.applicants.index'),
         },
         {
             title: 'Review Logbook',
