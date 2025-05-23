@@ -24,6 +24,9 @@ class InternshipApplicantController extends Controller
      */
     public function index(Request $request)
     {
+        // Check if user has permission to view internships
+        $this->authorize('viewAny', Internship::class);
+
         $user = Auth::user();
         $query = Internship::query();
 
@@ -185,7 +188,8 @@ class InternshipApplicantController extends Controller
      */
     public function create()
     {
-        abort_unless(auth()->user()->hasRole('mahasiswa'), 403, 'Hanya mahasiswa yang dapat membuat aplikasi magang.');
+        // Check if user has permission to create internships
+        $this->authorize('create', Internship::class);
 
         $user = Auth::user();
         $profile = MahasiswaProfile::where('user_id', $user->id)->first();
@@ -201,11 +205,14 @@ class InternshipApplicantController extends Controller
      */
     public function store(StoreInternshipRequest $request)
     {
+        // Check if user has permission to create internships
+        $this->authorize('create', Internship::class);
+
         $validated = $request->validated();
 
         // Handle file upload
         if ($request->hasFile('application_file')) {
-            $path = $request->file('application_file')->store('internship_applications', 'public');
+            $path = $request->file('application_file')->store('internships/applications', 'public');
             $validated['application_file'] = $path;
         }
 
@@ -230,7 +237,8 @@ class InternshipApplicantController extends Controller
      */
     public function edit(Internship $internship)
     {
-        abort_if($internship->user_id !== auth()->id(), 403, 'Tindakan tidak sah.');
+        // Check if user has permission to update this internship
+        $this->authorize('update', $internship);
 
         $internship->loadMissing('user.mahasiswaProfile'); // Ensure relationships are loaded
 
@@ -250,9 +258,10 @@ class InternshipApplicantController extends Controller
      */
     public function update(UpdateInternshipRequest $request, Internship $internship)
     {
-        abort_if($internship->user_id !== auth()->id(), 403, 'Tindakan tidak sah.');
+        // Check if user has permission to update this internship
+        $this->authorize('update', $internship);
 
-        // Only prevent updates if status is accepted (for mahasiswa)
+        // Only prevent updates if status is accepted
         if ($internship->status === 'accepted') {
             return redirect()->back()->with('error', 'Anda tidak dapat memperbarui aplikasi yang sudah diterima.');
         }
@@ -266,7 +275,7 @@ class InternshipApplicantController extends Controller
                 Storage::disk('public')->delete($internship->application_file);
             }
 
-            $path = $request->file('application_file')->store('internship_applications', 'public');
+            $path = $request->file('application_file')->store('internships/applications', 'public');
             $validated['application_file'] = $path;
         } else {
             // If no new file is uploaded, keep the existing file
@@ -287,7 +296,8 @@ class InternshipApplicantController extends Controller
      */
     public function destroy(Internship $internship)
     {
-        abort_if($internship->user_id !== auth()->id(), 403, 'Tindakan tidak sah.');
+        // Check if user has permission to delete this internship
+        $this->authorize('delete', $internship);
 
         // Prevent deletion if status is accepted
         if ($internship->status === 'accepted') {
@@ -317,25 +327,33 @@ class InternshipApplicantController extends Controller
 
         $user = Auth::user();
 
-        // Mahasiswa can only bulk delete their own 'waiting' applications
-        if ($user->hasRole('mahasiswa')) {
-            $internships = Internship::whereIn('id', $validated['ids'])
-                ->where('user_id', $user->id)
-                ->where('status', 'waiting')
-                ->get();
+        // Check if user has permission to delete internships
+        if ($user->can('internships.delete')) {
+            $query = Internship::whereIn('id', $validated['ids']);
+
+            // If not admin, only allow deleting own waiting applications
+            if (! $user->can('admin.dashboard.view')) {
+                $query->where('user_id', $user->id)
+                    ->where('status', 'waiting');
+            }
+
+            $internships = $query->get();
 
             foreach ($internships as $internship) {
-                // Delete application file
-                if ($internship->application_file) {
-                    Storage::disk('public')->delete($internship->application_file);
+                // Check if user can delete this specific internship
+                if ($user->can('delete', $internship)) {
+                    // Delete application file
+                    if ($internship->application_file) {
+                        Storage::disk('public')->delete($internship->application_file);
+                    }
+                    $internship->delete();
                 }
-                $internship->delete();
             }
 
             return back()->with('success', 'Aplikasi magang yang dipilih berhasil dihapus!');
         } else {
-            // Dosen or other roles cannot bulk delete via this method
-            return back()->with('error', 'Tindakan tidak sah untuk penghapusan massal.');
+            // User doesn't have permission to delete internships
+            return back()->with('error', 'Anda tidak memiliki izin untuk menghapus aplikasi magang.');
         }
     }
 
@@ -344,23 +362,8 @@ class InternshipApplicantController extends Controller
      */
     public function downloadApplicationFile(Internship $internship)
     {
-        $user = Auth::user();
-
-        // Check if user is authorized (owns the internship or is the advisor Dosen)
-        $isOwner = $internship->user_id === $user->id;
-        $isAdvisor = false;
-
-        if ($user->hasRole('dosen')) {
-            $dosenProfile = DosenProfile::where('user_id', $user->id)->first();
-            if ($dosenProfile) {
-                $adviseeProfile = MahasiswaProfile::where('user_id', $internship->user_id)
-                    ->where('advisor_id', $dosenProfile->user_id)
-                    ->first();
-                $isAdvisor = (bool) $adviseeProfile;
-            }
-        }
-
-        abort_if(! $isOwner && ! $isAdvisor && ! $user->hasRole('admin'), 403, 'Tindakan tidak sah.');
+        // Check if user has permission to view this internship
+        $this->authorize('view', $internship);
 
         if (! $internship->application_file || ! Storage::disk('public')->exists($internship->application_file)) {
             return back()->with('error', 'Berkas aplikasi tidak ditemukan.');

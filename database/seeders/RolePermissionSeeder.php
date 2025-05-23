@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -23,88 +22,59 @@ class RolePermissionSeeder extends Seeder
      */
     public function run()
     {
-
-        /**
-         * Enable these options if you need same role and other permission for User Model
-         * Else, please follow the below steps for admin guard
-         */
-
-        // Create Roles and Permissions
+        // Create Roles
         $superadmin = Role::create(['name' => 'superadmin']);
         $admin = Role::create(['name' => 'admin']);
         $dosen = Role::create(['name' => 'dosen']);
         $mahasiswa = Role::create(['name' => 'mahasiswa']);
 
-        // Create permissions
-        $permissions = [
-            // superadmin Permissions
-            'superadmin.create',
-            'superadmin.view',
-            'superadmin.edit',
-            'superadmin.delete',
-            'superadmin.approve',
-
-            // admin Permissions
-            'admin.create',
-            'admin.view',
-            'admin.edit',
-            'admin.delete',
-            'admin.approve',
-
-            // dosen Permissions
-            'dosen.create',
-            'dosen.view',
-            'dosen.edit',
-            'dosen.delete',
-            'dosen.approve',
-
-            // mahasiswa Permissions
-            'mahasiswa.create',
-            'mahasiswa.view',
-            'mahasiswa.edit',
-            'mahasiswa.delete',
-            'mahasiswa.approve',
+        // Define permissions by resource
+        $permissionGroups = [
+            'internships' => ['create', 'view', 'edit', 'delete', 'approve', 'reject'],
+            'logbooks' => ['create', 'view', 'edit', 'delete', 'add_notes'],
+            'reports' => ['create', 'view', 'edit', 'delete', 'approve', 'reject', 'comment'],
+            'guidance-classes' => ['create', 'view', 'edit', 'delete', 'attend', 'take_attendance'],
+            'users' => ['create', 'view', 'edit', 'delete', 'assign_role'],
+            'admin' => ['dashboard.view', 'settings.edit', 'analytics.view'],
         ];
 
-        foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+        // Create permissions
+        $allPermissions = [];
+        foreach ($permissionGroups as $group => $actions) {
+            foreach ($actions as $action) {
+                $permissionName = "$group.$action";
+                Permission::create(['name' => $permissionName]);
+                $allPermissions[] = $permissionName;
+            }
         }
 
-        $superadmin->givePermissionTo([
-            // superadmin Permissions
-            'superadmin.create',
-            'superadmin.view',
-            'superadmin.edit',
-            'superadmin.delete',
-            'superadmin.approve',
-        ]);
+        // Assign all permissions to superadmin
+        $superadmin->givePermissionTo($allPermissions);
 
-        // Assign permissions to roles
+        // Assign permissions to admin
         $admin->givePermissionTo([
-            // admin Permissions
-            'admin.create',
-            'admin.view',
-            'admin.edit',
-            'admin.delete',
-            'admin.approve',
+            'internships.view', 'internships.approve', 'internships.reject',
+            'logbooks.view', 'logbooks.add_notes',
+            'reports.view', 'reports.approve', 'reports.reject', 'reports.comment',
+            'guidance-classes.view', 'guidance-classes.create', 'guidance-classes.edit', 'guidance-classes.delete',
+            'users.create', 'users.view', 'users.edit', 'users.delete', 'users.assign_role',
+            'admin.dashboard.view', 'admin.settings.edit', 'admin.analytics.view',
         ]);
 
+        // Assign permissions to dosen
         $dosen->givePermissionTo([
-            // dosen Permissions
-            'dosen.create',
-            'dosen.view',
-            'dosen.edit',
-            'dosen.delete',
-            'dosen.approve',
+            'internships.view', 'internships.approve', 'internships.reject',
+            'logbooks.view', 'logbooks.add_notes',
+            'reports.view', 'reports.approve', 'reports.reject', 'reports.comment',
+            'guidance-classes.create', 'guidance-classes.view', 'guidance-classes.edit', 'guidance-classes.delete', 'guidance-classes.take_attendance',
         ]);
 
+        // Assign permissions to mahasiswa
         $mahasiswa->givePermissionTo([
-            // mahasiswa Permissions
-            'mahasiswa.create',
-            'mahasiswa.view',
-            'mahasiswa.edit',
-            'mahasiswa.delete',
-            'mahasiswa.approve',
+            'internships.create', 'internships.view', 'internships.edit',
+            'logbooks.create', 'logbooks.view', 'logbooks.edit',
+            'reports.create', 'reports.view', 'reports.edit', 'reports.delete',
+            'guidance-classes.view', 'guidance-classes.attend',
         ]);
 
         // Create and Assign Permissions

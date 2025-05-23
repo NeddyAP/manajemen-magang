@@ -45,10 +45,10 @@ export const initialColumnVisibility: VisibilityState = {
 function UploadRevisionCell({ row }: { row: Row<Report> }) {
     const report = row.original;
     const { auth } = usePage<PageProps>().props;
-    const user = auth.user;
 
-    const isAdvisorOrAdmin = user.roles?.some((role: { name: string }) => ['dosen', 'admin'].includes(role.name)) ?? false;
-    const canUploadRevision = isAdvisorOrAdmin && (report.status === 'approved' || report.status === 'rejected');
+    const canUploadRevision =
+        (auth.permissions?.includes('reports.edit') || auth.permissions?.includes('reports.comment')) &&
+        (report.status === 'approved' || report.status === 'rejected');
 
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
@@ -93,11 +93,11 @@ function ReportActionsCell({ row }: { row: Row<Report> }) {
     const user = auth.user;
 
     const isOwner = user.id === report.user_id;
-    const isAdvisorOrAdmin = user.roles?.some((role: { name: string }) => ['dosen', 'admin'].includes(role.name)) ?? false;
 
-    const canEdit = isOwner && report.status !== 'approved';
-    const canDelete = isOwner;
-    const canApproveReject = isAdvisorOrAdmin && report.status === 'pending';
+    // Use permissions instead of roles
+    const canEdit = isOwner && report.status !== 'approved' && auth.permissions?.includes('reports.edit');
+    const canDelete = isOwner && auth.permissions?.includes('reports.delete');
+    const canApproveReject = auth.permissions?.includes('reports.approve') && report.status === 'pending';
 
     const [rejectionNote, setRejectionNote] = useState('');
 

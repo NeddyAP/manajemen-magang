@@ -18,8 +18,8 @@ class ReportPolicy
      */
     public function viewAny(User $user)
     {
-        // Assuming any authenticated user associated with an internship can see their list of reports
-        return $user->hasRole('mahasiswa');
+        // Check if user has permission to view reports
+        return $user->can('reports.view');
     }
 
     /**
@@ -29,6 +29,27 @@ class ReportPolicy
      */
     public function view(User $user, Report $report)
     {
+        // If user doesn't have permission to view reports, deny access
+        if (! $user->can('reports.view')) {
+            return false;
+        }
+
+        // Admin with proper permissions can view any report
+        if ($user->can('admin.dashboard.view')) {
+            return true;
+        }
+
+        // Dosen can view reports of their advisees
+        if ($user->can('reports.approve')) {
+            $internship = $report->internship;
+            if ($internship && $internship->user && $internship->user->mahasiswaProfile) {
+                if ($internship->user->mahasiswaProfile->advisor_id === $user->id) {
+                    return true;
+                }
+            }
+        }
+
+        // User can view their own reports
         return $user->id === $report->user_id;
     }
 
@@ -39,10 +60,8 @@ class ReportPolicy
      */
     public function create(User $user)
     {
-        // Logic to check if user has an active internship, etc.
-        // For now, allowing any mahasiswa to attempt creation,
-        // controller/request validation will handle specific internship checks.
-        return $user->hasRole('mahasiswa');
+        // Check if user has permission to create reports
+        return $user->can('reports.create');
     }
 
     /**
@@ -52,6 +71,12 @@ class ReportPolicy
      */
     public function update(User $user, Report $report)
     {
+        // If user doesn't have permission to edit reports, deny access
+        if (! $user->can('reports.edit')) {
+            return false;
+        }
+
+        // Only allow editing if the report is pending or rejected
         return $user->id === $report->user_id &&
                ($report->status === 'pending' || $report->status === 'rejected');
     }
@@ -63,6 +88,12 @@ class ReportPolicy
      */
     public function delete(User $user, Report $report)
     {
+        // If user doesn't have permission to delete reports, deny access
+        if (! $user->can('reports.delete')) {
+            return false;
+        }
+
+        // Only allow deletion if the report is pending and belongs to the user
         return $user->id === $report->user_id && $report->status === 'pending';
     }
 
@@ -73,16 +104,20 @@ class ReportPolicy
      */
     public function approveOrReject(User $user, Report $report)
     {
-        if ($user->hasRole('admin')) {
+        // Check if user has permission to approve reports
+        if (! $user->can('reports.approve')) {
+            return false;
+        }
+
+        // Admin with proper permissions can approve any report
+        if ($user->can('admin.dashboard.view')) {
             return true;
         }
 
-        if ($user->hasRole('dosen')) {
-            // Check if the Dosen is the advisor for the student who owns the internship related to the report
-            $internship = $report->internship;
-            if ($internship && $internship->user && $internship->user->mahasiswaProfile) {
-                return $internship->user->mahasiswaProfile->advisor_id === $user->id;
-            }
+        // Dosen can only approve reports of their advisees
+        $internship = $report->internship;
+        if ($internship && $internship->user && $internship->user->mahasiswaProfile) {
+            return $internship->user->mahasiswaProfile->advisor_id === $user->id;
         }
 
         return false;
@@ -95,7 +130,8 @@ class ReportPolicy
      */
     public function restore(User $user, Report $report)
     {
-        return false; // Or implement if needed
+        // Only admin can restore deleted reports
+        return $user->can('admin.dashboard.view');
     }
 
     /**
@@ -105,6 +141,7 @@ class ReportPolicy
      */
     public function forceDelete(User $user, Report $report)
     {
-        return false; // Or implement if needed
+        // Only admin can force delete reports
+        return $user->can('admin.dashboard.view');
     }
 }

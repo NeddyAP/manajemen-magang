@@ -42,6 +42,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
                 'role' => $request->user()?->roles?->first()?->name,
+                'permissions' => $request->user()?->getAllPermissions()->pluck('name'),
                 'mahasiswa_profile' => $request->user()?->mahasiswa_profile,
                 'dosen_profile' => $request->user()?->dosen_profile,
                 'admin_profile' => $request->user()?->admin_profile,

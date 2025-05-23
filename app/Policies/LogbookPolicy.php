@@ -12,10 +12,8 @@ class LogbookPolicy
      */
     public function viewAny(User $user): bool
     {
-        // Mahasiswa can view their own logbooks, Dosen can view their advisees'
-        // Admin can view all. This is typically handled in the controller query.
-        // For a general policy, allow if user has a relevant role.
-        return $user->hasAnyRole(['mahasiswa', 'dosen', 'admin']);
+        // Check if user has permission to view logbooks
+        return $user->can('logbooks.view');
     }
 
     /**
@@ -23,25 +21,31 @@ class LogbookPolicy
      */
     public function view(User $user, Logbook $logbook): bool
     {
-        // Mahasiswa can view their own logbook.
-        if ($user->hasRole('mahasiswa')) {
-            return $user->id === $logbook->user_id;
+        // If user doesn't have the permission, deny access
+        if (! $user->can('logbooks.view')) {
+            return false;
         }
 
-        // Dosen can view logbooks of their advisees.
-        if ($user->hasRole('dosen')) {
-            // Ensure logbook has an associated user and internship
-            if (! $logbook->user || ! $logbook->internship || ! $logbook->internship->user) {
-                return false;
-            }
-            // Check if the logbook's user (student) is an advisee of the current dosen
-            $studentProfile = $logbook->internship->user->mahasiswaProfile;
-
-            return $studentProfile && $studentProfile->advisor_id === $user->id;
+        // Admin with proper permissions can view any logbook
+        if ($user->can('admin.dashboard.view')) {
+            return true;
         }
 
-        // Admin can view any logbook.
-        return $user->hasRole('admin');
+        // Mahasiswa can view their own logbook
+        if ($user->id === $logbook->user_id) {
+            return true;
+        }
+
+        // Dosen can view logbooks of their advisees
+        // Ensure logbook has an associated user and internship
+        if (! $logbook->user || ! $logbook->internship || ! $logbook->internship->user) {
+            return false;
+        }
+
+        // Check if the logbook's user (student) is an advisee of the current dosen
+        $studentProfile = $logbook->internship->user->mahasiswaProfile;
+
+        return $studentProfile && $studentProfile->advisor_id === $user->id;
     }
 
     /**
@@ -49,9 +53,8 @@ class LogbookPolicy
      */
     public function create(User $user): bool
     {
-        // Only mahasiswa can create logbooks for their active internships.
-        // Further checks (e.g., active internship) are in FormRequest/Controller.
-        return $user->hasRole('mahasiswa');
+        // Check if user has permission to create logbooks
+        return $user->can('logbooks.create');
     }
 
     /**
@@ -59,15 +62,23 @@ class LogbookPolicy
      */
     public function update(User $user, Logbook $logbook): bool
     {
-        // Mahasiswa can update their own logbook.
-        if ($user->hasRole('mahasiswa')) {
-            return $user->id === $logbook->user_id;
+        // If user doesn't have the permission, deny access
+        if (! $user->can('logbooks.edit')) {
+            return false;
         }
 
-        // Dosen can update supervisor_notes on logbooks of their advisees.
-        // This policy method might need to be more granular if different fields have different update permissions.
-        // For now, if a Dosen is an advisor, they can update (controller/request should limit fields).
-        if ($user->hasRole('dosen')) {
+        // Admin with proper permissions can update any logbook
+        if ($user->can('admin.dashboard.view')) {
+            return true;
+        }
+
+        // Mahasiswa can update their own logbook
+        if ($user->can('logbooks.edit') && $user->id === $logbook->user_id) {
+            return true;
+        }
+
+        // Dosen can add notes to logbooks of their advisees
+        if ($user->can('logbooks.add_notes')) {
             if (! $logbook->user || ! $logbook->internship || ! $logbook->internship->user) {
                 return false;
             }
@@ -76,8 +87,7 @@ class LogbookPolicy
             return $studentProfile && $studentProfile->advisor_id === $user->id;
         }
 
-        // Admin can update any logbook.
-        return $user->hasRole('admin');
+        return false;
     }
 
     /**
@@ -85,13 +95,18 @@ class LogbookPolicy
      */
     public function delete(User $user, Logbook $logbook): bool
     {
-        // Mahasiswa can delete their own logbook.
-        if ($user->hasRole('mahasiswa')) {
-            return $user->id === $logbook->user_id;
+        // If user doesn't have the permission, deny access
+        if (! $user->can('logbooks.delete')) {
+            return false;
         }
 
-        // Admin can delete any logbook.
-        return $user->hasRole('admin');
+        // Admin with proper permissions can delete any logbook
+        if ($user->can('admin.dashboard.view')) {
+            return true;
+        }
+
+        // Mahasiswa can delete their own logbook
+        return $user->id === $logbook->user_id;
     }
 
     /**
@@ -99,7 +114,7 @@ class LogbookPolicy
      */
     public function restore(User $user, Logbook $logbook): bool
     {
-        return false;
+        return $user->can('admin.dashboard.view');
     }
 
     /**
@@ -107,6 +122,6 @@ class LogbookPolicy
      */
     public function forceDelete(User $user, Logbook $logbook): bool
     {
-        return false;
+        return $user->can('admin.dashboard.view');
     }
 }

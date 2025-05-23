@@ -2,9 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Models\DosenProfile;
 use App\Models\Internship;
-use App\Models\MahasiswaProfile;
 use App\Models\Report;
 use App\Models\User;
 use App\Notifications\Reports\ReportRevisionUploaded;
@@ -13,6 +11,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
+use Tests\Helpers\PermissionTestHelper;
 
 uses(RefreshDatabase::class);
 
@@ -23,19 +22,20 @@ beforeEach(function (): void {
     // Create roles
     Role::create(['name' => 'dosen', 'guard_name' => 'web']);
     Role::create(['name' => 'mahasiswa', 'guard_name' => 'web']);
+    Role::create(['name' => 'admin', 'guard_name' => 'web']);
+    Role::create(['name' => 'superadmin', 'guard_name' => 'web']);
 
-    // Create Dosen user
-    $this->dosenUser = User::factory()->create();
-    $this->dosenUser->assignRole('dosen');
-    DosenProfile::factory()->create(['user_id' => $this->dosenUser->id]);
+    // Create Dosen user with proper permissions
+    $this->dosenUser = PermissionTestHelper::createUserWithRoleAndPermissions('dosen');
 
-    // Create Mahasiswa user
-    $this->mahasiswaUser = User::factory()->create();
-    $this->mahasiswaUser->assignRole('mahasiswa');
-    MahasiswaProfile::factory()->create(['user_id' => $this->mahasiswaUser->id, 'advisor_id' => $this->dosenUser->id]);
+    // Create Mahasiswa user with proper permissions
+    $this->mahasiswaUser = PermissionTestHelper::createUserWithRoleAndPermissions('mahasiswa');
+
+    // Update mahasiswa profile to set advisor relationship
+    $this->mahasiswaUser->mahasiswaProfile->update(['advisor_id' => $this->dosenUser->dosenProfile->id]);
 
     // Create Internship
-    $this->internship = Internship::factory()->create(['user_id' => $this->mahasiswaUser->id]);
+    $this->internship = PermissionTestHelper::createActiveInternshipForMahasiswa($this->mahasiswaUser);
 
     // Create a report (default to approved status)
     $this->report = Report::factory()->create([

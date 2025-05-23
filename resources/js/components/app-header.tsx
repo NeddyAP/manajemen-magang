@@ -120,11 +120,11 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     };
 
     const computedRightNavItems: NavItem[] = [];
-    if (auth?.role) {
-        const roleName = auth.role;
-        if (roleName && ['admin', 'superadmin'].includes(roleName)) {
+    if (auth?.user) {
+        // Use permissions instead of roles
+        if (auth.permissions?.includes('admin.dashboard.view')) {
             computedRightNavItems.push({ title: 'Dashboard', href: '/admin', icon: LayoutDashboard });
-        } else if (roleName && ['mahasiswa', 'dosen'].includes(roleName)) {
+        } else if (auth.permissions?.includes('internships.view')) {
             computedRightNavItems.push({ title: 'Dashboard', href: '/internships', icon: LayoutDashboard });
         }
         computedRightNavItems.push({ title: 'Panduan', href: '/buku-panduan', icon: BookOpen });

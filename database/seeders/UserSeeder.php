@@ -25,13 +25,14 @@ class UserSeeder extends Seeder
             );
         }
 
-        // Create Mahasiswa Users (advisor assignment is handled in UserFactory@mahasiswa)
-        User::factory()->count(20)->mahasiswa()->create([
-            // You can override default factory values here if needed for the 20 users,
-            // but for unique emails and names, the factory's definition() is usually sufficient.
-            // If specific naming like 'Mahasiswa X' is needed, a loop might be better,
-            // but the request was to simplify.
-        ]);
+        // Create Mahasiswa Users with specific emails and password
+        for ($i = 1; $i <= 20; $i++) {
+            User::factory()->mahasiswa()->create([
+                'name' => 'Mahasiswa '.$i,
+                'email' => "mahasiswa{$i}@example.com",
+                'password' => Hash::make('a'),
+            ]);
+        }
 
         // Create Test Mahasiswa User (advisor assignment is handled in UserFactory@mahasiswa)
         User::factory()->mahasiswa()->create([

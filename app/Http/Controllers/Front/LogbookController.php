@@ -161,7 +161,9 @@ class LogbookController extends Controller
 
     public function create(Internship $internship)
     {
-        abort_if($internship->user_id !== auth()->id() || $internship->status !== 'accepted', 403, 'Unauthorized action.');
+        // Check if user can create logbooks and if internship is accepted
+        $this->authorize('create', Logbook::class);
+        abort_if($internship->status !== 'accepted', 403, 'Internship must be accepted to create logbooks.');
 
         return Inertia::render('front/internships/logbooks/create', [
             'internship' => $internship,
@@ -170,7 +172,9 @@ class LogbookController extends Controller
 
     public function store(StoreLogbookRequest $request, Internship $internship)
     {
-        abort_if($internship->user_id !== auth()->id() || $internship->status !== 'accepted', 403, 'Unauthorized action or internship not accepted.');
+        // Check if user can create logbooks and if internship is accepted
+        $this->authorize('create', Logbook::class);
+        abort_if($internship->status !== 'accepted', 403, 'Internship must be accepted to create logbooks.');
 
         $validated = $request->validated();
 
@@ -193,7 +197,11 @@ class LogbookController extends Controller
 
     public function edit(Internship $internship, Logbook $logbook)
     {
-        abort_if((! auth()->user()->hasRole('dosen') && $internship->user_id !== auth()->id()) || $logbook->internship_id !== $internship->id, 403, 'Unauthorized action.');
+        // Check if user can edit this logbook
+        $this->authorize('update', $logbook);
+
+        // Ensure the logbook belongs to the internship
+        abort_if($logbook->internship_id !== $internship->id, 404, 'Logbook not found for this internship.');
 
         return Inertia::render('front/internships/logbooks/edit', [
             'internship' => $internship,
@@ -203,15 +211,19 @@ class LogbookController extends Controller
 
     public function update(UpdateLogbookRequest $request, Internship $internship, Logbook $logbook)
     {
-        abort_if($logbook->internship_id !== $internship->id, 404);
-        // Additional check if Dosen is trying to update notes vs student updating their entry
-        if (auth()->user()->hasRole('dosen')) {
-            $validated['supervisor_notes'] = $request->input('supervisor_notes');
-        }
+        // Check if user can update this logbook
+        $this->authorize('update', $logbook);
+
+        // Ensure the logbook belongs to the internship
+        abort_if($logbook->internship_id !== $internship->id, 404, 'Logbook not found for this internship.');
 
         $validated = $request->validated();
 
-        // If a Dosen is updating, they might only be allowed to update supervisor_notes
+        // If user has permission to add notes but not edit the whole logbook
+        if (auth()->user()->can('logbooks.add_notes') && ! auth()->user()->can('logbooks.edit')) {
+            // Only allow updating supervisor_notes
+            $validated = ['supervisor_notes' => $request->input('supervisor_notes')];
+        }
 
         $logbook->update($validated);
 
@@ -364,22 +376,35 @@ class LogbookController extends Controller
 
     private function authorizeAccess(Internship $internship)
     {
-        $user = Auth::user();
-        $isOwner = $internship->user_id === $user->id;
-        $isAdvisor = false;
-
-        if ($user->hasRole('dosen')) {
-            $dosenProfile = DosenProfile::where('user_id', $user->id)->first();
-            if ($dosenProfile) {
-                // Ensure $internship->user_id is the student's user_id
-                // And the student's advisor_id matches the current dosen's user_id
-                $studentProfile = MahasiswaProfile::where('user_id', $internship->user_id)->first();
-                if ($studentProfile && $studentProfile->advisor_id === $dosenProfile->user_id) {
-                    $isAdvisor = true;
-                }
-            }
+        // Check if user has permission to view logbooks
+        if (! Auth::user()->can('logbooks.view')) {
+            abort(403, 'You do not have permission to view logbooks.');
         }
 
-        abort_if((! $isOwner && ! $isAdvisor) || $internship->status !== 'accepted', 403, 'Akses tidak diizinkan atau status magang belum diterima.');
+        // Check if internship is accepted
+        if ($internship->status !== 'accepted') {
+            abort(403, 'Internship must be accepted to view logbooks.');
+        }
+
+        $user = Auth::user();
+        $isOwner = $internship->user_id === $user->id;
+
+        // If not the owner, check if user is the advisor
+        if (! $isOwner) {
+            $isAdvisor = false;
+
+            // Get the student's profile
+            $studentProfile = MahasiswaProfile::where('user_id', $internship->user_id)->first();
+
+            // Check if current user is the advisor
+            if ($studentProfile && $studentProfile->advisor_id === $user->id) {
+                $isAdvisor = true;
+            }
+
+            // If not owner or advisor, deny access
+            if (! $isAdvisor) {
+                abort(403, 'You do not have permission to view this internship\'s logbooks.');
+            }
+        }
     }
 }

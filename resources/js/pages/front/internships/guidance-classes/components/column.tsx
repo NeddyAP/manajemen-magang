@@ -142,10 +142,13 @@ export const initialColumnVisibility = {
 
 // Create a proper React component for the actions cell
 const ActionsCell = ({ row }: { row: { original: GuidanceClass } }) => {
-    const { user } = usePage<SharedData>().props.auth;
+    const { user, permissions } = usePage<SharedData>().props.auth;
     const guidanceClass = row.original;
-    const isDosen = user?.roles?.[0]?.name === 'dosen';
-    const isLecturer = isDosen && guidanceClass.lecturer && user.id === guidanceClass.lecturer.id;
+
+    // Check if user has permission to edit/delete and is the lecturer of this class
+    const canEdit = permissions?.includes('guidance-classes.edit') && guidanceClass.lecturer && user.id === guidanceClass.lecturer.id;
+
+    const canDelete = permissions?.includes('guidance-classes.delete') && guidanceClass.lecturer && user.id === guidanceClass.lecturer.id;
 
     return (
         <DropdownMenu>
@@ -162,24 +165,24 @@ const ActionsCell = ({ row }: { row: { original: GuidanceClass } }) => {
                 <DropdownMenuItem asChild>
                     <Link href={route('front.internships.guidance-classes.show', guidanceClass.id)}>Lihat Detail</Link>
                 </DropdownMenuItem>
-                {isLecturer && (
-                    <>
-                        <DropdownMenuItem asChild>
-                            <Link href={route('front.internships.guidance-classes.edit', guidanceClass.id)}>Edit</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                            className="text-red-500"
-                            onClick={() => {
-                                if (confirm('Apakah Anda yakin ingin menghapus kelas bimbingan ini?')) {
-                                    router.delete(route('front.internships.guidance-classes.destroy', guidanceClass.id), {
-                                        preserveScroll: true,
-                                    });
-                                }
-                            }}
-                        >
-                            Hapus
-                        </DropdownMenuItem>
-                    </>
+                {canEdit && (
+                    <DropdownMenuItem asChild>
+                        <Link href={route('front.internships.guidance-classes.edit', guidanceClass.id)}>Edit</Link>
+                    </DropdownMenuItem>
+                )}
+                {canDelete && (
+                    <DropdownMenuItem
+                        className="text-red-500"
+                        onClick={() => {
+                            if (confirm('Apakah Anda yakin ingin menghapus kelas bimbingan ini?')) {
+                                router.delete(route('front.internships.guidance-classes.destroy', guidanceClass.id), {
+                                    preserveScroll: true,
+                                });
+                            }
+                        }}
+                    >
+                        Hapus
+                    </DropdownMenuItem>
                 )}
             </DropdownMenuContent>
         </DropdownMenu>

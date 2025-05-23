@@ -21,9 +21,9 @@ class InternshipFactory extends Factory
         $endDate = fake()->dateTimeBetween($startDate, (clone $startDate)->modify('+6 months')); // Ensure end_date is after start_date
 
         return [
-            'user_id' => User::factory(), // Added user_id
+            'user_id' => User::factory(),
             'type' => fake()->randomElement(['kkl', 'kkn']),
-            'application_file' => 'dummy_files/internship_'.fake()->unique()->uuid().'.pdf',
+            'application_file' => 'internships/dummy_files/dummy_file.pdf',
             'company_name' => fake()->company(),
             'company_address' => fake()->address(),
             'start_date' => $startDate,

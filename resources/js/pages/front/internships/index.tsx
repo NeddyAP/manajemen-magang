@@ -13,12 +13,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface User {
-    role: string;
+    role?: string;
 }
 
 interface PageProps {
     auth: {
         user: User;
+        role?: string;
+        permissions?: string[];
         [key: string]: unknown;
     };
     [key: string]: unknown;
@@ -32,15 +34,12 @@ interface CardItem {
     route: string;
     buttonText: string;
     buttonVariant: 'default' | 'outline' | 'secondary' | 'destructive' | 'ghost' | 'link';
-    showOnlyFor?: string[];
+    requiredPermissions?: string[];
 }
 
 export default function InternshipsIndex() {
     const { auth } = usePage<PageProps>().props;
-    const role = auth.role;
-    const isMahasiswa = role === 'mahasiswa';
-    const isDosen = role === 'dosen';
-    const isAdmin = role === 'admin' || role === 'superadmin';
+    const permissions = auth.permissions || [];
 
     const cards: CardItem[] = [
         {
@@ -51,7 +50,7 @@ export default function InternshipsIndex() {
             route: route('admin.dashboard'),
             buttonText: 'Lihat Dashboard',
             buttonVariant: 'default',
-            showOnlyFor: ['admin'],
+            requiredPermissions: ['admin.dashboard.view'],
         },
         {
             id: 'apply',
@@ -61,7 +60,7 @@ export default function InternshipsIndex() {
             route: route('front.internships.applicants.create'),
             buttonText: 'Ajukan Sekarang',
             buttonVariant: 'default',
-            showOnlyFor: ['mahasiswa'],
+            requiredPermissions: ['internships.create'],
         },
         {
             id: 'my-applications',
@@ -71,6 +70,7 @@ export default function InternshipsIndex() {
             route: route('front.internships.applicants.index'),
             buttonText: 'Lihat Aplikasi',
             buttonVariant: 'outline',
+            requiredPermissions: ['internships.view'],
         },
         {
             id: 'logbooks',
@@ -80,6 +80,7 @@ export default function InternshipsIndex() {
             route: route('front.internships.logbooks.intern-list'),
             buttonText: 'Pilih Magang',
             buttonVariant: 'outline',
+            requiredPermissions: ['logbooks.view'],
         },
         {
             id: 'reports',
@@ -89,6 +90,7 @@ export default function InternshipsIndex() {
             route: route('front.internships.reports.intern-list'),
             buttonText: 'Pilih Magang',
             buttonVariant: 'outline',
+            requiredPermissions: ['reports.view'],
         },
         {
             id: 'classes',
@@ -98,16 +100,19 @@ export default function InternshipsIndex() {
             route: route('front.internships.guidance-classes.index'),
             buttonText: 'Lihat Kelas',
             buttonVariant: 'outline',
+            requiredPermissions: ['guidance-classes.view'],
         },
     ];
 
-    // Filter cards based on user role
+    // Filter cards based on user permissions
     const filteredCards = cards.filter((card) => {
-        if (!card.showOnlyFor) return true;
-        if (isMahasiswa && card.showOnlyFor.includes('mahasiswa')) return true;
-        if (isDosen && card.showOnlyFor.includes('dosen')) return true;
-        if (isAdmin && card.showOnlyFor.includes('admin')) return true;
-        return !card.showOnlyFor.length;
+        // If no permissions required, show the card
+        if (!card.requiredPermissions || card.requiredPermissions.length === 0) {
+            return true;
+        }
+
+        // Check if user has any of the required permissions
+        return card.requiredPermissions.some((permission) => permissions.includes(permission));
     });
 
     return (

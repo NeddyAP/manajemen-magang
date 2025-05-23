@@ -9,6 +9,7 @@ export interface User {
     name: string;
     email: string;
     roles?: { name: string }[];
+    permissions?: string[];
     avatar_url?: string | null | undefined;
     profile?: Record<string, unknown>;
     admin_profile?: {
