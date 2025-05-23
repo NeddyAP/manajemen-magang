@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Front\DosenDashboardController;
 use App\Http\Controllers\Front\GuidanceClassController;
 use App\Http\Controllers\Front\InternshipApplicantController;
 use App\Http\Controllers\Front\InternshipController;
 use App\Http\Controllers\Front\LogbookController;
+use App\Http\Controllers\Front\MahasiswaDashboardController;
 use App\Http\Controllers\Front\ReportController; // Import ReportController
 use App\Http\Controllers\GuidanceClassAttendanceController;
 use App\Http\Controllers\HomeController;
@@ -94,6 +96,16 @@ Route::middleware(['auth'])->prefix('api')->name('api.')->group(function (): voi
 Route::get('/notifications', [NotificationController::class, 'history'])
     ->middleware(['auth', 'verified'])
     ->name('notifications.index');
+
+// Dosen Dashboard
+Route::get('/dosen/dashboard', [DosenDashboardController::class, 'index'])
+    ->middleware(['auth', 'verified', 'role:dosen'])
+    ->name('dosen.dashboard');
+
+// Mahasiswa Dashboard
+Route::get('/mahasiswa/dashboard', [MahasiswaDashboardController::class, 'index'])
+    ->middleware(['auth', 'verified', 'role:mahasiswa'])
+    ->name('mahasiswa.dashboard');
 
 require __DIR__.'/admin.php';
 require __DIR__.'/settings.php';

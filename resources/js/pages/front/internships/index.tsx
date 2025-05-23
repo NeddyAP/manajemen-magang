@@ -1,9 +1,12 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardView } from '@/components/internships/card-view';
+import { DashboardView } from '@/components/internships/dashboard-view';
+import { ViewToggle } from '@/components/view-toggle';
 import FrontLayout from '@/layouts/front-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { type BreadcrumbItem, DatabaseNotification, User as FullUser } from '@/types'; // Renamed User to FullUser to avoid conflict
+import { Internship, Logbook, Report } from '@/types/internship';
+import { Head, router, usePage } from '@inertiajs/react';
 import { Archive, BookOpen, FilePlus, FileText, LayoutDashboard, Users } from 'lucide-react';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -12,16 +15,70 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+// This User interface is specific to the auth prop structure
 interface User {
     role?: string;
 }
 
+interface StudentInClass {
+    id: number;
+    name: string;
+    // Potentially other fields
+}
+
+interface UpcomingClass {
+    id: number;
+    title: string;
+    description?: string;
+    start_date: string;
+    end_date: string;
+    location?: string;
+    meeting_link?: string;
+    students: StudentInClass[];
+}
+
 interface PageProps {
     auth: {
-        user: User;
+        user: User; // This uses the local User interface for auth
         role?: string;
         permissions?: string[];
         [key: string]: unknown;
+    };
+    viewPreference: 'cards' | 'dashboard';
+    userRole: string;
+    dashboardData: {
+        // Dosen data
+        supervisedStudents?: FullUser[]; // Use FullUser from @/types
+        pendingLogbooks?: Logbook[];
+        pendingReports?: Report[];
+        dosenUpcomingClasses?: UpcomingClass[];
+        dosenCounts?: {
+            total_advisees: number;
+            active_internships: number;
+            pending_logbooks: number;
+            pending_reports: number;
+            upcoming_classes: number;
+        };
+
+        // Mahasiswa data
+        internships?: Internship[];
+        activeInternship?: Internship | null;
+        recentLogbooks?: Logbook[];
+        reports?: Report[];
+        mahasiswaUpcomingClasses?: UpcomingClass[];
+        mahasiswaCounts?: {
+            waiting_applications: number;
+            accepted_internships: number;
+            rejected_internships: number;
+            total_logbooks: number;
+            pending_reports: number;
+            approved_reports: number;
+            upcoming_classes: number;
+        };
+        advisor?: FullUser | null; // Use FullUser from @/types
+
+        // Common data
+        notifications: DatabaseNotification[];
     };
     [key: string]: unknown;
 }
@@ -38,8 +95,25 @@ interface CardItem {
 }
 
 export default function InternshipsIndex() {
-    const { auth } = usePage<PageProps>().props;
+    const { auth, viewPreference: initialViewPreference, userRole, dashboardData } = usePage<PageProps>().props;
     const permissions = auth.permissions || [];
+    const [viewPreference, setViewPreference] = useState<'cards' | 'dashboard'>(initialViewPreference || 'cards');
+
+    // Update view preference when changed
+    const handleViewChange = (view: 'cards' | 'dashboard') => {
+        setViewPreference(view);
+
+        // Update the cookie via a request parameter
+        router.get(
+            route('front.internships.index'),
+            { view_preference: view },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                only: [],
+            },
+        );
+    };
 
     const cards: CardItem[] = [
         {
@@ -115,33 +189,26 @@ export default function InternshipsIndex() {
         return card.requiredPermissions.some((permission) => permissions.includes(permission));
     });
 
+    // Only show the view toggle if the user is a dosen or mahasiswa
+    const showViewToggle = userRole === 'dosen' || userRole === 'mahasiswa';
+
     return (
         <FrontLayout breadcrumbs={breadcrumbs}>
             <Head title="Magang" />
             <div className="flex min-h-screen flex-1 flex-col gap-4 p-4">
                 <div className="border-sidebar-border/70 dark:border-sidebar-border relative container mx-auto max-w-7xl flex-1 overflow-hidden rounded-xl">
-                    <div className="mb-8 text-center">
-                        <h1 className="mt-10 text-3xl font-bold tracking-tight">Program Magang</h1>
-                        <p className="text-muted-foreground">Kelola semua kebutuhan program magang Anda di satu tempat.</p>
-                    </div>
+                    {/* View Toggle */}
+                    {showViewToggle && <ViewToggle view={viewPreference} onChange={handleViewChange} />}
 
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                        {filteredCards.map((card) => (
-                            <Card key={card.id} className="flex flex-col text-center">
-                                <CardHeader className="flex flex-col items-center pt-8">
-                                    {card.icon}
-                                    <CardTitle className="text-xl font-semibold">{card.title}</CardTitle>
-                                    <CardDescription className="mt-1 text-sm">{card.description}</CardDescription>
-                                </CardHeader>
-                                <CardContent className="mt-auto flex flex-col items-center pb-8">
-                                    {/* <p className="mb-4 text-sm">{card.content}</p> // Removed as per new design */}
-                                    <Button asChild variant={card.buttonVariant} className="mt-4 w-full max-w-xs">
-                                        <Link href={card.route}>{card.buttonText}</Link>
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
+                    {/* Render the appropriate view based on the user's preference */}
+                    {viewPreference === 'cards' ? (
+                        <CardView cards={filteredCards} />
+                    ) : (
+                        <DashboardView
+                            userRole={userRole}
+                            data={{ ...dashboardData, activeInternship: dashboardData.activeInternship ?? null, advisor: dashboardData.advisor ?? null }}
+                        />
+                    )}
                 </div>
             </div>
         </FrontLayout>

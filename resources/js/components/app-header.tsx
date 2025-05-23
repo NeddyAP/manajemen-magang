@@ -121,9 +121,13 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
 
     const computedRightNavItems: NavItem[] = [];
     if (auth?.user) {
-        // Use permissions instead of roles
+        // Use permissions and roles to determine dashboard link
         if (auth.permissions?.includes('admin.dashboard.view')) {
-            computedRightNavItems.push({ title: 'Dashboard', href: '/admin', icon: LayoutDashboard });
+            computedRightNavItems.push({ title: 'Admin Dashboard', href: '/admin', icon: LayoutDashboard });
+        } else if (auth.user.roles?.some((role) => role.name === 'dosen')) {
+            computedRightNavItems.push({ title: 'Dashboard Dosen', href: '/dosen/dashboard', icon: LayoutDashboard });
+        } else if (auth.user.roles?.some((role) => role.name === 'mahasiswa')) {
+            computedRightNavItems.push({ title: 'Dashboard Mahasiswa', href: '/mahasiswa/dashboard', icon: LayoutDashboard });
         } else if (auth.permissions?.includes('internships.view')) {
             computedRightNavItems.push({ title: 'Dashboard', href: '/internships', icon: LayoutDashboard });
         }
