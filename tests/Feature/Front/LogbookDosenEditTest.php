@@ -36,9 +36,9 @@ class LogbookDosenEditTest extends TestCase
         Role::create(['name' => 'superadmin', 'guard_name' => 'web']);
 
         // Create users with roles and permissions
-        $this->dosen = PermissionTestHelper::createUserWithRoleAndPermissions('dosen', ['logbooks.view', 'logbooks.add_notes']);
-        $this->otherDosen = PermissionTestHelper::createUserWithRoleAndPermissions('dosen', ['logbooks.view', 'logbooks.add_notes']);
-        $this->mahasiswa = PermissionTestHelper::createUserWithRoleAndPermissions('mahasiswa', ['logbooks.view', 'logbooks.create', 'logbooks.edit']);
+        $this->dosen = PermissionTestHelper::createUserWithRoleAndPermissions('dosen');
+        $this->otherDosen = PermissionTestHelper::createUserWithRoleAndPermissions('dosen');
+        $this->mahasiswa = PermissionTestHelper::createUserWithRoleAndPermissions('mahasiswa');
 
         // Create an internship for the mahasiswa with the dosen as advisor
         $this->internship = PermissionTestHelper::createActiveInternshipForMahasiswa($this->mahasiswa);

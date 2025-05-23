@@ -21,9 +21,7 @@ class MahasiswaDashboardController extends Controller
         $user = Auth::user();
 
         // Ensure the user is a mahasiswa
-        if (! $user->hasRole('mahasiswa')) {
-            abort(403, 'Unauthorized action.');
-        }
+        abort_unless($user->hasRole('mahasiswa'), 403, 'Unauthorized action.');
 
         // Get current internship application status
         $internships = Internship::where('user_id', $user->id)

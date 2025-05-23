@@ -22,9 +22,7 @@ class DosenDashboardController extends Controller
         $user = Auth::user();
 
         // Ensure the user is a dosen
-        if (! $user->hasRole('dosen')) {
-            abort(403, 'Unauthorized action.');
-        }
+        abort_unless($user->hasRole('dosen'), 403, 'Unauthorized action.');
 
         // Get advisee IDs
         $adviseeIds = $user->advisees()->pluck('user_id');
@@ -117,9 +115,7 @@ class DosenDashboardController extends Controller
     {
         // Ensure the user is a dosen
         $user = Auth::user();
-        if (! $user->hasRole('dosen')) {
-            abort(403, 'Only dosen can access this page.');
-        }
+        abort_unless($user->hasRole('dosen'), 403, 'Only dosen can access this page.');
 
         // Get all advisees (students supervised by this dosen)
         $advisees = $user->advisees()

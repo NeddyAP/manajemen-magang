@@ -394,14 +394,10 @@ class LogbookController extends Controller
     private function authorizeAccess(Internship $internship)
     {
         // Check if user has permission to view logbooks
-        if (! Auth::user()->can('logbooks.view')) {
-            abort(403, 'You do not have permission to view logbooks.');
-        }
+        abort_unless(Auth::user()->can('logbooks.view'), 403, 'You do not have permission to view logbooks.');
 
         // Check if internship is accepted
-        if ($internship->status !== 'accepted') {
-            abort(403, 'Internship must be accepted to view logbooks.');
-        }
+        abort_if($internship->status !== 'accepted', 403, 'Internship must be accepted to view logbooks.');
 
         $user = Auth::user();
         $isOwner = $internship->user_id === $user->id;
@@ -419,9 +415,7 @@ class LogbookController extends Controller
             }
 
             // If not owner or advisor, deny access
-            if (! $isAdvisor) {
-                abort(403, 'You do not have permission to view this internship\'s logbooks.');
-            }
+            abort_unless($isAdvisor, 403, 'You do not have permission to view this internship\'s logbooks.');
         }
     }
 }

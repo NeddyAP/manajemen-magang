@@ -42,10 +42,8 @@ class ReportPolicy
         // Dosen can view reports of their advisees
         if ($user->can('reports.approve')) {
             $internship = $report->internship;
-            if ($internship && $internship->user && $internship->user->mahasiswaProfile) {
-                if ($internship->user->mahasiswaProfile->advisor_id === $user->id) {
-                    return true;
-                }
+            if ($internship && $internship->user && $internship->user->mahasiswaProfile && $internship->user->mahasiswaProfile->advisor_id === $user->id) {
+                return true;
             }
         }
 
