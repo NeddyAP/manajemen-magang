@@ -91,6 +91,27 @@ class LogbookPolicy
     }
 
     /**
+     * Determine whether the user can update only the supervisor_notes field.
+     */
+    public function updateSupervisorNotes(User $user, Logbook $logbook): bool
+    {
+        // Check if user has permission to add notes
+        if (! $user->can('logbooks.add_notes')) {
+            return false;
+        }
+
+        // Ensure the logbook has an associated user and internship
+        if (! $logbook->user || ! $logbook->internship || ! $logbook->internship->user) {
+            return false;
+        }
+
+        // Check if the logbook's user (student) is an advisee of the current dosen
+        $studentProfile = $logbook->internship->user->mahasiswaProfile;
+
+        return $studentProfile && $studentProfile->advisor_id === $user->id;
+    }
+
+    /**
      * Determine whether the user can delete the model.
      */
     public function delete(User $user, Logbook $logbook): bool

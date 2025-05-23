@@ -11,12 +11,24 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { SharedData } from '@/types';
 import { Logbook } from '@/types/internship';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { MoreHorizontal } from 'lucide-react';
+import { Edit, MoreHorizontal, Pencil } from 'lucide-react';
+
+// Get user role from auth
+const useUserRole = () => {
+    const { role } = usePage<SharedData>().props.auth;
+    return {
+        role,
+        isDosen: role === 'dosen',
+        isMahasiswa: role === 'mahasiswa',
+        isAdmin: role === 'admin' || role === 'superadmin',
+    };
+};
 
 export const columns: ColumnDef<Logbook>[] = [
     {
@@ -63,9 +75,48 @@ export const columns: ColumnDef<Logbook>[] = [
         header: ({ column }) => <DataTableColumnHeader column={column} title="Catatan Pembimbing" />,
         cell: ({ row }) => {
             const notes = row.getValue('supervisor_notes');
-            if (!notes || typeof notes !== 'string') return '-';
+            const { isDosen } = useUserRole();
+            const logbook = row.original;
 
-            return notes.length > 50 ? `${notes.slice(0, 50)}...` : notes;
+            // If no notes, show appropriate message
+            if (!notes || typeof notes !== 'string') {
+                return (
+                    <div className="flex items-center">
+                        <span className="text-muted-foreground">Belum ada catatan</span>
+                        {isDosen && (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="ml-2 h-6 w-6 p-0 text-blue-600 hover:text-blue-800"
+                                onClick={() => router.get(route('front.internships.logbooks.edit', [logbook.internship_id, logbook.id]))}
+                                title="Tambah Catatan Pembimbing"
+                            >
+                                <Pencil className="h-3 w-3" />
+                                <span className="sr-only">Tambah Catatan</span>
+                            </Button>
+                        )}
+                    </div>
+                );
+            }
+
+            // Show notes with edit button for dosen
+            return (
+                <div className="flex items-center">
+                    <span>{notes.length > 50 ? `${notes.slice(0, 50)}...` : notes}</span>
+                    {isDosen && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="ml-2 h-6 w-6 p-0 text-blue-600 hover:text-blue-800"
+                            onClick={() => router.get(route('front.internships.logbooks.edit', [logbook.internship_id, logbook.id]))}
+                            title="Edit Catatan Pembimbing"
+                        >
+                            <Pencil className="h-3 w-3" />
+                            <span className="sr-only">Edit Catatan</span>
+                        </Button>
+                    )}
+                </div>
+            );
         },
     },
     {
@@ -83,36 +134,59 @@ export const columns: ColumnDef<Logbook>[] = [
         id: 'actions',
         cell: ({ row }) => {
             const logbook = row.original;
+            const { isDosen, isMahasiswa, isAdmin } = useUserRole();
 
             return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Buka menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(String(logbook.id))}>Salin ID</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                            <a href={route('front.internships.logbooks.edit', [logbook.internship_id, logbook.id])}>Ubah</a>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                            onClick={() => {
-                                if (confirm('Apakah Anda yakin ingin menghapus logbook ini?')) {
-                                    router.delete(route('front.internships.logbooks.destroy', [logbook.internship_id, logbook.id]), {
-                                        preserveScroll: true,
-                                    });
-                                }
-                            }}
-                            className="text-red-500"
-                        >
-                            Hapus
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="flex items-center gap-2">
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Buka menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(String(logbook.id))}>Salin ID</DropdownMenuItem>
+                            <DropdownMenuSeparator />
+
+                            {/* Show edit option for mahasiswa (owner) or admin */}
+                            {(isMahasiswa || isAdmin) && (
+                                <DropdownMenuItem asChild>
+                                    <a href={route('front.internships.logbooks.edit', [logbook.internship_id, logbook.id])}>
+                                        Ubah
+                                    </a>
+                                </DropdownMenuItem>
+                            )}
+
+                            {/* Show edit notes option for dosen */}
+                            {isDosen && (
+                                <DropdownMenuItem asChild>
+                                    <a href={route('front.internships.logbooks.edit', [logbook.internship_id, logbook.id])}>
+                                        Edit Catatan Pembimbing
+                                    </a>
+                                </DropdownMenuItem>
+                            )}
+
+                            {/* Show delete option only for mahasiswa (owner) or admin */}
+                            {(isMahasiswa || isAdmin) && (
+                                <DropdownMenuItem
+                                    onClick={() => {
+                                        if (confirm('Apakah Anda yakin ingin menghapus logbook ini?')) {
+                                            router.delete(route('front.internships.logbooks.destroy', [logbook.internship_id, logbook.id]), {
+                                                preserveScroll: true,
+                                            });
+                                        }
+                                    }}
+                                    className="text-red-500"
+                                >
+                                    Hapus
+                                </DropdownMenuItem>
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
             );
         },
     },

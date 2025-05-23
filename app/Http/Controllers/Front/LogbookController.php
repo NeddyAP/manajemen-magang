@@ -197,11 +197,19 @@ class LogbookController extends Controller
 
     public function edit(Internship $internship, Logbook $logbook)
     {
-        // Check if user can edit this logbook
-        $this->authorize('update', $logbook);
-
         // Ensure the logbook belongs to the internship
         abort_if($logbook->internship_id !== $internship->id, 404, 'Logbook not found for this internship.');
+
+        $user = auth()->user();
+
+        // Check if user is a dosen who can only update supervisor_notes
+        if ($user->hasRole('dosen')) {
+            // Use the specific policy method for dosen updating supervisor notes
+            $this->authorize('updateSupervisorNotes', $logbook);
+        } else {
+            // For other users, check regular update permission
+            $this->authorize('update', $logbook);
+        }
 
         return Inertia::render('front/internships/logbooks/edit', [
             'internship' => $internship,
@@ -211,18 +219,27 @@ class LogbookController extends Controller
 
     public function update(UpdateLogbookRequest $request, Internship $internship, Logbook $logbook)
     {
-        // Check if user can update this logbook
-        $this->authorize('update', $logbook);
-
         // Ensure the logbook belongs to the internship
         abort_if($logbook->internship_id !== $internship->id, 404, 'Logbook not found for this internship.');
 
+        $user = auth()->user();
         $validated = $request->validated();
 
-        // If user has permission to add notes but not edit the whole logbook
-        if (auth()->user()->can('logbooks.add_notes') && ! auth()->user()->can('logbooks.edit')) {
-            // Only allow updating supervisor_notes
-            $validated = ['supervisor_notes' => $request->input('supervisor_notes')];
+        // Check if user is a dosen who can only update supervisor_notes
+        if ($user->hasRole('dosen')) {
+            // Use the specific policy method for dosen updating supervisor notes
+            $this->authorize('updateSupervisorNotes', $logbook);
+
+            // Only allow updating supervisor_notes field
+            $validated = ['supervisor_notes' => $request->input('supervisor_notes', '')];
+        } else {
+            // For other users, check regular update permission
+            $this->authorize('update', $logbook);
+
+            // For mahasiswa, remove supervisor_notes from validated data to prevent them from updating it
+            if ($user->hasRole('mahasiswa')) {
+                unset($validated['supervisor_notes']);
+            }
         }
 
         $logbook->update($validated);

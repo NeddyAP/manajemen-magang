@@ -195,7 +195,7 @@ export default function InternshipsIndex() {
     return (
         <FrontLayout breadcrumbs={breadcrumbs}>
             <Head title="Magang" />
-            <div className="flex min-h-screen flex-1 flex-col gap-4 p-4">
+            <div className="flex min-h-screen flex-1 flex-col gap-4 p-4 mt-5 mb-20">
                 <div className="border-sidebar-border/70 dark:border-sidebar-border relative container mx-auto max-w-7xl flex-1 overflow-hidden rounded-xl">
                     {/* View Toggle */}
                     {showViewToggle && <ViewToggle view={viewPreference} onChange={handleViewChange} />}

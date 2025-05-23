@@ -77,18 +77,18 @@ export function DashboardView({ userRole, data }: DashboardViewProps) {
                 <h1 className="text-2xl font-bold">Dashboard Dosen</h1>
                 <p className="text-muted-foreground">Selamat datang di dashboard dosen. Berikut adalah ringkasan aktivitas dan tugas Anda.</p>
 
-                {/* Top row - Analytics */}
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                    <SupervisedStudentsCard students={data.supervisedStudents || []} totalAdvisees={data.dosenCounts?.total_advisees || 0} />
-                    <PendingLogbooksCard logbooks={data.pendingLogbooks || []} totalPending={data.dosenCounts?.pending_logbooks || 0} />
-                    <PendingReportsCard reports={data.pendingReports || []} totalPending={data.dosenCounts?.pending_reports || 0} />
-                </div>
-
-                {/* Bottom row - Additional info */}
+                {/* Top row - Additional info */}
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                     <DosenUpcomingClassesCard classes={data.dosenUpcomingClasses || []} totalUpcoming={data.dosenCounts?.upcoming_classes || 0} />
                     <DosenQuickActionsCard />
                     <NotificationSummaryCard notifications={data.notifications} />
+                </div>
+
+                {/* Bottom row - Analytics */}
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <SupervisedStudentsCard students={data.supervisedStudents || []} totalAdvisees={data.dosenCounts?.total_advisees || 0} />
+                    <PendingLogbooksCard logbooks={data.pendingLogbooks || []} totalPending={data.dosenCounts?.pending_logbooks || 0} />
+                    <PendingReportsCard reports={data.pendingReports || []} totalPending={data.dosenCounts?.pending_reports || 0} />
                 </div>
             </div>
         );
