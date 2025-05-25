@@ -27,6 +27,12 @@ return new class extends Migration
             $table->char('progress', 2)->default('0');
             $table->softDeletes();
             $table->timestamps();
+
+            // Performance indexes
+            $table->index(['user_id', 'status']);
+            $table->index(['status', 'created_at']);
+            $table->index(['start_date', 'end_date']);
+            $table->index('company_name');
         });
     }
 

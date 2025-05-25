@@ -26,6 +26,11 @@ return new class extends Migration
             $table->text('supervisor_notes')->nullable();
             $table->softDeletes();
             $table->timestamps();
+
+            // Performance indexes
+            $table->index(['internship_id', 'date']);
+            $table->index(['user_id', 'date']);
+            $table->index('supervisor_notes'); 
         });
     }
 

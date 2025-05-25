@@ -26,6 +26,12 @@ return new class extends Migration
             $table->timestamp('revision_uploaded_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
+
+            // Performance indexes
+            $table->index(['user_id', 'status']);
+            $table->index(['internship_id', 'version']);
+            $table->index(['status', 'created_at']);
+            $table->index('title');
         });
     }
 
