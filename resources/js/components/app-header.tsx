@@ -140,7 +140,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     return (
         <>
             <div className="border-sidebar-border/80 border-b shadow-sm">
-                <div className="mx-auto flex h-20 items-center px-6 md:max-w-7xl">
+                <div className="mx-auto flex h-15 items-center px-6 md:max-w-7xl">
                     {/* Mobile Menu */}
                     <div className="lg:hidden">
                         <Sheet>

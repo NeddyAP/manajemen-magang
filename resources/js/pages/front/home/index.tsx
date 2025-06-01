@@ -33,7 +33,7 @@ export default function Home({ faqCategories = [], faqsByCategory = {} }: HomePr
             <div className="relative -mx-[max(0px,calc((100%-96rem)/2))]">
                 <section
                     id="hero"
-                    className="flex min-h-screen items-center justify-center bg-gradient-to-tr from-sky-100 via-sky-200 to-teal-600 transition-colors duration-200 dark:from-gray-800 dark:via-gray-900 dark:to-black"
+                    className="flex min-h-screen items-center justify-center bg-gradient-to-tr from-blue-100 via-blue-200 to-blue-600 transition-colors duration-200 dark:from-gray-800 dark:via-gray-900 dark:to-black"
                 >
                     <div className="container mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-6 lg:grid-cols-2 lg:px-8">
                         <div className="flex flex-col items-start space-y-8 text-left">
