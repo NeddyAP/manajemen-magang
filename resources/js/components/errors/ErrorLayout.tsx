@@ -93,14 +93,14 @@ const ErrorLayout: React.FC<ErrorLayoutProps> = ({
               <img 
                 src="/assets/error/Roket.png" 
                 alt="Rocket" 
-                className="absolute top-[30%] right-[30%] w-md h-auto z-30 rocket-float-animation drop-shadow-lg"
+                className="absolute top-[22%] right-[20%] w-lg h-auto z-30 rocket-float-animation drop-shadow-lg"
               />
               
               {/* Planet */}
               <img 
                 src="/assets/error/planet.png" 
                 alt="Planet" 
-                className="absolute bottom-[-10%] right-0 w-xm h-auto z-40 rotate-animation drop-shadow-lg"
+                className="absolute bottom-0 right-[-5%] w-xm h-auto z-40 rotate-animation drop-shadow-lg"
               />
 
             </div>
