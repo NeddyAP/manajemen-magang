@@ -5,12 +5,11 @@ use App\Http\Controllers\Front\GuidanceClassController;
 use App\Http\Controllers\Front\InternshipApplicantController;
 use App\Http\Controllers\Front\InternshipController;
 use App\Http\Controllers\Front\LogbookController;
-use App\Http\Controllers\Front\MahasiswaDashboardController;
-use App\Http\Controllers\Front\ReportController; // Import ReportController
+use App\Http\Controllers\Front\ReportController;
 use App\Http\Controllers\GuidanceClassAttendanceController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\TutorialController; // Import NotificationController
+use App\Http\Controllers\TutorialController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -106,11 +105,6 @@ Route::get('/dosen/dashboard', [DosenDashboardController::class, 'index'])
 Route::get('/dosen/students-progress', [DosenDashboardController::class, 'studentsProgress'])
     ->middleware(['auth', 'verified', 'role:dosen'])
     ->name('dosen.students-progress');
-
-// Mahasiswa Dashboard
-Route::get('/mahasiswa/dashboard', [MahasiswaDashboardController::class, 'index'])
-    ->middleware(['auth', 'verified', 'role:mahasiswa'])
-    ->name('mahasiswa.dashboard');
 
 require __DIR__.'/admin.php';
 require __DIR__.'/settings.php';

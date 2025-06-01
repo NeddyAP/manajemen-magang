@@ -61,3 +61,24 @@ This document records significant architectural and project decisions, their rat
 - Developers need to be familiar with Tailwind's utility classes.
 - UI components are consistent across the application.
 - The application has a modern, responsive design that works well on different screen sizes.
+
+[2025-01-06 12:41:47] - **Mahasiswa Dashboard Removal**
+
+**Decision:** Remove the redundant Mahasiswa Dashboard route and redirect to internships index.
+
+**Rationale:**
+- The Mahasiswa Dashboard provided redundant functionality that duplicates the internships index page
+- Simplifies the application navigation by reducing unnecessary intermediate pages
+- Maintains SEO and user bookmarks by implementing a permanent 301 redirect
+- Removes unused controller import to clean up the codebase
+
+**Implementation:**
+- Removed `Route::get('/mahasiswa/dashboard', [MahasiswaDashboardController::class, 'index'])` route
+- Added `Route::redirect('/mahasiswa/dashboard', '/internships', 301)` for permanent redirect
+- Removed unused `use App\Http\Controllers\Front\MahasiswaDashboardController` import
+
+**Implications:**
+- Users accessing `/mahasiswa/dashboard` will be automatically redirected to `/internships`
+- Search engines will understand this is a permanent move (301 status)
+- Reduces maintenance overhead by eliminating duplicate dashboard functionality
+- Controller and view files for MahasiswaDashboardController may need cleanup in future tasks

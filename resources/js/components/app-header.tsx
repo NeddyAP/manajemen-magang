@@ -131,7 +131,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                 icon: LayoutDashboard,
             });
         } else if (auth.user.roles?.some((role) => role.name === 'mahasiswa')) {
-            computedRightNavItems.push({ title: 'Dashboard Mahasiswa', href: '/mahasiswa/dashboard', icon: LayoutDashboard });
+            computedRightNavItems.push({ title: 'Dashboard Mahasiswa', href: '/internships', icon: LayoutDashboard });
         } else if (auth.permissions?.includes('internships.view')) {
             computedRightNavItems.push({ title: 'Dashboard', href: '/internships', icon: LayoutDashboard });
         }

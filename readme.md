@@ -128,12 +128,6 @@ Sistem ini bertujuan untuk:
     ```
 
 9.  **Build aset frontend:**
-    Untuk pengembangan (dengan hot module replacement):
-
-    ```bash
-    npm run dev
-    ```
-
     Untuk produksi:
 
     ```bash
@@ -141,10 +135,20 @@ Sistem ini bertujuan untuk:
     ```
 
 10. **Mulai server pengembangan:**
+
+    ```bash
+    composer dev
+    ```
+    Jika terjadi error saat menjalankan `compser dev` jalankan server secara terpisah:
+    
     ```bash
     php artisan serve
     ```
     Dan di terminal terpisah, jika Anda menjalankan `npm run dev`:
+    ```bash
+    npm run dev
+    ```
+
     ```bash
     # Server dev Vite seharusnya sudah berjalan
     ```

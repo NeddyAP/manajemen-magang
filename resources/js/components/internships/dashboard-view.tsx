@@ -115,6 +115,19 @@ export function DashboardView({ userRole, data }: DashboardViewProps) {
 
                 {/* Top row - Main info */}
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <MahasiswaUpcomingClassesCard
+                        classes={data.mahasiswaUpcomingClasses || []}
+                        totalUpcoming={data.mahasiswaCounts?.upcoming_classes || 0}
+                    />
+                    <MahasiswaQuickActionsCard activeInternship={data.activeInternship} hasAdvisor={!!data.advisor} />
+                    <div className="grid grid-cols-1 gap-4">
+                        <AdvisorInfoCard advisor={data.advisor} />
+                        <NotificationSummaryCard notifications={data.notifications} />
+                    </div>
+                </div>
+
+                {/* Bottom row - Additional info */}
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                     <InternshipStatusCard
                         internships={data.internships || []}
                         counts={{
@@ -136,19 +149,6 @@ export function DashboardView({ userRole, data }: DashboardViewProps) {
                             approved_reports: data.mahasiswaCounts?.approved_reports || 0,
                         }}
                     />
-                </div>
-
-                {/* Bottom row - Additional info */}
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                    <MahasiswaUpcomingClassesCard
-                        classes={data.mahasiswaUpcomingClasses || []}
-                        totalUpcoming={data.mahasiswaCounts?.upcoming_classes || 0}
-                    />
-                    <MahasiswaQuickActionsCard activeInternship={data.activeInternship} hasAdvisor={!!data.advisor} />
-                    <div className="grid grid-cols-1 gap-4">
-                        <AdvisorInfoCard advisor={data.advisor} />
-                        <NotificationSummaryCard notifications={data.notifications} />
-                    </div>
                 </div>
             </div>
         );
