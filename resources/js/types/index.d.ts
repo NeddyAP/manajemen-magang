@@ -37,6 +37,9 @@ export interface SharedData {
     auth: Auth;
     ziggy: Config & { location: string };
     globalVariables: GlobalVariable[];
+    google: {
+        client_id: string;
+    };
     mahasiswa_profile: MahasiswaProfile;
     dosen_profile: DosenProfile;
     admin_profile: AdminProfile;

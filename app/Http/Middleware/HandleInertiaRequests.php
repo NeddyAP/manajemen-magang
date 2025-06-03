@@ -58,6 +58,9 @@ class HandleInertiaRequests extends Middleware
                 'info' => fn () => $request->session()->get('info'),
             ],
             'globalVariables' => GlobalVariable::where('is_active', 1)->get(),
+            'google' => [
+                'client_id' => config('services.google.client_id'),
+            ],
         ]);
     }
 }

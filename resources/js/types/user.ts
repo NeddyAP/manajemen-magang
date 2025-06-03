@@ -12,6 +12,7 @@ export interface User {
     permissions?: string[];
     avatar_url?: string | null | undefined;
     profile?: Record<string, unknown>;
+    google_id?: string | null;
     admin_profile?: {
         employee_id: string;
         department: string;

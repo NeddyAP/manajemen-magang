@@ -15,4 +15,6 @@ Route::middleware('auth')->group(function (): void {
     Route::put('settings/password', [PasswordController::class, 'update'])->name('password.update');
 
     Route::get('settings/appearance', [ProfileController::class, 'appearance'])->name('appearance');
+
+    Route::post('settings/profile/link-google', [ProfileController::class, 'linkGoogleAccount'])->name('profile.link-google');
 });

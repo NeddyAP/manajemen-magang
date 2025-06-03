@@ -1,22 +1,30 @@
 import React from 'react';
 import ErrorLayout from '../../components/errors/ErrorLayout';
 
-const ServiceUnavailable: React.FC = () => {
-  const errorProps = (window as any).errorProps || {
-    title: '503 Layanan Tidak Tersedia',
-    code: '503',
-    messageTitle: 'Layanan Sedang Dalam Pemeliharaan',
-    message: 'Layanan sedang dalam pemeliharaan untuk meningkatkan kualitas layanan. Silakan coba lagi dalam beberapa saat.'
-  };
+// Define interface for error props
+interface ErrorProps {
+    title: string;
+    code: string;
+    messageTitle: string;
+    message: string;
+}
 
-  return (
-    <ErrorLayout
-      title={errorProps.title}
-      code={errorProps.code}
-      messageTitle={errorProps.messageTitle}
-      message={errorProps.message}
-    />
-  );
+// Extend window interface to include errorProps
+declare global {
+    interface Window {
+        errorProps?: ErrorProps;
+    }
+}
+
+const ServiceUnavailable: React.FC = () => {
+    const errorProps = window.errorProps || {
+        title: '503 Service Unavailable',
+        code: '503',
+        messageTitle: 'Layanan Tidak Tersedia',
+        message: 'Maaf, layanan sedang dalam pemeliharaan. Kami akan kembali sebentar lagi. Terima kasih atas kesabaran Anda.',
+    };
+
+    return <ErrorLayout code={errorProps.code} messageTitle={errorProps.messageTitle} message={errorProps.message} />;
 };
 
 export default ServiceUnavailable;

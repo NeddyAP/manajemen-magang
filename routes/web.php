@@ -106,6 +106,11 @@ Route::get('/dosen/students-progress', [DosenDashboardController::class, 'studen
     ->middleware(['auth', 'verified', 'role:dosen'])
     ->name('dosen.students-progress');
 
+// force https
+if (env('APP_ENV') === 'production') {
+    URL::forceScheme('https');
+}
+
 require __DIR__.'/admin.php';
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

@@ -35,6 +35,10 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
         <link rel="shortcut icon" href="{{ asset('assets/logo.svg') }}">
+        
+        {{-- Google Sign-In Script --}}
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        
         @routes
         @viteReactRefresh
         @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])

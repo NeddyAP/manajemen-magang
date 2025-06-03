@@ -1,22 +1,30 @@
 import React from 'react';
 import ErrorLayout from '../../components/errors/ErrorLayout';
 
-const InternalServerError: React.FC = () => {
-  const errorProps = (window as any).errorProps || {
-    title: '500 Kesalahan Server',
-    code: '500',
-    messageTitle: 'Kesalahan Server Internal',
-    message: 'Maaf, terjadi kesalahan pada server. Tim kami telah diberitahu dan sedang menangani masalah ini. Silakan coba lagi nanti.'
-  };
+// Define interface for error props
+interface ErrorProps {
+    title: string;
+    code: string;
+    messageTitle: string;
+    message: string;
+}
 
-  return (
-    <ErrorLayout
-      title={errorProps.title}
-      code={errorProps.code}
-      messageTitle={errorProps.messageTitle}
-      message={errorProps.message}
-    />
-  );
+// Extend window interface to include errorProps
+declare global {
+    interface Window {
+        errorProps?: ErrorProps;
+    }
+}
+
+const InternalServerError: React.FC = () => {
+    const errorProps = window.errorProps || {
+        title: '500 Internal Server Error',
+        code: '500',
+        messageTitle: 'Server Mengalami Kendala',
+        message: 'Maaf, server kami sedang mengalami kendala. Tim teknis sedang menangani masalah ini. Silakan coba lagi nanti.',
+    };
+
+    return <ErrorLayout code={errorProps.code} messageTitle={errorProps.messageTitle} message={errorProps.message} />;
 };
 
 export default InternalServerError;

@@ -30,7 +30,7 @@ return new class extends Migration
             // Performance indexes
             $table->index(['internship_id', 'date']);
             $table->index(['user_id', 'date']);
-            $table->index('supervisor_notes'); 
+            $table->index('supervisor_notes');
         });
     }
 
