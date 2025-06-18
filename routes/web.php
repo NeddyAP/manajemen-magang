@@ -59,7 +59,7 @@ Route::middleware(['auth', 'verified'])->prefix('internships')->name('front.inte
         Route::get('/reports/{internship}/{report}/download', [ReportController::class, 'downloadReportFile'])->name('reports.download');
         Route::post('/reports/{internship}/{report}/approve', [ReportController::class, 'approve'])->name('reports.approve');
         Route::post('/reports/{internship}/{report}/reject', [ReportController::class, 'reject'])->name('reports.reject');
-        Route::post('/reports/{internship}/{report}/upload-revision', [ReportController::class, 'uploadRevision'])->name('reports.uploadRevision'); // New route for Dosen revision upload
+        Route::post('/reports/{internship}/{report}/upload-revision', [ReportController::class, 'uploadRevision'])->name('reports.uploadRevision');
     });
 
     // Guidance Classes routes
@@ -95,11 +95,6 @@ Route::middleware(['auth'])->prefix('api')->name('api.')->group(function (): voi
 Route::get('/notifications', [NotificationController::class, 'history'])
     ->middleware(['auth', 'verified'])
     ->name('notifications.index');
-
-// Dosen Dashboard (redirects to internships index with dashboard view)
-Route::get('/dosen/dashboard', [DosenDashboardController::class, 'index'])
-    ->middleware(['auth', 'verified', 'role:dosen'])
-    ->name('dosen.dashboard');
 
 // Dosen Students Progress Dashboard
 Route::get('/dosen/students-progress', [DosenDashboardController::class, 'studentsProgress'])
