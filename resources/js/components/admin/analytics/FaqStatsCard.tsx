@@ -1,0 +1,96 @@
+import { Icon } from '@/components/icon';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import axios from 'axios';
+import { HelpCircle, CheckCircle, XCircle, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
+interface FaqStatsData {
+    total_faqs: number;
+    active_faqs: number;
+    inactive_faqs: number;
+    recent_count_30d: number;
+}
+
+export function FaqStatsCard() {
+    const [stats, setStats] = useState<FaqStatsData | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        setLoading(true);
+        axios
+            .get(route('admin.analytics.faq-stats'))
+            .then((response) => {
+                setStats(response.data);
+                setError(null);
+            })
+            .catch((err) => {
+                console.error('Error fetching FAQ stats:', err);
+                setError('Gagal memuat statistik FAQ.');
+                setStats(null);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }, []);
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Statistik FAQ</CardTitle>
+            </CardHeader>
+            <CardContent>
+                {loading && <p>Memuat...</p>}
+                {error && <p className="text-red-500">{error}</p>}
+                {stats && !loading && !error && (
+                    <div className="space-y-4">
+                        <div className="flex items-center">
+                            <Icon iconNode={HelpCircle} className="text-muted-foreground mr-3 h-5 w-5" />
+                            <div className="flex flex-1 items-center justify-between">
+                                <span className="text-muted-foreground">Total FAQ</span>
+                                <span className="font-semibold text-2xl text-blue-600">{stats.total_faqs}</span>
+                            </div>
+                        </div>
+                        <div className="flex items-center">
+                            <Icon iconNode={CheckCircle} className="text-muted-foreground mr-3 h-5 w-5" />
+                            <div className="flex flex-1 items-center justify-between">
+                                <span className="text-muted-foreground">FAQ Aktif</span>
+                                <span className="font-semibold text-2xl text-green-600">{stats.active_faqs}</span>
+                            </div>
+                        </div>
+                        <div className="flex items-center">
+                            <Icon iconNode={XCircle} className="text-muted-foreground mr-3 h-5 w-5" />
+                            <div className="flex flex-1 items-center justify-between">
+                                <span className="text-muted-foreground">FAQ Nonaktif</span>
+                                <span className="font-semibold text-2xl text-gray-600">{stats.inactive_faqs}</span>
+                            </div>
+                        </div>
+                        <div className="flex items-center">
+                            <Icon iconNode={Plus} className="text-muted-foreground mr-3 h-5 w-5" />
+                            <div className="flex flex-1 items-center justify-between">
+                                <span className="text-muted-foreground">Baru (30 hari)</span>
+                                <span className="font-semibold text-2xl text-purple-600">{stats.recent_count_30d}</span>
+                            </div>
+                        </div>
+
+                        {/* Activity indicator */}
+                        {stats.total_faqs > 0 && (
+                            <div className="mt-6 space-y-2">
+                                <div className="flex justify-between text-sm text-muted-foreground">
+                                    <span>FAQ Aktif</span>
+                                    <span>{Math.round((stats.active_faqs / stats.total_faqs) * 100)}%</span>
+                                </div>
+                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                    <div 
+                                        className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                                        style={{ width: `${Math.min((stats.active_faqs / stats.total_faqs) * 100, 100)}%` }}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+    );
+}
