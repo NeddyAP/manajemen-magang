@@ -243,6 +243,90 @@ export default function InternshipForm({ internship }: Props) {
                                 )}
                                 <InputError message={errors.application_file} />
                             </div>
+
+                            {/* Payment Files Section */}
+                            <div className="space-y-4">
+                                <h4 className="text-md font-medium text-gray-900 dark:text-gray-100">Bukti Pembayaran</h4>
+
+                                {/* SPP Payment File */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="spp_payment_file">Bukti Pembayaran SPP</Label>
+                                    {internship?.spp_payment_file ? (
+                                        <div className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm text-gray-600 dark:text-gray-400">
+                                                    {internship.spp_payment_file.split('/').pop()}
+                                                </span>
+                                                <a
+                                                    href={route('admin.internships.download-spp-payment', internship.id)}
+                                                    className="text-sm text-blue-600 hover:underline"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    Unduh
+                                                </a>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900">
+                                            <span className="text-sm text-gray-500">Tidak ada file</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* KKL/KKN Payment File */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="kkl_kkn_payment_file">Bukti Pembayaran KKL/KKN</Label>
+                                    {internship?.kkl_kkn_payment_file ? (
+                                        <div className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm text-gray-600 dark:text-gray-400">
+                                                    {internship.kkl_kkn_payment_file.split('/').pop()}
+                                                </span>
+                                                <a
+                                                    href={route('admin.internships.download-kkl-kkn-payment', internship.id)}
+                                                    className="text-sm text-blue-600 hover:underline"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    Unduh
+                                                </a>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900">
+                                            <span className="text-sm text-gray-500">Tidak ada file</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Practicum Payment File */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="practicum_payment_file">Bukti Pembayaran Praktikum</Label>
+                                    {internship?.practicum_payment_file ? (
+                                        <div className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm text-gray-600 dark:text-gray-400">
+                                                    {internship.practicum_payment_file.split('/').pop()}
+                                                </span>
+                                                <a
+                                                    href={route('admin.internships.download-practicum-payment', internship.id)}
+                                                    className="text-sm text-blue-600 hover:underline"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    Unduh
+                                                </a>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="rounded-md border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-900">
+                                            <span className="text-sm text-gray-500">Tidak ada file</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div className="space-y-4">
                                     <Label htmlFor="start_date">Tanggal Mulai</Label>

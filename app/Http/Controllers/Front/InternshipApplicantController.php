@@ -210,10 +210,28 @@ class InternshipApplicantController extends Controller
 
         $validated = $request->validated();
 
-        // Handle file upload
+        // Handle file upload for application file
         if ($request->hasFile('application_file')) {
             $path = $request->file('application_file')->store('internships/applications', 'public');
             $validated['application_file'] = $path;
+        }
+
+        // Handle file upload for SPP payment file
+        if ($request->hasFile('spp_payment_file')) {
+            $path = $request->file('spp_payment_file')->store('internships/payments/spp', 'public');
+            $validated['spp_payment_file'] = $path;
+        }
+
+        // Handle file upload for KKL/KKN payment file
+        if ($request->hasFile('kkl_kkn_payment_file')) {
+            $path = $request->file('kkl_kkn_payment_file')->store('internships/payments/kkl-kkn', 'public');
+            $validated['kkl_kkn_payment_file'] = $path;
+        }
+
+        // Handle file upload for Practicum payment file
+        if ($request->hasFile('practicum_payment_file')) {
+            $path = $request->file('practicum_payment_file')->store('internships/payments/practicum', 'public');
+            $validated['practicum_payment_file'] = $path;
         }
 
         $validated['user_id'] = auth()->id();
@@ -268,7 +286,7 @@ class InternshipApplicantController extends Controller
 
         $validated = $request->validated();
 
-        // Handle file upload
+        // Handle application file upload
         if ($request->hasFile('application_file')) {
             // Delete old file if exists
             if ($internship->application_file) {
@@ -278,83 +296,129 @@ class InternshipApplicantController extends Controller
             $path = $request->file('application_file')->store('internships/applications', 'public');
             $validated['application_file'] = $path;
         } else {
-            // If no new file is uploaded, keep the existing file
+            // If no new file is uploaded, keep the existing file by removing it from validated data
             unset($validated['application_file']);
         }
 
-        // Always set the status back to waiting on update
-        $validated['status'] = 'waiting';
+        // Handle SPP payment file upload
+        if ($request->hasFile('spp_payment_file')) {
+            // Delete old file if exists
+            if ($internship->spp_payment_file) {
+                Storage::disk('public')->delete($internship->spp_payment_file);
+            }
+
+            $path = $request->file('spp_payment_file')->store('internships/payments/spp', 'public');
+            $validated['spp_payment_file'] = $path;
+        } else {
+            // If no new file is uploaded, keep the existing file by removing it from validated data
+            unset($validated['spp_payment_file']);
+        }
+
+        // Handle KKL/KKN payment file upload
+        if ($request->hasFile('kkl_kkn_payment_file')) {
+            // Delete old file if exists
+            if ($internship->kkl_kkn_payment_file) {
+                Storage::disk('public')->delete($internship->kkl_kkn_payment_file);
+            }
+
+            $path = $request->file('kkl_kkn_payment_file')->store('internships/payments/kkl-kkn', 'public');
+            $validated['kkl_kkn_payment_file'] = $path;
+        } else {
+            // If no new file is uploaded, keep the existing file by removing it from validated data
+            unset($validated['kkl_kkn_payment_file']);
+        }
+
+        // Handle Practicum payment file upload
+        if ($request->hasFile('practicum_payment_file')) {
+            // Delete old file if exists
+            if ($internship->practicum_payment_file) {
+                Storage::disk('public')->delete($internship->practicum_payment_file);
+            }
+
+            $path = $request->file('practicum_payment_file')->store('internships/payments/practicum', 'public');
+            $validated['practicum_payment_file'] = $path;
+        } else {
+            // If no new file is uploaded, keep the existing file by removing it from validated data
+            unset($validated['practicum_payment_file']);
+        }
 
         $internship->update($validated);
 
         return redirect()->route('front.internships.applicants.index')
-            ->with('success', 'Aplikasi magang berhasil diperbarui!');
+            ->with('success', 'Aplikasi magang berhasil diperbarui.');
     }
 
     /**
-     * Remove the specified internship application.
+     * Remove the specified internship application from storage.
      */
     public function destroy(Internship $internship)
     {
-        // Check if user has permission to delete this internship
         $this->authorize('delete', $internship);
 
-        // Prevent deletion if status is accepted
+        // Only allow deletion if status is waiting or rejected
         if ($internship->status === 'accepted') {
-            return redirect()->back()->with('error', 'Anda tidak dapat menghapus aplikasi yang sudah diterima.');
+            return redirect()->back()->with('error', 'Aplikasi yang sudah diterima tidak dapat dihapus.');
         }
 
-        // Delete application file if exists
+        // Delete associated files
         if ($internship->application_file) {
             Storage::disk('public')->delete($internship->application_file);
+        }
+        if ($internship->spp_payment_file) {
+            Storage::disk('public')->delete($internship->spp_payment_file);
+        }
+        if ($internship->kkl_kkn_payment_file) {
+            Storage::disk('public')->delete($internship->kkl_kkn_payment_file);
+        }
+        if ($internship->practicum_payment_file) {
+            Storage::disk('public')->delete($internship->practicum_payment_file);
         }
 
         $internship->delete();
 
         return redirect()->route('front.internships.applicants.index')
-            ->with('success', 'Aplikasi magang berhasil dihapus!');
+            ->with('success', 'Aplikasi magang berhasil dihapus.');
     }
 
     /**
-     * Bulk delete internship applications.
+     * Bulk delete internship applications from storage.
      */
     public function bulkDestroy(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'ids' => 'required|array',
-            'ids.*' => 'integer',
+            'ids.*' => 'exists:internships,id',
         ]);
 
-        $user = Auth::user();
+        $internships = Internship::whereIn('id', $request->input('ids'))->get();
 
-        // Check if user has permission to delete internships
-        if ($user->can('internships.delete')) {
-            $query = Internship::whereIn('id', $validated['ids']);
+        foreach ($internships as $internship) {
+            $this->authorize('delete', $internship);
 
-            // If not admin, only allow deleting own waiting applications
-            if (! $user->can('admin.dashboard.view')) {
-                $query->where('user_id', $user->id)
-                    ->where('status', 'waiting');
+            // Only allow deletion if status is waiting or rejected
+            if ($internship->status === 'accepted') {
+                return redirect()->back()->with('error', 'Tidak dapat menghapus aplikasi yang sudah diterima.');
             }
 
-            $internships = $query->get();
-
-            foreach ($internships as $internship) {
-                // Check if user can delete this specific internship
-                if ($user->can('delete', $internship)) {
-                    // Delete application file
-                    if ($internship->application_file) {
-                        Storage::disk('public')->delete($internship->application_file);
-                    }
-                    $internship->delete();
-                }
+            // Delete associated files
+            if ($internship->application_file) {
+                Storage::disk('public')->delete($internship->application_file);
+            }
+            if ($internship->spp_payment_file) {
+                Storage::disk('public')->delete($internship->spp_payment_file);
+            }
+            if ($internship->kkl_kkn_payment_file) {
+                Storage::disk('public')->delete($internship->kkl_kkn_payment_file);
+            }
+            if ($internship->practicum_payment_file) {
+                Storage::disk('public')->delete($internship->practicum_payment_file);
             }
 
-            return back()->with('success', 'Aplikasi magang yang dipilih berhasil dihapus!');
-        } else {
-            // User doesn't have permission to delete internships
-            return back()->with('error', 'Anda tidak memiliki izin untuk menghapus aplikasi magang.');
+            $internship->delete();
         }
+
+        return redirect()->route('front.internships.applicants.index')
+            ->with('success', 'Aplikasi magang yang dipilih berhasil dihapus.');
     }
 
     /**
@@ -370,5 +434,50 @@ class InternshipApplicantController extends Controller
         }
 
         return Storage::disk('public')->download($internship->application_file);
+    }
+
+    /**
+     * Download the SPP payment file.
+     */
+    public function downloadSppPaymentFile(Internship $internship)
+    {
+        // Check if user has permission to view this internship
+        $this->authorize('view', $internship);
+
+        if (! $internship->spp_payment_file || ! Storage::disk('public')->exists($internship->spp_payment_file)) {
+            return back()->with('error', 'Berkas bukti pembayaran SPP tidak ditemukan.');
+        }
+
+        return Storage::disk('public')->download($internship->spp_payment_file);
+    }
+
+    /**
+     * Download the KKL/KKN payment file.
+     */
+    public function downloadKklKknPaymentFile(Internship $internship)
+    {
+        // Check if user has permission to view this internship
+        $this->authorize('view', $internship);
+
+        if (! $internship->kkl_kkn_payment_file || ! Storage::disk('public')->exists($internship->kkl_kkn_payment_file)) {
+            return back()->with('error', 'Berkas bukti pembayaran KKL/KKN tidak ditemukan.');
+        }
+
+        return Storage::disk('public')->download($internship->kkl_kkn_payment_file);
+    }
+
+    /**
+     * Download the Practicum payment file.
+     */
+    public function downloadPracticumPaymentFile(Internship $internship)
+    {
+        // Check if user has permission to view this internship
+        $this->authorize('view', $internship);
+
+        if (! $internship->practicum_payment_file || ! Storage::disk('public')->exists($internship->practicum_payment_file)) {
+            return back()->with('error', 'Berkas bukti pembayaran praktikum tidak ditemukan.');
+        }
+
+        return Storage::disk('public')->download($internship->practicum_payment_file);
     }
 }

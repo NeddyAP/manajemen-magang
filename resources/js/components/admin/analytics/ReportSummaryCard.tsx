@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 const STATUS_COLORS: { [key: string]: string } = {
     pending: '#f59e0b', // amber-500
@@ -106,10 +106,10 @@ export function ReportSummaryCard() {
                         {/* Additional metrics */}
                         <div className="space-y-2 text-sm">
                             {Object.entries(stats.by_status).map(([status, count]) => (
-                                <div key={status} className="flex justify-between items-center">
+                                <div key={status} className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <div 
-                                            className="w-3 h-3 rounded-full" 
+                                        <div
+                                            className="h-3 w-3 rounded-full"
                                             style={{ backgroundColor: STATUS_COLORS[status] || STATUS_COLORS.default }}
                                         />
                                         <span>{STATUS_NAMES_ID[status] || status}</span>

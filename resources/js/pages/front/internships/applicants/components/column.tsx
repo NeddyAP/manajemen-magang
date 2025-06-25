@@ -12,12 +12,13 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Internship } from '@/types/internship';
 import { router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { FileSpreadsheet, MoreHorizontal } from 'lucide-react';
+import { FileArchive, FileDigit, FileSpreadsheet, FileText, MoreHorizontal } from 'lucide-react';
 
 // Rename to baseColumns
 export const baseColumns: ColumnDef<Internship>[] = [
@@ -166,19 +167,56 @@ export const baseColumns: ColumnDef<Internship>[] = [
         },
     },
     {
-        accessorKey: 'application_file',
+        id: 'berkas',
         header: ({ column }) => <DataTableColumnHeader column={column} title="Berkas" />,
         cell: ({ row }) => {
-            const filePath = row.getValue('application_file');
-            if (!filePath || typeof filePath !== 'string') return '-';
+            const files = [
+                {
+                    path: row.original.application_file,
+                    label: 'Berkas Pengajuan',
+                    icon: FileArchive,
+                },
+                {
+                    path: row.original.spp_payment_file,
+                    label: 'Bukti Pembayaran SPP',
+                    icon: FileText,
+                },
+                {
+                    path: row.original.kkl_kkn_payment_file,
+                    label: 'Bukti Pembayaran KKL/KKN',
+                    icon: FileSpreadsheet,
+                },
+                {
+                    path: row.original.practicum_payment_file,
+                    label: 'Bukti Pembayaran Praktikum',
+                    icon: FileDigit,
+                },
+            ].filter((file) => file.path && typeof file.path === 'string');
 
-            // Create a URL to the file
-            const fileUrl = `/storage/${filePath}`;
+            if (files.length === 0) return '-';
 
             return (
-                <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                    <FileSpreadsheet className="mr-2 inline h-4 w-4" />
-                </a>
+                <div className="flex gap-1">
+                    {files.map((file, index) => {
+                        const fileUrl = `/storage/${file.path}`;
+                        const IconComponent = file.icon;
+
+                        return (
+                            <TooltipProvider key={index}>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                                            <IconComponent className="h-4 w-4" />
+                                        </a>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>{file.label}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        );
+                    })}
+                </div>
             );
         },
     },

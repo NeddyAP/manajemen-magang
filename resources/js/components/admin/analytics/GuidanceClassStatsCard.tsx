@@ -47,34 +47,34 @@ export function GuidanceClassStatsCard() {
                             <Icon iconNode={Calendar} className="text-muted-foreground mr-3 h-5 w-5" />
                             <div className="flex flex-1 items-center justify-between">
                                 <span className="text-muted-foreground">Total Kelas</span>
-                                <span className="font-semibold text-2xl text-blue-600">{stats.total_classes}</span>
+                                <span className="text-2xl font-semibold text-blue-600">{stats.total_classes}</span>
                             </div>
                         </div>
                         <div className="flex items-center">
                             <Icon iconNode={CalendarCheck} className="text-muted-foreground mr-3 h-5 w-5" />
                             <div className="flex flex-1 items-center justify-between">
                                 <span className="text-muted-foreground">Kelas Mendatang</span>
-                                <span className="font-semibold text-2xl text-green-600">{stats.upcoming_classes}</span>
+                                <span className="text-2xl font-semibold text-green-600">{stats.upcoming_classes}</span>
                             </div>
                         </div>
                         <div className="flex items-center">
                             <Icon iconNode={CalendarX} className="text-muted-foreground mr-3 h-5 w-5" />
                             <div className="flex flex-1 items-center justify-between">
                                 <span className="text-muted-foreground">Kelas Selesai</span>
-                                <span className="font-semibold text-2xl text-gray-600">{stats.past_classes}</span>
+                                <span className="text-2xl font-semibold text-gray-600">{stats.past_classes}</span>
                             </div>
                         </div>
 
                         {/* Progress indicator */}
                         {stats.total_classes > 0 && (
                             <div className="mt-6 space-y-2">
-                                <div className="flex justify-between text-sm text-muted-foreground">
+                                <div className="text-muted-foreground flex justify-between text-sm">
                                     <span>Progress Kelas</span>
                                     <span>{Math.round((stats.past_classes / stats.total_classes) * 100)}% Selesai</span>
                                 </div>
-                                <div className="w-full bg-gray-200 rounded-full h-2">
-                                    <div 
-                                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                <div className="h-2 w-full rounded-full bg-gray-200">
+                                    <div
+                                        className="h-2 rounded-full bg-blue-600 transition-all duration-300"
                                         style={{ width: `${Math.min((stats.past_classes / stats.total_classes) * 100, 100)}%` }}
                                     />
                                 </div>

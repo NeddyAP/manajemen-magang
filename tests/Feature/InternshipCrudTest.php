@@ -63,13 +63,20 @@ test('[mahasiswa] can submit a valid internship application', function (): void 
 
     // The factory generates a string for 'application_file', remove it as we'll upload a fake file.
     unset($baseInternshipData['application_file']);
+    unset($baseInternshipData['spp_payment_file']);
+    unset($baseInternshipData['kkl_kkn_payment_file']);
+    unset($baseInternshipData['practicum_payment_file']);
     // The factory also generates dates as DateTime objects, ensure they are strings for the POST request.
     $baseInternshipData['start_date'] = (new DateTime($baseInternshipData['start_date']))->format('Y-m-d');
     $baseInternshipData['end_date'] = (new DateTime($baseInternshipData['end_date']))->format('Y-m-d');
 
     $postData = array_merge(
         $baseInternshipData,
-        ['application_file' => UploadedFile::fake()->create('document.pdf', 1024, 'application/pdf')]
+        ['application_file' => UploadedFile::fake()->create('document.pdf', 1024, 'application/pdf')],
+        ['spp_payment_file' => UploadedFile::fake()->create('document.pdf', 1024, 'application/pdf')],
+        ['kkl_kkn_payment_file' => UploadedFile::fake()->create('document.pdf', 1024, 'application/pdf')],
+        ['practicum_payment_file' => UploadedFile::fake()->create('document.pdf', 1024, 'application/pdf')]
+
     );
 
     $this->actingAs($mahasiswa)
@@ -95,6 +102,9 @@ test('[mahasiswa] cannot submit an internship application with invalid data', fu
     $validBaseData = Internship::factory()->make([
         'user_id' => $mahasiswa->id,
         'application_file' => UploadedFile::fake()->create('document.pdf', 1024, 'application/pdf'),
+        'spp_payment_file' => UploadedFile::fake()->create('document.pdf', 1024, 'application/pdf'),
+        'kkl_kkn_payment_file' => UploadedFile::fake()->create('document.pdf', 1024, 'application/pdf'),
+        'practicum_payment_file' => UploadedFile::fake()->create('document.pdf', 1024, 'application/pdf'),
     ])->toArray();
     // Ensure dates are strings
     $validBaseData['start_date'] = (new DateTime($validBaseData['start_date']))->format('Y-m-d');
@@ -206,6 +216,9 @@ test('[mahasiswa] can view but cannot update internship if already accepted', fu
 
         unset($updatedData['user_id']);
         unset($updatedData['application_file']);
+        unset($updatedData['spp_payment_file']);
+        unset($updatedData['kkl_kkn_payment_file']);
+        unset($updatedData['practicum_payment_file']);
         $updatedData['start_date'] = (new DateTime($updatedData['start_date']))->format('Y-m-d');
         $updatedData['end_date'] = (new DateTime($updatedData['end_date']))->format('Y-m-d');
 
@@ -238,6 +251,9 @@ test('[mahasiswa] can update their own internship with valid data if editable', 
     // For simplicity, let's assume file is not updated here or is optional on update.
     // If it's required, it must be provided.
     unset($validDataForUpdate['application_file']); // Assuming file is not part of this specific update test or is optional
+    unset($validDataForUpdate['spp_payment_file']);
+    unset($validDataForUpdate['kkl_kkn_payment_file']);
+    unset($validDataForUpdate['practicum_payment_file']);
 
     $updatedData = array_merge(
         $validDataForUpdate, // provides all other required fields with valid values
@@ -269,6 +285,9 @@ test('[mahasiswa] cannot update their internship with invalid data', function ()
     $validBaseDataForUpdate['start_date'] = (new DateTime($validBaseDataForUpdate['start_date']))->format('Y-m-d');
     $validBaseDataForUpdate['end_date'] = (new DateTime($validBaseDataForUpdate['end_date']))->format('Y-m-d');
     unset($validBaseDataForUpdate['application_file']); // Assuming file is not part of this specific update test or is optional
+    unset($validBaseDataForUpdate['spp_payment_file']);
+    unset($validBaseDataForUpdate['kkl_kkn_payment_file']);
+    unset($validBaseDataForUpdate['practicum_payment_file']);
     unset($validBaseDataForUpdate['user_id']);
 
     $invalidUpdateData = array_merge($validBaseDataForUpdate, ['company_name' => '']); // Make company_name invalid
@@ -385,13 +404,19 @@ test('[mahasiswa] can submit an internship application with a file upload', func
 
     // The factory generates a string for 'application_file', remove it.
     unset($baseInternshipData['application_file']);
+    unset($baseInternshipData['spp_payment_file']);
+    unset($baseInternshipData['kkl_kkn_payment_file']);
+    unset($baseInternshipData['practicum_payment_file']);
     // Ensure dates are strings
     $baseInternshipData['start_date'] = (new DateTime($baseInternshipData['start_date']))->format('Y-m-d');
     $baseInternshipData['end_date'] = (new DateTime($baseInternshipData['end_date']))->format('Y-m-d');
 
     $postData = array_merge(
         $baseInternshipData,
-        ['application_file' => $file]
+        ['application_file' => $file],
+        ['spp_payment_file' => $file],
+        ['kkl_kkn_payment_file' => $file],
+        ['practicum_payment_file' => $file]
     );
 
     $this->actingAs($mahasiswa)
@@ -402,7 +427,13 @@ test('[mahasiswa] can submit an internship application with a file upload', func
     $createdInternship = Internship::where('user_id', $mahasiswa->id)->where('company_name', $baseInternshipData['company_name'])->first();
     $this->assertNotNull($createdInternship);
     $this->assertNotNull($createdInternship->application_file);
+    $this->assertNotNull($createdInternship->spp_payment_file);
+    $this->assertNotNull($createdInternship->kkl_kkn_payment_file);
+    $this->assertNotNull($createdInternship->practicum_payment_file);
     Storage::disk('public')->assertExists($createdInternship->application_file);
+    Storage::disk('public')->assertExists($createdInternship->spp_payment_file);
+    Storage::disk('public')->assertExists($createdInternship->kkl_kkn_payment_file);
+    Storage::disk('public')->assertExists($createdInternship->practicum_payment_file);
 });
 
 test('internship application fails if uploaded file is invalid', function (): void {
@@ -413,17 +444,22 @@ test('internship application fails if uploaded file is invalid', function (): vo
     $baseInternshipData = Internship::factory()->make([
         'user_id' => $mahasiswa->id, // Associate with the mahasiswa
     ])->toArray();
-    unset($baseInternshipData['application_file']); // Remove factory string path
-    // Ensure dates are strings
+    unset($baseInternshipData['application_file']);
+    unset($baseInternshipData['spp_payment_file']);
+    unset($baseInternshipData['kkl_kkn_payment_file']);
+    unset($baseInternshipData['practicum_payment_file']);
     $baseInternshipData['start_date'] = (new DateTime($baseInternshipData['start_date']))->format('Y-m-d');
     $baseInternshipData['end_date'] = (new DateTime($baseInternshipData['end_date']))->format('Y-m-d');
 
     $postData = array_merge(
         $baseInternshipData,
-        ['application_file' => $invalidFile]
+        ['application_file' => $invalidFile],
+        ['spp_payment_file' => $invalidFile],
+        ['kkl_kkn_payment_file' => $invalidFile],
+        ['practicum_payment_file' => $invalidFile]
     );
 
     $this->actingAs($mahasiswa)
         ->post(route('front.internships.applicants.store'), $postData)
-        ->assertSessionHasErrors('application_file');
+        ->assertSessionHasErrors(['application_file', 'spp_payment_file', 'kkl_kkn_payment_file', 'practicum_payment_file']);
 });

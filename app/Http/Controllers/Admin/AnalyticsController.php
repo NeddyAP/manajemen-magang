@@ -64,7 +64,7 @@ class AnalyticsController extends Controller
     public function getStudentPerformance(Request $request): JsonResponse
     {
         // Calculate actual student performance metrics
-        
+
         // Logbook completion rate: students with logbooks vs total students with internships
         $studentsWithInternships = Internship::distinct('user_id')->count('user_id');
         $studentsWithLogbooks = Logbook::distinct('user_id')->count('user_id');
@@ -109,7 +109,7 @@ class AnalyticsController extends Controller
     public function getSystemUsage(Request $request): JsonResponse
     {
         // Comprehensive system usage metrics
-        
+
         $activeUsers30d = User::where('last_login_at', '>=', now()->subDays(30))->count();
         $activeUsers7d = User::where('last_login_at', '>=', now()->subDays(7))->count();
         $activeUsersToday = User::where('last_login_at', '>=', now()->startOfDay())->count();
@@ -119,7 +119,7 @@ class AnalyticsController extends Controller
         $recentLogbooks = Logbook::where('created_at', '>=', now()->subDays(30))->count();
         $recentReports = Report::where('created_at', '>=', now()->subDays(30))->count();
         $recentGuidanceClasses = GuidanceClass::where('created_at', '>=', now()->subDays(30))->count();
-        
+
         // File storage metrics
         $totalFiles = Internship::whereNotNull('application_file')->count() +
                      Report::whereNotNull('report_file')->count() +
@@ -138,19 +138,19 @@ class AnalyticsController extends Controller
             'active_users_7d' => $activeUsers7d,
             'active_users_30d' => $activeUsers30d,
             'total_users' => $totalUsers,
-            
+
             // Content totals
             'total_internships' => $totalInternships,
             'total_logbooks' => $totalLogbooks,
             'total_reports' => $totalReports,
             'total_guidance_classes' => $totalGuidanceClasses,
-            
+
             // Recent activity (last 30 days)
             'recent_internships_30d' => $recentInternships,
             'recent_logbooks_30d' => $recentLogbooks,
             'recent_reports_30d' => $recentReports,
             'recent_guidance_classes_30d' => $recentGuidanceClasses,
-            
+
             // System metrics
             'total_uploaded_files' => $totalFiles,
             'user_engagement_rate' => $totalUsers > 0 ? round(($activeUsers30d / $totalUsers) * 100, 1) : 0,
@@ -167,13 +167,13 @@ class AnalyticsController extends Controller
         $total = Logbook::count();
         $recentCount = Logbook::where('created_at', '>=', now()->subDays(7))->count();
         $monthlyCount = Logbook::where('created_at', '>=', now()->subDays(30))->count();
-        
+
         // Since logbooks don't have status, we'll categorize by other meaningful metrics
         $withSupervisorNotes = Logbook::whereNotNull('supervisor_notes')
             ->where('supervisor_notes', '!=', '')
             ->count();
         $withoutSupervisorNotes = $total - $withSupervisorNotes;
-        
+
         // Group by internship status to understand logbook context
         $byInternshipStatus = Logbook::join('internships', 'logbooks.internship_id', '=', 'internships.id')
             ->select('internships.status', DB::raw('count(logbooks.id) as total'))

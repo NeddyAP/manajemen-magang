@@ -18,6 +18,9 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->enum('type', array_column(InternshipTypeEnum::cases(), 'value'));
             $table->string('application_file');
+            $table->string('spp_payment_file');
+            $table->string('kkl_kkn_payment_file');
+            $table->string('practicum_payment_file');
             $table->string('company_name');
             $table->string('company_address');
             $table->date('start_date');

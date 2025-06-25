@@ -61,10 +61,14 @@ class AnalyticsTest extends TestCase
     {
         $response = $this->actingAs($this->adminUser)->getJson(route('admin.analytics.student-performance'));
         $response->assertStatus(200)
-            ->assertJson([
-                'logbook_completion_avg' => 85.5,
-                'report_approval_rate' => 92.1,
-                'guidance_attendance_avg' => 95.0,
+            ->assertJsonStructure([
+                'logbook_completion_avg',
+                'report_approval_rate',
+                'guidance_attendance_avg',
+                'students_with_logbooks',
+                'students_with_internships',
+                'total_reports',
+                'approved_reports',
             ]);
     }
 
@@ -79,10 +83,21 @@ class AnalyticsTest extends TestCase
         $response = $this->actingAs($this->adminUser)->getJson(route('admin.analytics.system-usage'));
 
         $response->assertStatus(200)
-            ->assertJson([
-                'active_users_last_30d' => 3,
-                'total_internships' => 15,
-                'total_logbooks' => 10,
+            ->assertJsonStructure([
+                'active_users_today',
+                'active_users_7d',
+                'active_users_30d',
+                'total_users',
+                'total_internships',
+                'total_logbooks',
+                'total_reports',
+                'total_guidance_classes',
+                'recent_internships_30d',
+                'recent_logbooks_30d',
+                'recent_reports_30d',
+                'recent_guidance_classes_30d',
+                'total_uploaded_files',
+                'user_engagement_rate',
             ]);
     }
 
@@ -207,7 +222,14 @@ class AnalyticsTest extends TestCase
     {
         $response = $this->actingAs($this->adminUser)->getJson(route('admin.analytics.trash-stats'));
         $response->assertStatus(200)
-            ->assertJson(['total_items_in_trash' => 'N/A']);
+            ->assertJsonStructure([
+                'total_items_in_trash',
+                'recently_trashed_7d',
+                'by_model' => [
+                    'users', 'internships', 'logbooks', 'reports', 'tutorials', 'faqs', 'global_variables', 'guidance_classes',
+                ],
+            ])
+            ->assertJson(['total_items_in_trash' => 0]);
     }
 
     public function test_non_admin_cannot_access_analytics_endpoints(): void

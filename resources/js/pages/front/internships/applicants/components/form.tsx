@@ -46,6 +46,9 @@ export default function InternshipForm({ internship, mode, disabled = false, mah
     const { data, setData, post, processing, errors, clearErrors, transform, setError } = useForm({
         type: (internship?.type as InternshipType) ?? 'kkl',
         application_file: null as File | null | undefined,
+        spp_payment_file: null as File | null | undefined,
+        kkl_kkn_payment_file: null as File | null | undefined,
+        practicum_payment_file: null as File | null | undefined,
         company_name: internship?.company_name ?? '',
         company_address: internship?.company_address ?? '',
         start_date: internship?.start_date ?? '',
@@ -54,14 +57,28 @@ export default function InternshipForm({ internship, mode, disabled = false, mah
     });
 
     const [currentFile, setCurrentFile] = useState(internship?.application_file || '');
+    const [currentSppPaymentFile, setCurrentSppPaymentFile] = useState(internship?.spp_payment_file || '');
+    const [currentKklKknPaymentFile, setCurrentKklKknPaymentFile] = useState(internship?.kkl_kkn_payment_file || '');
+    const [currentPracticumPaymentFile, setCurrentPracticumPaymentFile] = useState(internship?.practicum_payment_file || '');
     const [startDate, setStartDate] = useState<Date | undefined>(data.start_date ? new Date(data.start_date as string) : undefined);
     const [endDate, setEndDate] = useState<Date | undefined>(data.end_date ? new Date(data.end_date as string) : undefined);
 
     useEffect(() => {
-        if (mode === 'edit' && data.application_file === null) {
-            // Ensure 'undefined' if no new file is picked in edit mode
+        if (mode === 'edit') {
+            if (data.application_file === null) {
+                // Ensure 'undefined' if no new file is picked in edit mode
+            }
+            if (data.spp_payment_file === null) {
+                // Ensure 'undefined' if no new file is picked in edit mode
+            }
+            if (data.kkl_kkn_payment_file === null) {
+                // Ensure 'undefined' if no new file is picked in edit mode
+            }
+            if (data.practicum_payment_file === null) {
+                // Ensure 'undefined' if no new file is picked in edit mode
+            }
         }
-    }, [mode, data.application_file]);
+    }, [mode, data.application_file, data.spp_payment_file, data.kkl_kkn_payment_file, data.practicum_payment_file]);
 
     const handleNextTab = () => {
         clearErrors();
@@ -103,13 +120,16 @@ export default function InternshipForm({ internship, mode, disabled = false, mah
                 newErrors.application_file = 'Berkas Lamaran harus diunggah.';
                 formIsValid = false;
             }
+            // New payment files are nullable/optional for both create and edit modes
             // In 'edit' mode, application_file is not strictly required to proceed
             // if the user doesn't want to change the existing file.
             // The backend will handle keeping the old file if no new one is submitted.
             // A new file (instanceof File) would be validated by the backend if provided.
 
             if (!formIsValid) {
-                setError('application_file', newErrors.application_file);
+                Object.keys(newErrors).forEach((key) => {
+                    setError(key as keyof typeof data, newErrors[key]);
+                });
                 toast.error('Harap unggah Berkas Lamaran.');
                 return;
             }
@@ -136,6 +156,9 @@ export default function InternshipForm({ internship, mode, disabled = false, mah
             const {
                 type,
                 application_file, // This is File | null | undefined from useForm's state
+                spp_payment_file,
+                kkl_kkn_payment_file,
+                practicum_payment_file,
                 company_name,
                 company_address,
                 start_date,
@@ -145,13 +168,31 @@ export default function InternshipForm({ internship, mode, disabled = false, mah
             } = currentFormData;
 
             let submissionApplicationFile = application_file;
-            if (mode === 'edit' && application_file === null) {
-                submissionApplicationFile = undefined;
+            let submissionSppPaymentFile = spp_payment_file;
+            let submissionKklKknPaymentFile = kkl_kkn_payment_file;
+            let submissionPracticumPaymentFile = practicum_payment_file;
+
+            if (mode === 'edit') {
+                if (application_file === null) {
+                    submissionApplicationFile = undefined;
+                }
+                if (spp_payment_file === null) {
+                    submissionSppPaymentFile = undefined;
+                }
+                if (kkl_kkn_payment_file === null) {
+                    submissionKklKknPaymentFile = undefined;
+                }
+                if (practicum_payment_file === null) {
+                    submissionPracticumPaymentFile = undefined;
+                }
             }
 
             return {
                 type,
                 application_file: submissionApplicationFile,
+                spp_payment_file: submissionSppPaymentFile,
+                kkl_kkn_payment_file: submissionKklKknPaymentFile,
+                practicum_payment_file: submissionPracticumPaymentFile,
                 company_name,
                 company_address,
                 start_date,
@@ -166,14 +207,37 @@ export default function InternshipForm({ internship, mode, disabled = false, mah
         });
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = (
+        e: React.ChangeEvent<HTMLInputElement>,
+        fieldName: 'application_file' | 'spp_payment_file' | 'kkl_kkn_payment_file' | 'practicum_payment_file',
+    ) => {
         const file = e.target.files?.[0] || null;
-        setData('application_file', file);
-        if (file) {
-            setCurrentFile(file.name);
-        } else {
-            // If file is cleared, reset to original if in edit mode, or empty if create
-            setCurrentFile(mode === 'edit' ? internship?.application_file || '' : '');
+        setData(fieldName, file);
+
+        if (fieldName === 'application_file') {
+            if (file) {
+                setCurrentFile(file.name);
+            } else {
+                setCurrentFile(mode === 'edit' ? internship?.application_file || '' : '');
+            }
+        } else if (fieldName === 'spp_payment_file') {
+            if (file) {
+                setCurrentSppPaymentFile(file.name);
+            } else {
+                setCurrentSppPaymentFile(mode === 'edit' ? internship?.spp_payment_file || '' : '');
+            }
+        } else if (fieldName === 'kkl_kkn_payment_file') {
+            if (file) {
+                setCurrentKklKknPaymentFile(file.name);
+            } else {
+                setCurrentKklKknPaymentFile(mode === 'edit' ? internship?.kkl_kkn_payment_file || '' : '');
+            }
+        } else if (fieldName === 'practicum_payment_file') {
+            if (file) {
+                setCurrentPracticumPaymentFile(file.name);
+            } else {
+                setCurrentPracticumPaymentFile(mode === 'edit' ? internship?.practicum_payment_file || '' : '');
+            }
         }
     };
 
@@ -363,7 +427,7 @@ export default function InternshipForm({ internship, mode, disabled = false, mah
                                         type="file"
                                         accept=".pdf"
                                         disabled={disabled || processing}
-                                        onChange={handleFileChange}
+                                        onChange={(e) => handleFileChange(e, 'application_file')}
                                     />
                                     {currentFile && (
                                         <p className="text-muted-foreground text-sm">
@@ -387,7 +451,107 @@ export default function InternshipForm({ internship, mode, disabled = false, mah
                                     )}
                                     <InputError message={errors.application_file} />
                                 </div>
-                                <p>Bagian Unggah Berkas.</p>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="spp_payment_file">Bukti Pembayaran SPP </Label>
+                                    <Input
+                                        id="spp_payment_file"
+                                        type="file"
+                                        accept=".pdf,.jpg,.jpeg,.png"
+                                        disabled={disabled || processing}
+                                        onChange={(e) => handleFileChange(e, 'spp_payment_file')}
+                                    />
+                                    {(currentSppPaymentFile || data.spp_payment_file) && (
+                                        <p className="text-muted-foreground text-sm">
+                                            File saat ini:{' '}
+                                            {data.spp_payment_file instanceof File
+                                                ? data.spp_payment_file.name
+                                                : currentSppPaymentFile
+                                                  ? getFileName(currentSppPaymentFile)
+                                                  : 'Belum ada file dipilih.'}
+                                            {mode === 'edit' && internship?.spp_payment_file && !data.spp_payment_file && (
+                                                <a
+                                                    href={route('front.internships.applicants.download-spp-payment', internship.id)}
+                                                    className="ml-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    (Unduh)
+                                                </a>
+                                            )}
+                                        </p>
+                                    )}
+                                    <InputError message={errors.spp_payment_file} />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="kkl_kkn_payment_file">Bukti Pembayaran KKL/KKN </Label>
+                                    <Input
+                                        id="kkl_kkn_payment_file"
+                                        type="file"
+                                        accept=".pdf,.jpg,.jpeg,.png"
+                                        disabled={disabled || processing}
+                                        onChange={(e) => handleFileChange(e, 'kkl_kkn_payment_file')}
+                                    />
+                                    {(currentKklKknPaymentFile || data.kkl_kkn_payment_file) && (
+                                        <p className="text-muted-foreground text-sm">
+                                            File saat ini:{' '}
+                                            {data.kkl_kkn_payment_file instanceof File
+                                                ? data.kkl_kkn_payment_file.name
+                                                : currentKklKknPaymentFile
+                                                  ? getFileName(currentKklKknPaymentFile)
+                                                  : 'Belum ada file dipilih.'}
+                                            {mode === 'edit' && internship?.kkl_kkn_payment_file && !data.kkl_kkn_payment_file && (
+                                                <a
+                                                    href={route('front.internships.applicants.download-kkl-kkn-payment', internship.id)}
+                                                    className="ml-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    (Unduh)
+                                                </a>
+                                            )}
+                                        </p>
+                                    )}
+                                    <InputError message={errors.kkl_kkn_payment_file} />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="practicum_payment_file">Bukti Pembayaran Praktikum </Label>
+                                    <Input
+                                        id="practicum_payment_file"
+                                        type="file"
+                                        accept=".pdf,.jpg,.jpeg,.png"
+                                        disabled={disabled || processing}
+                                        onChange={(e) => handleFileChange(e, 'practicum_payment_file')}
+                                    />
+                                    {(currentPracticumPaymentFile || data.practicum_payment_file) && (
+                                        <p className="text-muted-foreground text-sm">
+                                            File saat ini:{' '}
+                                            {data.practicum_payment_file instanceof File
+                                                ? data.practicum_payment_file.name
+                                                : currentPracticumPaymentFile
+                                                  ? getFileName(currentPracticumPaymentFile)
+                                                  : 'Belum ada file dipilih.'}
+                                            {mode === 'edit' && internship?.practicum_payment_file && !data.practicum_payment_file && (
+                                                <a
+                                                    href={route('front.internships.applicants.download-practicum-payment', internship.id)}
+                                                    className="ml-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    (Unduh)
+                                                </a>
+                                            )}
+                                        </p>
+                                    )}
+                                    <InputError message={errors.practicum_payment_file} />
+                                </div>
+
+                                <p className="text-muted-foreground text-sm">
+                                    Unggah berkas pendukung untuk melengkapi aplikasi magang Anda. File bukti pembayaran dapat berupa PDF atau gambar
+                                    (JPG/PNG).
+                                </p>
                             </CardContent>
                         </Card>
                         <div className="mt-6 flex justify-between gap-4">
@@ -458,6 +622,36 @@ export default function InternshipForm({ internship, mode, disabled = false, mah
                                                 ? data.application_file.name
                                                 : mode === 'edit' && internship?.application_file
                                                   ? `${getFileName(internship.application_file)} (Berkas lama akan dipertahankan jika tidak ada perubahan)`
+                                                  : 'Tidak ada berkas dipilih.'}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span className="font-semibold text-gray-700 dark:text-gray-300">Bukti Pembayaran SPP:</span>
+                                        <span className="ml-2 text-gray-600 dark:text-gray-400">
+                                            {data.spp_payment_file instanceof File
+                                                ? data.spp_payment_file.name
+                                                : mode === 'edit' && internship?.spp_payment_file
+                                                  ? `${getFileName(internship.spp_payment_file)} (Berkas lama akan dipertahankan jika tidak ada perubahan)`
+                                                  : 'Tidak ada berkas dipilih.'}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span className="font-semibold text-gray-700 dark:text-gray-300">Bukti Pembayaran KKL/KKN:</span>
+                                        <span className="ml-2 text-gray-600 dark:text-gray-400">
+                                            {data.kkl_kkn_payment_file instanceof File
+                                                ? data.kkl_kkn_payment_file.name
+                                                : mode === 'edit' && internship?.kkl_kkn_payment_file
+                                                  ? `${getFileName(internship.kkl_kkn_payment_file)} (Berkas lama akan dipertahankan jika tidak ada perubahan)`
+                                                  : 'Tidak ada berkas dipilih.'}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span className="font-semibold text-gray-700 dark:text-gray-300">Bukti Pembayaran Praktikum:</span>
+                                        <span className="ml-2 text-gray-600 dark:text-gray-400">
+                                            {data.practicum_payment_file instanceof File
+                                                ? data.practicum_payment_file.name
+                                                : mode === 'edit' && internship?.practicum_payment_file
+                                                  ? `${getFileName(internship.practicum_payment_file)} (Berkas lama akan dipertahankan jika tidak ada perubahan)`
                                                   : 'Tidak ada berkas dipilih.'}
                                         </span>
                                     </div>

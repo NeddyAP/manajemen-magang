@@ -1,9 +1,9 @@
 import { Icon } from '@/components/icon';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import axios from 'axios';
-import { Trash2, Clock, AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Clock, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 const MODEL_COLORS: { [key: string]: string } = {
     users: '#3b82f6', // blue-500
@@ -61,7 +61,7 @@ export function TrashStatsCard() {
     const prepareModelDataForChart = () => {
         if (!stats?.by_model) return [];
         return Object.entries(stats.by_model)
-            .filter(([_, count]) => count > 0) // Only show models with items in trash
+            .filter(([, count]) => count > 0) // Only show models with items in trash
             .map(([model, count]) => ({
                 model,
                 displayName: MODEL_NAMES_ID[model] || MODEL_NAMES_ID.default,
@@ -95,7 +95,7 @@ export function TrashStatsCard() {
 
                         {/* Warning if trash is not empty */}
                         {stats.total_items_in_trash > 0 && (
-                            <div className="flex items-center gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                            <div className="flex items-center gap-2 rounded-lg border border-yellow-200 bg-yellow-50 p-3">
                                 <Icon iconNode={AlertTriangle} className="h-4 w-4 text-yellow-600" />
                                 <span className="text-sm text-yellow-800">
                                     Ada {stats.total_items_in_trash} item di sampah yang dapat dipulihkan atau dihapus permanen.
@@ -135,12 +135,12 @@ export function TrashStatsCard() {
                         {stats.total_items_in_trash > 0 && (
                             <div className="space-y-2 text-sm">
                                 {Object.entries(stats.by_model)
-                                    .filter(([_, count]) => count > 0)
+                                    .filter(([, count]) => count > 0)
                                     .map(([model, count]) => (
-                                        <div key={model} className="flex justify-between items-center">
+                                        <div key={model} className="flex items-center justify-between">
                                             <div className="flex items-center gap-2">
-                                                <div 
-                                                    className="w-3 h-3 rounded-full" 
+                                                <div
+                                                    className="h-3 w-3 rounded-full"
                                                     style={{ backgroundColor: MODEL_COLORS[model] || MODEL_COLORS.default }}
                                                 />
                                                 <span>{MODEL_NAMES_ID[model] || model}</span>
@@ -153,8 +153,8 @@ export function TrashStatsCard() {
 
                         {/* Empty state */}
                         {stats.total_items_in_trash === 0 && (
-                            <div className="text-center py-8">
-                                <Icon iconNode={Trash2} className="mx-auto h-12 w-12 text-gray-300 mb-3" />
+                            <div className="py-8 text-center">
+                                <Icon iconNode={Trash2} className="mx-auto mb-3 h-12 w-12 text-gray-300" />
                                 <p className="text-muted-foreground">Sampah kosong - tidak ada item yang dihapus.</p>
                             </div>
                         )}

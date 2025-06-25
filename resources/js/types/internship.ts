@@ -6,6 +6,9 @@ export interface Internship {
     user?: User;
     type?: string;
     application_file?: string;
+    spp_payment_file?: string;
+    kkl_kkn_payment_file?: string;
+    practicum_payment_file?: string;
     company_name?: string;
     company_address?: string;
     start_date?: string;

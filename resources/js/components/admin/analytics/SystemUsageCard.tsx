@@ -1,7 +1,5 @@
-import { Icon } from '@/components/icon';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import axios from 'axios';
-import { BookOpen, Briefcase, Users } from 'lucide-react'; // Import specific icons
 import { useEffect, useState } from 'react';
 
 interface SystemUsageData {
@@ -58,11 +56,11 @@ export function SystemUsageCard() {
                         <div className="space-y-3">
                             <h4 className="text-sm font-medium text-gray-700">Aktivitas Pengguna</h4>
                             <div className="grid grid-cols-2 gap-3 text-sm">
-                                <div className="text-center p-2 bg-blue-50 rounded">
+                                <div className="rounded bg-blue-50 p-2 text-center">
                                     <div className="text-lg font-bold text-blue-600">{usage.active_users_today}</div>
                                     <div className="text-muted-foreground">Hari Ini</div>
                                 </div>
-                                <div className="text-center p-2 bg-green-50 rounded">
+                                <div className="rounded bg-green-50 p-2 text-center">
                                     <div className="text-lg font-bold text-green-600">{usage.active_users_30d}</div>
                                     <div className="text-muted-foreground">30 Hari</div>
                                 </div>
@@ -94,13 +92,13 @@ export function SystemUsageCard() {
 
                         {/* Engagement Rate */}
                         <div className="space-y-2">
-                            <div className="flex justify-between text-sm text-muted-foreground">
+                            <div className="text-muted-foreground flex justify-between text-sm">
                                 <span>Tingkat Keterlibatan</span>
                                 <span>{usage.user_engagement_rate}%</span>
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div className="h-2 w-full rounded-full bg-gray-200">
                                 <div
-                                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                    className="h-2 rounded-full bg-blue-600 transition-all duration-300"
                                     style={{ width: `${Math.min(usage.user_engagement_rate, 100)}%` }}
                                 />
                             </div>

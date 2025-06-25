@@ -38,6 +38,9 @@ class UpdateInternshipRequest extends FormRequest
             'company_address' => ['required', 'string', 'max:255'],
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after:start_date'],
+            'spp_payment_file' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
+            'kkl_kkn_payment_file' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
+            'practicum_payment_file' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
         ];
     }
 
@@ -55,6 +58,9 @@ class UpdateInternshipRequest extends FormRequest
             'company_address' => 'Alamat Perusahaan/Instansi',
             'start_date' => 'Tanggal Mulai',
             'end_date' => 'Tanggal Selesai',
+            'spp_payment_file' => 'Bukti Pembayaran SPP',
+            'kkl_kkn_payment_file' => 'Bukti Pembayaran KKL/KKN',
+            'practicum_payment_file' => 'Bukti Pembayaran Praktikum',
         ];
     }
 }

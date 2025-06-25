@@ -1,9 +1,9 @@
 import { Icon } from '@/components/icon';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import axios from 'axios';
-import { Users, UserPlus, Activity } from 'lucide-react';
+import { Activity, UserPlus, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 const ROLE_COLORS: { [key: string]: string } = {
     superadmin: '#8b5cf6', // violet-500
@@ -118,10 +118,10 @@ export function UserStatsCard() {
                         {/* Role breakdown */}
                         <div className="space-y-2 text-sm">
                             {stats.users_by_role.map((item) => (
-                                <div key={item.role} className="flex justify-between items-center">
+                                <div key={item.role} className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <div 
-                                            className="w-3 h-3 rounded-full" 
+                                        <div
+                                            className="h-3 w-3 rounded-full"
                                             style={{ backgroundColor: ROLE_COLORS[item.role] || ROLE_COLORS.default }}
                                         />
                                         <span>{ROLE_NAMES_ID[item.role] || item.role}</span>
